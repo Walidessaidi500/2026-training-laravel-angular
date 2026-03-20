@@ -27,7 +27,7 @@ class LoginUser
             throw new InvalidArgumentException('Datos invalidos');
         }
 
-        $isPasswordValid = $this->passwordHasher->verify($plainPassword, $user->PasswordHash());
+        $isPasswordValid = $this->passwordHasher->verify($plainPassword, $user->passwordHash());
 
         if (!$isPasswordValid) {
             throw new InvalidArgumentException('Datos invalidos');
