@@ -2,6 +2,7 @@
 
 namespace App\User\Domain\Interfaces;
 
+use App\Shared\Domain\ValueObject\Email;
 use App\User\Domain\Entity\User;
 
 interface UserRepositoryInterface
@@ -10,6 +11,5 @@ interface UserRepositoryInterface
 
     public function findById(string $id): ?User;
 
-    /*Esto lo que hace es buscar un usuario por su correo electronico*/
     public function findByEmail(Email $email): ?User;
 }

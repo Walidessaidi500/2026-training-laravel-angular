@@ -2,6 +2,7 @@
 
 namespace App\User\Infrastructure\Persistence\Repositories;
 
+use App\Shared\Domain\ValueObject\Email;
 use App\User\Domain\Entity\User;
 use App\User\Domain\Interfaces\UserRepositoryInterface;
 use App\User\Infrastructure\Persistence\Models\EloquentUser;
@@ -34,6 +35,22 @@ class EloquentUserRepository implements UserRepositoryInterface
             return null;
         }
 
+        return $this->toDomainEntity($model);
+    }
+
+    public function findByEmail(Email $email): ?User
+    {
+        $model = $this->model->newQuery()->where('email', $email->value())->first();
+
+        if ($model === null) {
+            return null;
+        }
+
+        return $this->toDomainEntity($model);
+    }
+
+    private function toDomainEntity(EloquentUser $model): User
+    {
         return User::fromPersistence(
             $model->uuid,
             $model->name,

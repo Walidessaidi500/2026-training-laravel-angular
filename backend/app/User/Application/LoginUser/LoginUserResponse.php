@@ -1,9 +1,10 @@
 <?php
+
 namespace App\User\Application\LoginUser;
 
 class LoginUserResponse
 {
-    public function __construct(
+    private function __construct(
         public readonly string $token,
         public readonly string $userName,
         public readonly string $userEmail,
@@ -13,5 +14,17 @@ class LoginUserResponse
     public static function create(string $token, string $userName, string $userEmail): self
     {
         return new self($token, $userName, $userEmail);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function toArray(): array
+    {
+        return [
+            'token' => $this->token,
+            'user_name' => $this->userName,
+            'user_email' => $this->userEmail,
+        ];
     }
 }
