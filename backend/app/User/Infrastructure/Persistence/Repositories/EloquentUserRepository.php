@@ -3,6 +3,7 @@
 namespace App\User\Infrastructure\Persistence\Repositories;
 
 use App\Shared\Domain\ValueObject\Email;
+use App\Shared\Domain\ValueObject\Uuid;
 use App\User\Domain\Entity\User;
 use App\User\Domain\Interfaces\UserRepositoryInterface;
 use App\User\Infrastructure\Persistence\Models\EloquentUser;
@@ -11,7 +12,8 @@ class EloquentUserRepository implements UserRepositoryInterface
 {
     public function __construct(
         private EloquentUser $model,
-    ) {}
+    ) {
+    }
 
     public function save(User $user): void
     {
@@ -27,9 +29,9 @@ class EloquentUserRepository implements UserRepositoryInterface
         );
     }
 
-    public function findById(string $id): ?User
+    public function findById(Uuid $id): ?User
     {
-        $model = $this->model->newQuery()->where('uuid', $id)->first();
+        $model = $this->model->newQuery()->where('uuid', $id->value())->first();
 
         if ($model === null) {
             return null;
