@@ -26,9 +26,7 @@ final readonly class CreateUserResponse
         );
     }
 
-    /**
-     * @return array<string, string>
-     */
+    // @return array<string, string>
     public function toArray(): array
     {
         return [
