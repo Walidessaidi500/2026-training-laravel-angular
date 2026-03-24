@@ -27,3 +27,8 @@ export interface LoginUserResponse {
   }
 }
 
+export interface ApiValidationError {
+  message?: string;
+  fieldErrors?: Record<string, string[]>;
+}
+

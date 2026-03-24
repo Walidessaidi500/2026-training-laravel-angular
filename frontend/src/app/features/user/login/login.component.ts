@@ -1,9 +1,7 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { ApiClientService } from '../../../core/infrastructure/api/api-client.service';
-import { ValidationMessagesService } from '../../../core/validation/validation-messages.service';
-import type { ApiValidationError } from '../../../shared/models/api-error.models';
-import type { LoginUserRequest, LoginUserResponse } from '../../../shared/models/user-api.models';
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, AbstractControl } from '@angular/forms';
+import { BaseApiService } from '../../../services/api/base-api.service';
+import type { LoginUserRequest, LoginUserResponse, ApiValidationError } from '../../../shared/models/user-api.models';
 import { ToastController, IonButton, IonInput, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/infrastructure/auth/auth.service';
@@ -17,8 +15,7 @@ import { AuthService } from '../../../core/infrastructure/auth/auth.service';
 export class LoginComponent implements OnInit {
 
   private readonly fb = inject(FormBuilder);
-  private readonly api = inject(ApiClientService);
-  private readonly validationMessages = inject(ValidationMessagesService);
+  private readonly api = inject(BaseApiService);
   private readonly toastController = inject(ToastController);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly authService = inject(AuthService);
@@ -36,7 +33,12 @@ export class LoginComponent implements OnInit {
   }
 
   getFieldError(controlName: string): string {
-    return this.validationMessages.getControlMessage(this.form.get(controlName), controlName);
+    const control = this.form.get(controlName);
+    if (!control || !control.errors || !control.touched) return '';
+    if (control.errors['required']) return 'El campo es requerido.';
+    if (control.errors['email']) return 'Debe ser un email válido.';
+    if (control.errors['serverError']) return control.errors['serverError'];
+    return 'Campo inválido.';
   }
 
   onSubmit(): void {
@@ -59,8 +61,9 @@ export class LoginComponent implements OnInit {
       password: this.form.value.password
     };
 
-    this.api.post<LoginUserResponse>('/login', payload).subscribe({
-      next: async (response) => {
+    this.api.httpCall('/login', payload, 'post').subscribe({
+      next: async (res: any) => {
+        const response = res.data as LoginUserResponse;
         this.submitting = false;
 
         this.authService.setSession(response.token, response.user);
@@ -76,7 +79,7 @@ export class LoginComponent implements OnInit {
 
         this.router.navigate(['/']); // De momento lo redirigimos a la raíz o al main-layout
       },
-      error: (err) => {
+      error: (err: any) => {
         this.submitting = false;
         const apiError = err.error as ApiValidationError | undefined;
 
@@ -91,7 +94,7 @@ export class LoginComponent implements OnInit {
               });
             }
           }
-          this.formLevelMessage = apiError.message ?? Object.values(apiError.fieldErrors).flat().find(Boolean) ?? '';
+          this.formLevelMessage = apiError.message ?? Object.values(apiError.fieldErrors).reduce((acc: string[], val: string[]) => acc.concat(val), []).find(Boolean) ?? '';
         } else {
           this.formLevelMessage = apiError?.message ?? err.message ?? 'Error de credenciales.';
         }

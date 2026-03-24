@@ -23,6 +23,9 @@ install-frontend:
 db-migrate:
 	docker compose exec api php artisan migrate
 
+db-seed:
+	docker compose exec api php artisan db:seed
+
 test:
 	docker compose exec api php artisan test
 

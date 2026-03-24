@@ -1,9 +1,7 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { ApiClientService } from '../../../core/infrastructure/api/api-client.service';
-import { ValidationMessagesService } from '../../../core/validation/validation-messages.service';
-import type { ApiValidationError } from '../../../shared/models/api-error.models';
-import type { CreateUserRequest } from '../../../shared/models/user-api.models';
+import { BaseApiService } from '../../../services/api/base-api.service';
+import type { CreateUserRequest, ApiValidationError } from '../../../shared/models/user-api.models';
 import { ToastController, IonButton, IonInput, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
 
 @Component({
@@ -15,10 +13,9 @@ import { ToastController, IonButton, IonInput, IonItem, IonLabel, IonNote } from
 })
 export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly api = inject(ApiClientService);
+  private readonly api = inject(BaseApiService);
   private readonly toastController = inject(ToastController);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly validationMessages = inject(ValidationMessagesService);
 
   protected readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
@@ -48,9 +45,15 @@ export class RegisterComponent {
       confirmation !== '' &&
       password !== confirmation
     ) {
-      return this.validationMessages.getMessage('passwordMismatch', null, field);
+      return 'Las contraseñas no coinciden.';
     }
-    return this.validationMessages.getControlMessage(this.form.get(field), field);
+    const control = this.form.get(field);
+    if (!control || !control.errors || !control.touched) return '';
+    if (control.errors['required']) return 'El campo es requerido.';
+    if (control.errors['email']) return 'Debe ser un email válido.';
+    if (control.errors['minlength']) return `Mínimo ${control.errors['minlength'].requiredLength} caracteres.`;
+    if (control.errors['serverError']) return control.errors['serverError'];
+    return 'Campo inválido.';
   }
 
   private clearServerErrors(): void {
@@ -78,7 +81,7 @@ export class RegisterComponent {
     }
     const value = this.form.getRawValue() as CreateUserRequest;
     this.submitting = true;
-    this.api.createUser(value).subscribe({
+    this.api.httpCall('/register', value, 'post').subscribe({
       next: async () => {
         this.submitting = false;
         this.form.reset();
@@ -91,7 +94,7 @@ export class RegisterComponent {
         });
         await toast.present();
       },
-      error: async (err) => {
+      error: async (err: any) => {
         this.submitting = false;
         const apiError = err.error as ApiValidationError | undefined;
         if (apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0) {
@@ -108,7 +111,7 @@ export class RegisterComponent {
           this.form.markAllAsTouched();
           this.formLevelMessage =
             apiError.message ??
-            Object.values(apiError.fieldErrors).flat().find(Boolean) ??
+            Object.values(apiError.fieldErrors).reduce((acc: string[], val: string[]) => acc.concat(val), []).find(Boolean) ??
             '';
         } else {
           this.formLevelMessage = apiError?.message ?? err.message ?? 'Error al registrar.';
