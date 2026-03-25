@@ -9,7 +9,6 @@ import { ToastController, IonButton, IonInput, IonItem, IonLabel, IonNote } from
   standalone: true,
   imports: [ReactiveFormsModule, IonButton, IonInput, IonItem, IonLabel, IonNote],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css',
 })
 export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
@@ -81,7 +80,7 @@ export class RegisterComponent {
     }
     const value = this.form.getRawValue() as CreateUserRequest;
     this.submitting = true;
-    this.api.httpCall('/register', value, 'post').subscribe({
+    this.api.httpCall('/users', value, 'post').subscribe({
       next: async () => {
         this.submitting = false;
         this.form.reset();
@@ -97,8 +96,9 @@ export class RegisterComponent {
       error: async (err: any) => {
         this.submitting = false;
         const apiError = err.error as ApiValidationError | undefined;
-        if (apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0) {
-          for (const [field, messages] of Object.entries(apiError.fieldErrors)) {
+        const validationErrors = apiError?.errors ?? apiError?.fieldErrors;
+        if (validationErrors && Object.keys(validationErrors).length > 0) {
+          for (const [field, messages] of Object.entries(validationErrors)) {
             const control = this.form.get(field);
             const firstMessage = Array.isArray(messages) ? messages[0] : String(messages);
             if (control && firstMessage) {
@@ -110,8 +110,8 @@ export class RegisterComponent {
           }
           this.form.markAllAsTouched();
           this.formLevelMessage =
-            apiError.message ??
-            Object.values(apiError.fieldErrors).reduce((acc: string[], val: string[]) => acc.concat(val), []).find(Boolean) ??
+            apiError?.message ??
+            Object.values(validationErrors).reduce((acc: string[], val: string[]) => acc.concat(val), []).find(Boolean) ??
             '';
         } else {
           this.formLevelMessage = apiError?.message ?? err.message ?? 'Error al registrar.';

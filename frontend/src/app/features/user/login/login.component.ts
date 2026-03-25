@@ -63,7 +63,7 @@ export class LoginComponent implements OnInit {
 
     this.api.httpCall('/login', payload, 'post').subscribe({
       next: async (res: any) => {
-        const response = res.data as LoginUserResponse;
+        const response = res.data ?? res;
         this.submitting = false;
 
         this.authService.setSession(response.token, response.user);
@@ -77,14 +77,15 @@ export class LoginComponent implements OnInit {
         await toast.present();
         this.cdr.detectChanges();
 
-        this.router.navigate(['/']); // De momento lo redirigimos a la raíz o al main-layout
+        this.router.navigate(['/backoffice']); // Redirigimos al backoffice tras login exitoso
       },
-      error: (err: any) => {
+      error: async (err: any) => {
         this.submitting = false;
         const apiError = err.error as ApiValidationError | undefined;
+        const validationErrors = apiError?.errors ?? apiError?.fieldErrors;
 
-        if (apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0) {
-          for (const [field, messages] of Object.entries(apiError.fieldErrors)) {
+        if (validationErrors && Object.keys(validationErrors).length > 0) {
+          for (const [field, messages] of Object.entries(validationErrors)) {
             const control = this.form.get(field);
             const firstMessage = Array.isArray(messages) ? messages[0] : String(messages);
             if (control && firstMessage) {
@@ -94,9 +95,17 @@ export class LoginComponent implements OnInit {
               });
             }
           }
-          this.formLevelMessage = apiError.message ?? Object.values(apiError.fieldErrors).reduce((acc: string[], val: string[]) => acc.concat(val), []).find(Boolean) ?? '';
+          this.formLevelMessage = apiError?.message ?? Object.values(validationErrors).reduce((acc: string[], val: string[]) => acc.concat(val), []).find(Boolean) ?? '';
         } else {
           this.formLevelMessage = apiError?.message ?? err.message ?? 'Error de credenciales.';
+          const toast = await this.toastController.create({
+            message: this.formLevelMessage ?? 'Error de credenciales.',
+            duration: 5000,
+            position: 'bottom',
+            color: 'danger',
+            buttons: [{ text: 'Cerrar', role: 'cancel' }]
+          });
+          await toast.present();
         }
         this.cdr.detectChanges();
       }
