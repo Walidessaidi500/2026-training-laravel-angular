@@ -3,11 +3,12 @@ import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl } from '@
 import { BaseApiService } from '../../../services/api/base-api.service';
 import type { CreateUserRequest, ApiValidationError } from '../../../shared/models/user-api.models';
 import { ToastController, IonButton, IonInput, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, IonButton, IonInput, IonItem, IonLabel, IonNote],
+  imports: [ReactiveFormsModule, IonButton, IonInput, IonItem, IonLabel, IonNote, RouterLink],
   templateUrl: './register.component.html',
 })
 export class RegisterComponent {
@@ -15,6 +16,7 @@ export class RegisterComponent {
   private readonly api = inject(BaseApiService);
   private readonly toastController = inject(ToastController);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
 
   protected readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
@@ -92,6 +94,7 @@ export class RegisterComponent {
           buttons: [{ text: 'Cerrar', role: 'cancel' }]
         });
         await toast.present();
+        this.router.navigate(['/login']);
       },
       error: async (err: any) => {
         this.submitting = false;

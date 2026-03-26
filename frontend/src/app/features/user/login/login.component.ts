@@ -3,12 +3,12 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, AbstractContro
 import { BaseApiService } from '../../../services/api/base-api.service';
 import type { LoginUserRequest, LoginUserResponse, ApiValidationError } from '../../../shared/models/user-api.models';
 import { ToastController, IonButton, IonInput, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/infrastructure/auth/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, IonButton, IonInput, IonItem, IonLabel, IonNote],
+  imports: [ReactiveFormsModule, IonButton, IonInput, IonItem, IonLabel, IonNote, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })

@@ -1,30 +1,7 @@
 <ion-split-pane contentId="main-content" when="md">
   <ion-menu contentId="main-content" type="overlay">
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>TPV Backoffice</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <ion-list lines="none" class="menu-list">
-        @for (item of menuItems; track item.route) {
-        <ion-menu-toggle autoHide="false">
-          <ion-item [routerLink]="item.route" routerLinkActive="menu-item-active"
-            [routerLinkActiveOptions]="{ exact: false }" class="menu-item" button detail="8false">
-            <ion-icon [name]="item.icon" slot="start"></ion-icon>
-            <ion-label>{{ item.label }}</ion-label>
-          </ion-item>
-        </ion-menu-toggle>
-        }
-      </ion-list>
-
-      <div class="menu-footer">
-        <ion-item button detail="false" (click)="logout()" class="menu-item logout-item">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon>
-          <ion-label>Cerrar sesión</ion-label>
-        </ion-item>
-      </div>
-    </ion-content>
+    <app-sidebar mode="nav" title="Backoffice" [menuItems]="menuItems" (logout)="logout()">
+    </app-sidebar>
   </ion-menu>
 
   <div id="main-content" class="main-content">

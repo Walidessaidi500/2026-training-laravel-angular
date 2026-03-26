@@ -43,6 +43,9 @@
     <ion-button color="primary" type="submit" [disabled]="form.invalid || submitting" expand="block">
       {{ submitting ? 'Enviando…' : 'Registrarse' }}
     </ion-button>
+    <ion-button fill="clear" expand="block" routerLink="/login" [disabled]="submitting">
+      ¿Ya tienes cuenta? Inicia sesión
+    </ion-button>
   </div>
 
 </form>

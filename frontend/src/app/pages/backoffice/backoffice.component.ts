@@ -1,18 +1,9 @@
 import { Component, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
-import {
-  IonSplitPane,
-  IonMenu,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonList,
-  IonItem,
-  IonIcon,
-  IonLabel,
-  IonMenuToggle,
-} from '@ionic/angular/standalone';
+import { RouterOutlet, Router } from '@angular/router';
+import { IonSplitPane, IonMenu } from '@ionic/angular/standalone';
+import { SidebarComponent } from '../../components/layout/sidebar/sidebar.component';
+import { AuthService } from '../../core/infrastructure/auth/auth.service';
+
 import { addIcons } from 'ionicons';
 import {
   gridOutline,
@@ -23,26 +14,15 @@ import {
   restaurantOutline,
   logOutOutline,
 } from 'ionicons/icons';
-import { AuthService } from '../../core/infrastructure/auth/auth.service';
 
 @Component({
   selector: 'app-backoffice',
   standalone: true,
   imports: [
     RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
     IonSplitPane,
     IonMenu,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonList,
-    IonItem,
-    IonIcon,
-    IonLabel,
-    IonMenuToggle,
+    SidebarComponent,
   ],
   templateUrl: './backoffice.component.html',
   styleUrls: ['./backoffice.component.css'],
