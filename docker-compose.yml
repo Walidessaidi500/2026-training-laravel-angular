@@ -32,6 +32,8 @@ services:
       MYSQL_DATABASE: training
     ports:
       - "3306:3306"
+    volumes:
+      - ./docker/db-data:/var/lib/mysql
 
   dbgate:
     image: dbgate/dbgate

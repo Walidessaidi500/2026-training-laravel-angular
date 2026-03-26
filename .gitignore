@@ -69,3 +69,6 @@ docker/dbgate-data/
 # Logs y cachés genéricos
 *.log
 .cache/
+
+# Añadir al final de tu .gitignore
+docker/db-data/

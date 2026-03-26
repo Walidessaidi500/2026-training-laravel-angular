@@ -1,8 +1,37 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>TPV - Yurest</ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title>Restaurante Voraz</ion-title>
+    <ion-buttons slot="end">
+      <app-button color="light" fill="clear">
+        <ion-icon slot="icon-only" name="person-circle-outline"></ion-icon>
+      </app-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar color="light">
+    <ion-segment value="mesas">
+      <ion-segment-button value="mesas">
+        <ion-label>Mesas</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pedidos">
+        <ion-label>Pedidos</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content color="light" class="ion-padding">
+  <div class="tpv-grid">
+     <app-card title="Mesa 7 - Terraza">
+        <p>Cliente: Walid</p>
+        <p>Estado: Ocupada</p>
+        <app-button expand="block" color="primary">Ver detalle</app-button>
+        <app-button expand="block" fill="outline" color="secondary" style="margin-top: 8px;">Cerrar cuenta</app-button>
+     </app-card>
+
+     <app-card title="Mesa 8 - Terraza">
+        <p>Estado: Libre</p>
+        <app-button expand="block" color="tertiary">Comenzar Pedido</app-button>
+     </app-card>
+  </div>
 </ion-content>

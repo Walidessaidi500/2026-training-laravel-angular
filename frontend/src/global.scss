@@ -35,3 +35,39 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 /* @import '@ionic/angular/css/palettes/dark.system.css'; */
+
+// Global TPV Styling
+ion-toolbar {
+  --background: var(--ion-color-light);
+  --border-color: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
+
+ion-button {
+  --border-radius: 8px;
+  text-transform: none;
+  font-weight: 600;
+}
+
+ion-item {
+  --border-radius: 8px;
+}
+
+ion-segment {
+  --background: transparent;
+}
+
+ion-segment-button {
+  --indicator-color: var(--ion-color-primary);
+  --color-checked: var(--ion-color-primary);
+  text-transform: none;
+  font-weight: 500;
+}
+
+.tpv-card {
+  background: var(--ion-color-light-tint);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 12px;
+}

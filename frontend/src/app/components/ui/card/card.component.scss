@@ -1,0 +1,24 @@
+ion-card {
+  --background: var(--ion-color-light-tint);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  margin: 0 0 16px 0;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+
+  ion-card-header {
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+    ion-card-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--ion-color-dark);
+    }
+  }
+
+  ion-card-content {
+    padding-top: 16px;
+    font-size: 0.95rem;
+    color: var(--ion-color-dark-shade);
+  }
+}
