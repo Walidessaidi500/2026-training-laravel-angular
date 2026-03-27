@@ -115,7 +115,7 @@ export abstract class BaseApiService {
    *
    */
   private handleError(error: HttpErrorResponse): Observable<never> {
-    return throwError(() => error);
+    return throwError(() => new Error(error.message));
   }
 
 }
