@@ -1,3 +1,83 @@
-<p>
-  product-form works!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/backoffice/products" text="Atrás"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEdit ? 'Editar Producto' : 'Nuevo Producto' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" [disabled]="form.invalid" color="primary" fill="solid">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
+        Guardar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="form-container">
+    <form [formGroup]="form" class="tpv-card">
+      <div class="image-section">
+        <div class="image-preview">
+          @if (form.get('imageSrc')?.value) {
+            <img [src]="form.get('imageSrc')?.value" alt="Preview" />
+          } @else {
+            <div class="placeholder">
+              <ion-icon name="camera-outline"></ion-icon>
+            </div>
+          }
+        </div>
+        <ion-item lines="none" class="image-input">
+          <ion-label position="stacked">URL de la imagen</ion-label>
+          <ion-input formControlName="imageSrc" placeholder="https://..."></ion-input>
+        </ion-item>
+      </div>
+
+      <ion-list lines="full">
+        <ion-item>
+          <ion-label position="stacked">Nombre del producto</ion-label>
+          <ion-input formControlName="name" placeholder="Ej: Pizza Margarita"></ion-input>
+        </ion-item>
+
+        <div class="grid-row">
+          <ion-item class="grid-col">
+            <ion-label position="stacked">Familia</ion-label>
+            <ion-select formControlName="familyUuid" placeholder="Seleccionar" labelPlacement="stacked">
+              @for (family of families; track family.uuid) {
+                <ion-select-option [value]="family.uuid">{{ family.name }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <ion-item class="grid-col">
+            <ion-label position="stacked">Impuesto (IVA)</ion-label>
+            <ion-select formControlName="taxUuid" placeholder="Seleccionar" labelPlacement="stacked">
+              @for (tax of taxes; track tax.uuid) {
+                <ion-select-option [value]="tax.uuid">{{ tax.name }} ({{ tax.percentage }}%)</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <div class="grid-row">
+          <ion-item class="grid-col">
+            <ion-label position="stacked">Precio (€)</ion-label>
+            <ion-input type="number" formControlName="price" placeholder="0.00"></ion-input>
+          </ion-item>
+
+          <ion-item class="grid-col">
+            <ion-label position="stacked">Stock actual</ion-label>
+            <ion-input type="number" formControlName="stock" placeholder="0"></ion-input>
+          </ion-item>
+        </div>
+
+        <ion-item lines="none" class="toggle-item">
+          <ion-label>
+            <h3>Producto activo</h3>
+            <p>Habilita o deshabilita la venta de este producto en el TPV</p>
+          </ion-label>
+          <ion-toggle formControlName="active" slot="end" color="primary"></ion-toggle>
+        </ion-item>
+      </ion-list>
+    </form>
+  </div>
+</ion-content>

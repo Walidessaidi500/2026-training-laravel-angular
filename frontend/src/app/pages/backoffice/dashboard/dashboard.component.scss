@@ -1,0 +1,75 @@
+.dashboard-container {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stat-card {
+  margin: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 16px;
+  border: 1px solid rgba(var(--ion-color-medium-rgb), 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+
+  .card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    
+    ion-icon {
+      font-size: 2rem;
+      color: white;
+    }
+
+    &.products { background: #4dabf7; }
+    &.families { background: #ff922b; }
+    &.zones { background: #51cf66; }
+    &.tables { background: #cc5de8; }
+  }
+
+  ion-card-header {
+    padding: 12px;
+    
+    ion-card-subtitle {
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    ion-card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--ion-color-dark);
+      margin-top: 4px;
+    }
+  }
+}
+
+.welcome-section {
+  margin-top: 24px;
+  padding: 32px;
+  text-align: center;
+  background: white;
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: var(--ion-color-primary);
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}

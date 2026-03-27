@@ -7,12 +7,6 @@ import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { InterceptorProvider } from './app/providers/interceptor';
 
-bootstrapApplication(AppComponent, {
-  providers: [
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    { provide: HTTP_INTERCEPTORS, useClass: InterceptorProvider, multi: true },
-    provideIonicAngular({ mode: 'ios' }),
-    provideHttpClient(withInterceptorsFromDi(), withFetch()),
-    provideRouter(routes, withPreloading(PreloadAllModules)),
-  ],
-});
+import { appConfig } from './app/app.config';
+
+bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));

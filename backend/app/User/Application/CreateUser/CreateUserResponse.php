@@ -12,8 +12,7 @@ final readonly class CreateUserResponse
         public string $email,
         public string $createdAt,
         public string $updatedAt,
-    ) {
-    }
+    ) {}
 
     public static function create(User $user): self
     {

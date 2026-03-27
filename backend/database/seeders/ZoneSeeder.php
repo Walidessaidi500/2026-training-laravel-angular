@@ -25,7 +25,7 @@ class ZoneSeeder extends Seeder
             for ($i = 1; $i <= $tableCount; $i++) {
                 EloquentTable::factory()->create([
                     'zone_id' => $zone->id,
-                    'name' => 'Mesa ' . $tableCounter,
+                    'name' => 'Mesa '.$tableCounter,
                 ]);
                 $tableCounter++;
             }

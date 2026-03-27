@@ -8,8 +8,7 @@ class LoginUserResponse
         public readonly string $token,
         public readonly string $userName,
         public readonly string $userEmail,
-    ) {
-    }
+    ) {}
 
     public static function create(string $token, string $userName, string $userEmail): self
     {

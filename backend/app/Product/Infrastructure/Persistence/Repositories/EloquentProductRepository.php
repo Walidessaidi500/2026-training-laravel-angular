@@ -2,10 +2,12 @@
 
 namespace App\Product\Infrastructure\Persistence\Repositories;
 
+use App\Family\Infrastructure\Persistence\Models\EloquentFamily;
 use App\Product\Domain\Entity\Product;
 use App\Product\Domain\Interfaces\ProductRepositoryInterface;
 use App\Product\Infrastructure\Persistence\Models\EloquentProduct;
 use App\Shared\Domain\ValueObject\Uuid;
+use App\Tax\Infrastructure\Persistence\Models\EloquentTax;
 
 class EloquentProductRepository implements ProductRepositoryInterface
 {
@@ -81,11 +83,11 @@ class EloquentProductRepository implements ProductRepositoryInterface
 
     private function resolveFamilyId(Uuid $familyUuid): int
     {
-        return \App\Family\Infrastructure\Persistence\Models\EloquentFamily::where('uuid', $familyUuid->value())->firstOrFail()->id;
+        return EloquentFamily::where('uuid', $familyUuid->value())->firstOrFail()->id;
     }
 
     private function resolveTaxId(Uuid $taxUuid): int
     {
-        return \App\Tax\Infrastructure\Persistence\Models\EloquentTax::where('uuid', $taxUuid->value())->firstOrFail()->id;
+        return EloquentTax::where('uuid', $taxUuid->value())->firstOrFail()->id;
     }
 }

@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Zone\Infrastructure\Persistence\Models\EloquentZone;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 class ZoneFactory extends Factory
 {
-    protected $model = \App\Zone\Infrastructure\Persistence\Models\EloquentZone::class;
+    protected $model = EloquentZone::class;
 
     /**
      * @return array<string, mixed>

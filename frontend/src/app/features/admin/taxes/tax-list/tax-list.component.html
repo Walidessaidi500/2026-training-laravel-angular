@@ -1,3 +1,44 @@
-<p>
-  tax-list works!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Impuestos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/backoffice/taxes/new']" fill="solid" color="primary">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Nuevo Impuesto
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="list-container">
+    <ion-list lines="none">
+      @for (tax of taxes; track tax.uuid) {
+        <ion-item class="tax-item tpv-card">
+          <ion-icon name="receipt-outline" slot="start" color="primary" class="tax-icon"></ion-icon>
+          
+          <ion-label>
+            <h2>{{ tax.name }}</h2>
+            <p>Porcentaje: {{ tax.percentage }}%</p>
+          </ion-label>
+
+          <div slot="end" class="item-actions">
+            <div class="buttons">
+              <ion-button fill="clear" color="primary" [routerLink]="['/backoffice/taxes/edit', tax.uuid]">
+                <ion-icon name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" (click)="deleteTax(tax.uuid)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </ion-item>
+      } @empty {
+        <div class="empty-state">
+          <ion-icon name="receipt-outline"></ion-icon>
+          <p>No se encontraron impuestos</p>
+        </div>
+      }
+    </ion-list>
+  </div>
+</ion-content>

@@ -1,3 +1,35 @@
-<p>
-  family-form works!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/backoffice/families" text="Atrás"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEdit ? 'Editar Familia' : 'Nueva Familia' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" [disabled]="form.invalid" color="primary" fill="solid">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
+        Guardar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="form-container">
+    <form [formGroup]="form" class="tpv-card">
+      <ion-list lines="full">
+        <ion-item>
+          <ion-label position="stacked">Nombre de la familia</ion-label>
+          <ion-input formControlName="name" placeholder="Ej: Bebidas"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="toggle-item">
+          <ion-label>
+            <h3>Familia activa</h3>
+            <p>Habilita o deshabilita todos los productos de esta familia</p>
+          </ion-label>
+          <ion-toggle formControlName="active" slot="end" color="primary"></ion-toggle>
+        </ion-item>
+      </ion-list>
+    </form>
+  </div>
+</ion-content>

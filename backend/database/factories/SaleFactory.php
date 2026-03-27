@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Sale\Infrastructure\Persistence\Models\EloquentSale;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 class SaleFactory extends Factory
 {
-    protected $model = \App\Sale\Infrastructure\Persistence\Models\EloquentSale::class;
+    protected $model = EloquentSale::class;
 
     /**
      * @return array<string, mixed>

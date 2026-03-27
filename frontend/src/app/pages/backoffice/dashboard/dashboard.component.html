@@ -1,3 +1,66 @@
-<p>
-  dashboard works!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Dashboard</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="dashboard-container">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="3">
+          <ion-card class="stat-card">
+            <div class="card-icon products">
+              <ion-icon name="fast-food-outline"></ion-icon>
+            </div>
+            <ion-card-header>
+              <ion-card-subtitle>Catálogo</ion-card-subtitle>
+              <ion-card-title>{{ stats.products }} Productos</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6" size-lg="3">
+          <ion-card class="stat-card">
+            <div class="card-icon families">
+              <ion-icon name="pricetags-outline"></ion-icon>
+            </div>
+            <ion-card-header>
+              <ion-card-subtitle>Categorización</ion-card-subtitle>
+              <ion-card-title>{{ stats.families }} Familias</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6" size-lg="3">
+          <ion-card class="stat-card">
+            <div class="card-icon zones">
+              <ion-icon name="map-outline"></ion-icon>
+            </div>
+            <ion-card-header>
+              <ion-card-subtitle>Salón</ion-card-subtitle>
+              <ion-card-title>{{ stats.zones }} Zonas</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6" size-lg="3">
+          <ion-card class="stat-card">
+            <div class="card-icon tables">
+              <ion-icon name="restaurant-outline"></ion-icon>
+            </div>
+            <ion-card-header>
+              <ion-card-subtitle>Aforo</ion-card-subtitle>
+              <ion-card-title>{{ stats.tables }} Mesas</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div class="welcome-section tpv-card">
+      <h2>Bienvenido al Backoffice</h2>
+      <p>Desde aquí puedes gestionar el sistema. Usa el menú lateral para navegar entre las distintas secciones.</p>
+    </div>
+  </div>
+</ion-content>

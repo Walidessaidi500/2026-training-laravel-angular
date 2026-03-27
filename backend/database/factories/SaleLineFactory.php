@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Sale\Infrastructure\Persistence\Models\EloquentSaleLine;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 class SaleLineFactory extends Factory
 {
-    protected $model = \App\Sale\Infrastructure\Persistence\Models\EloquentSaleLine::class;
+    protected $model = EloquentSaleLine::class;
 
     /**
      * @return array<string, mixed>

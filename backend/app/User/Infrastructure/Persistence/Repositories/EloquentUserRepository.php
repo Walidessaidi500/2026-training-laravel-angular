@@ -12,8 +12,7 @@ class EloquentUserRepository implements UserRepositoryInterface
 {
     public function __construct(
         private EloquentUser $model,
-    ) {
-    }
+    ) {}
 
     public function save(User $user): void
     {

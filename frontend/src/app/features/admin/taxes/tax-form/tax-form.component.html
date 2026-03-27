@@ -1,3 +1,32 @@
-<p>
-  tax-form works!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/backoffice/taxes" text="Atrás"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEdit ? 'Editar Impuesto' : 'Nuevo Impuesto' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" [disabled]="form.invalid" color="primary" fill="solid">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
+        Guardar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="form-container">
+    <form [formGroup]="form" class="tpv-card">
+      <ion-list lines="full">
+        <ion-item>
+          <ion-label position="stacked">Nombre del impuesto</ion-label>
+          <ion-input formControlName="name" placeholder="Ej: IVA General"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Porcentaje (%)</ion-label>
+          <ion-input type="number" formControlName="percentage" placeholder="21"></ion-input>
+        </ion-item>
+      </ion-list>
+    </form>
+  </div>
+</ion-content>

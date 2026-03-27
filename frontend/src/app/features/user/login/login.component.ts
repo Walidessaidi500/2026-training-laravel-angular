@@ -66,7 +66,11 @@ export class LoginComponent implements OnInit {
         const response = res.data ?? res;
         this.submitting = false;
 
-        this.authService.setSession(response.token, response.user);
+        this.authService.setSession(response.token, {
+          id: '', // Backend no devuelve ID en el login actual, pero es opcional
+          name: response.user_name,
+          email: response.user_email
+        });
 
         const toast = await this.toastController.create({
           message: '¡Login exitoso! Redirigiendo...',

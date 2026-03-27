@@ -1,3 +1,58 @@
-<p>
-  family-list works!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Familias</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/backoffice/families/new']" fill="solid" color="primary">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Nueva Familia
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar 
+      placeholder="Buscar familia..." 
+      (ionInput)="handleSearch($event)"
+      class="custom-search"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="list-container">
+    <ion-list lines="none">
+      @for (family of filteredFamilies; track family.uuid) {
+        <ion-item class="family-item tpv-card">
+          <ion-icon name="pricetags-outline" slot="start" color="primary" class="family-icon"></ion-icon>
+          
+          <ion-label>
+            <h2>{{ family.name }}</h2>
+            <p>Estado: {{ family.active ? 'Activa' : 'Inactiva' }}</p>
+          </ion-label>
+
+          <div slot="end" class="item-actions">
+            <ion-badge [color]="family.active ? 'success' : 'medium'" class="status-badge">
+              {{ family.active ? 'Activa' : 'Inactiva' }}
+            </ion-badge>
+            
+            <div class="buttons">
+              <ion-button fill="clear" color="medium" (click)="toggleActive(family)">
+                <ion-icon [name]="family.active ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="primary" [routerLink]="['/backoffice/families/edit', family.uuid]">
+                <ion-icon name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" (click)="deleteFamily(family.uuid)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </ion-item>
+      } @empty {
+        <div class="empty-state">
+          <ion-icon name="pricetags-outline"></ion-icon>
+          <p>No se encontraron familias</p>
+        </div>
+      }
+    </ion-list>
+  </div>
+</ion-content>

@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Family\Infrastructure\Persistence\Models\EloquentFamily;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 class FamilyFactory extends Factory
 {
-    protected $model = \App\Family\Infrastructure\Persistence\Models\EloquentFamily::class;
+    protected $model = EloquentFamily::class;
 
     /**
      * @return array<string, mixed>

@@ -1,3 +1,63 @@
-<p>
-  product-list funciona!
-</p>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Productos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/backoffice/products/new']" fill="solid" color="primary">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Nuevo Producto
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar 
+      placeholder="Buscar por nombre..." 
+      (ionInput)="handleSearch($event)"
+      class="custom-search"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="list-container">
+    <ion-list lines="none">
+      @for (product of filteredProducts; track product.uuid) {
+        <ion-item class="product-item tpv-card">
+          <ion-thumbnail slot="start">
+            <img [src]="product.imageSrc || 'assets/placeholder-product.png'" [alt]="product.name" />
+          </ion-thumbnail>
+          
+          <ion-label>
+            <h2>{{ product.name }}</h2>
+            <p>Stock: <span [ngClass]="{'low-stock': product.stock <= 5}">{{ product.stock }}</span> uds.</p>
+            <div class="price-badge">
+              {{ formatPrice(product.price) }}
+            </div>
+          </ion-label>
+
+          <div slot="end" class="item-actions">
+            <ion-badge [color]="product.active ? 'success' : 'medium'" class="status-badge">
+              {{ product.active ? 'Activo' : 'Inactivo' }}
+            </ion-badge>
+            
+            <div class="buttons">
+              <ion-button fill="clear" color="medium" (click)="toggleActive(product)">
+                <ion-icon [name]="product.active ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="primary" [routerLink]="['/backoffice/products/edit', product.uuid]">
+                <ion-icon name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" (click)="deleteProduct(product.uuid)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </ion-item>
+      } @empty {
+        <div class="empty-state">
+          <ion-icon name="fast-food-outline"></ion-icon>
+          <p>No se encontraron productos</p>
+        </div>
+      }
+    </ion-list>
+  </div>
+</ion-content>

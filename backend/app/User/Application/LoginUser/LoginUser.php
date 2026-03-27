@@ -14,8 +14,7 @@ class LoginUser
         private UserRepositoryInterface $userRepository,
         private PasswordHasherInterface $passwordHasher,
         private TokenGeneratorInterface $tokenGenerator,
-    ) {
-    }
+    ) {}
 
     public function execute(string $plainEmail, string $plainPassword): LoginUserResponse
     {
@@ -29,7 +28,7 @@ class LoginUser
 
         $isPasswordValid = $this->passwordHasher->verify($plainPassword, $user->passwordHash());
 
-        if (!$isPasswordValid) {
+        if (! $isPasswordValid) {
             throw new InvalidArgumentException('Datos invalidos');
         }
 
