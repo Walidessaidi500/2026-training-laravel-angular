@@ -1,0 +1,11 @@
+<ion-card [class]="'stat-card stat-card--' + color">
+  <ion-card-content>
+    <div class="stat-icon">
+      <ion-icon [name]="icon"></ion-icon>
+    </div>
+    <div class="stat-content">
+      <p class="stat-label">{{ label }}</p>
+      <p class="stat-value">{{ value }}</p>
+    </div>
+  </ion-card-content>
+</ion-card>

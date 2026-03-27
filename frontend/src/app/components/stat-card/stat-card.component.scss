@@ -1,0 +1,111 @@
+.stat-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 0;
+
+  ion-card-content {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &.stat-card--primary {
+    --background: var(--ion-color-primary);
+
+    .stat-icon {
+      background: rgba(255, 83, 48, 0.15);
+    }
+
+    .stat-label,
+    .stat-value {
+      color: var(--ion-color-primary-contrast);
+    }
+  }
+
+  &.stat-card--secondary {
+    --background: var(--ion-color-secondary);
+
+    .stat-icon {
+      background: rgba(17, 17, 17, 0.15);
+    }
+
+    .stat-label,
+    .stat-value {
+      color: var(--ion-color-secondary-contrast);
+    }
+  }
+
+  &.stat-card--tertiary {
+    --background: var(--ion-color-tertiary);
+
+    .stat-icon {
+      background: rgba(1, 94, 185, 0.15);
+    }
+
+    .stat-label,
+    .stat-value {
+      color: var(--ion-color-tertiary-contrast);
+    }
+  }
+
+  &.stat-card--success {
+    --background: var(--ion-color-success);
+
+    .stat-icon {
+      background: rgba(45, 211, 111, 0.15);
+    }
+
+    .stat-label,
+    .stat-value {
+      color: var(--ion-color-success-contrast);
+    }
+  }
+
+  &.stat-card--danger {
+    --background: var(--ion-color-danger);
+
+    .stat-icon {
+      background: rgba(235, 68, 90, 0.15);
+    }
+
+    .stat-label,
+    .stat-value {
+      color: var(--ion-color-danger-contrast);
+    }
+  }
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+
+  ion-icon {
+    font-size: 24px;
+  }
+}
+
+.stat-content {
+  flex: 1;
+
+  .stat-label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-value {
+    margin: 4px 0 0 0;
+    font-size: 24px;
+    font-weight: 700;
+  }
+}
