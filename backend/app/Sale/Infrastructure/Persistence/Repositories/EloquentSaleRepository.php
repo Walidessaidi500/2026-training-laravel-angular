@@ -3,11 +3,11 @@
 namespace App\Sale\Infrastructure\Persistence\Repositories;
 
 use App\Sale\Infrastructure\Persistence\Models\EloquentSale;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EloquentSaleRepository
 {
-    public function list(int $page = 1, int $perPage = 15): Paginator
+    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator
     {
         return EloquentSale::paginate($perPage, ['*'], 'page', $page);
     }
@@ -25,6 +25,7 @@ class EloquentSaleRepository
     public function save(EloquentSale $sale): EloquentSale
     {
         $sale->save();
+
         return $sale;
     }
 

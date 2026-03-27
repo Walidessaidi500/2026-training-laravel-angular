@@ -8,7 +8,7 @@ use App\Product\Domain\ValueObject\Stock;
 use App\Shared\Domain\ValueObject\DomainDateTime;
 use App\Shared\Domain\ValueObject\Uuid;
 
-class Product
+class Product implements \JsonSerializable
 {
     private function __construct(
         private Uuid $id,
@@ -144,5 +144,21 @@ class Product
     public function updatedAt(): DomainDateTime
     {
         return $this->updatedAt;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'uuid' => $this->id->value(),
+            'family_uuid' => $this->familyId->value(),
+            'tax_uuid' => $this->taxId->value(),
+            'name' => $this->name->value(),
+            'price' => $this->price->value(),
+            'stock' => $this->stock->value(),
+            'active' => $this->active,
+            'image_src' => $this->imageSrc,
+            'created_at' => $this->createdAt->value()->format('Y-m-d\TH:i:s.u\Z'),
+            'updated_at' => $this->updatedAt->value()->format('Y-m-d\TH:i:s.u\Z'),
+        ];
     }
 }

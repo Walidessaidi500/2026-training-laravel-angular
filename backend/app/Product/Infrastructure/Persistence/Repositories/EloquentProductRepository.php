@@ -8,6 +8,7 @@ use App\Product\Domain\Interfaces\ProductRepositoryInterface;
 use App\Product\Infrastructure\Persistence\Models\EloquentProduct;
 use App\Shared\Domain\ValueObject\Uuid;
 use App\Tax\Infrastructure\Persistence\Models\EloquentTax;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EloquentProductRepository implements ProductRepositoryInterface
 {
@@ -58,6 +59,15 @@ class EloquentProductRepository implements ProductRepositoryInterface
             ->get()
             ->map(fn (EloquentProduct $model) => $this->toDomainEntity($model))
             ->all();
+    }
+
+    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->newQuery()
+            ->with(['family', 'tax'])
+            ->orderBy('name')
+            ->paginate($perPage, ['*'], 'page', $page)
+            ->through(fn (EloquentProduct $model) => $this->toDomainEntity($model));
     }
 
     public function delete(Uuid $id): void

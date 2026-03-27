@@ -6,7 +6,7 @@ use App\Family\Domain\ValueObject\FamilyName;
 use App\Shared\Domain\ValueObject\DomainDateTime;
 use App\Shared\Domain\ValueObject\Uuid;
 
-class Family
+class Family implements \JsonSerializable
 {
     private function __construct(
         private Uuid $id,
@@ -80,5 +80,16 @@ class Family
     public function updatedAt(): DomainDateTime
     {
         return $this->updatedAt;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'uuid' => $this->id->value(),
+            'name' => $this->name->value(),
+            'active' => $this->active,
+            'created_at' => $this->createdAt->value()->format('Y-m-d\TH:i:s.u\Z'),
+            'updated_at' => $this->updatedAt->value()->format('Y-m-d\TH:i:s.u\Z'),
+        ];
     }
 }

@@ -17,7 +17,7 @@ class UserController
         $perPage = $request->query('per_page', 15);
         $page = $request->query('page', 1);
 
-        $users = $this->userRepository->list($page, $perPage);
+        $users = EloquentUser::paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
             'data' => $users->items(),
@@ -34,7 +34,7 @@ class UserController
     {
         $user = $this->userRepository->find($uuid);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
@@ -69,13 +69,13 @@ class UserController
     {
         $user = $this->userRepository->find($uuid);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
         $validated = $request->validate([
             'name' => 'string|max:255',
-            'email' => 'email|unique:users,email,' . $user->id,
+            'email' => 'email|unique:users,email,'.$user->id,
             'password' => 'nullable|string|min:6',
             'role' => 'string|in:admin,supervisor,operator',
             'pin' => 'nullable|string|max:10',
@@ -110,7 +110,7 @@ class UserController
     {
         $user = $this->userRepository->find($uuid);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
@@ -123,7 +123,7 @@ class UserController
     {
         $user = $this->userRepository->find($uuid);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 

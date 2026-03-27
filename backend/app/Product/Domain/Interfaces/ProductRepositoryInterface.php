@@ -4,6 +4,7 @@ namespace App\Product\Domain\Interfaces;
 
 use App\Product\Domain\Entity\Product;
 use App\Shared\Domain\ValueObject\Uuid;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface ProductRepositoryInterface
 {
@@ -15,6 +16,8 @@ interface ProductRepositoryInterface
      * @return Product[]
      */
     public function findAll(): array;
+
+    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator;
 
     public function delete(Uuid $id): void;
 }

@@ -5,26 +5,39 @@ namespace App\Product\Infrastructure\Entrypoint\Http;
 use App\Product\Application\CreateProduct\CreateProduct;
 use App\Product\Application\DeleteProduct\DeleteProduct;
 use App\Product\Application\GetProduct\GetProduct;
-use App\Product\Application\ListProducts\ListProducts;
 use App\Product\Application\ToggleProductActive\ToggleProductActive;
 use App\Product\Application\UpdateProduct\UpdateProduct;
+use App\Product\Domain\Interfaces\ProductRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ProductController
 {
     public function __construct(
+        private ProductRepositoryInterface $productRepository,
         private CreateProduct $createProduct,
         private UpdateProduct $updateProduct,
         private DeleteProduct $deleteProduct,
-        private ListProducts $listProducts,
         private GetProduct $getProduct,
         private ToggleProductActive $toggleProductActive,
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return new JsonResponse(($this->listProducts)(), 200);
+        $perPage = $request->query('per_page', 15);
+        $page = $request->query('page', 1);
+
+        $products = $this->productRepository->list($page, $perPage);
+
+        return response()->json([
+            'data' => $products->items(),
+            'meta' => [
+                'current_page' => $products->currentPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'last_page' => $products->lastPage(),
+            ],
+        ]);
     }
 
     public function show(string $uuid): JsonResponse

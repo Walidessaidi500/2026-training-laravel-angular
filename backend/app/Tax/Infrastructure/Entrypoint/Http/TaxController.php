@@ -5,24 +5,37 @@ namespace App\Tax\Infrastructure\Entrypoint\Http;
 use App\Tax\Application\CreateTax\CreateTax;
 use App\Tax\Application\DeleteTax\DeleteTax;
 use App\Tax\Application\GetTax\GetTax;
-use App\Tax\Application\ListTaxes\ListTaxes;
 use App\Tax\Application\UpdateTax\UpdateTax;
+use App\Tax\Domain\Interfaces\TaxRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TaxController
 {
     public function __construct(
+        private TaxRepositoryInterface $taxRepository,
         private CreateTax $createTax,
         private UpdateTax $updateTax,
         private DeleteTax $deleteTax,
-        private ListTaxes $listTaxes,
         private GetTax $getTax,
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return new JsonResponse(($this->listTaxes)(), 200);
+        $perPage = $request->query('per_page', 15);
+        $page = $request->query('page', 1);
+
+        $taxes = $this->taxRepository->list($page, $perPage);
+
+        return response()->json([
+            'data' => $taxes->items(),
+            'meta' => [
+                'current_page' => $taxes->currentPage(),
+                'per_page' => $taxes->perPage(),
+                'total' => $taxes->total(),
+                'last_page' => $taxes->lastPage(),
+            ],
+        ]);
     }
 
     public function show(string $uuid): JsonResponse

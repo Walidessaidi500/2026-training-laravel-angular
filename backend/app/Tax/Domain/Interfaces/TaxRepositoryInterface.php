@@ -4,6 +4,7 @@ namespace App\Tax\Domain\Interfaces;
 
 use App\Shared\Domain\ValueObject\Uuid;
 use App\Tax\Domain\Entity\Tax;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface TaxRepositoryInterface
 {
@@ -15,6 +16,8 @@ interface TaxRepositoryInterface
      * @return Tax[]
      */
     public function findAll(): array;
+
+    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator;
 
     public function delete(Uuid $id): void;
 }

@@ -34,7 +34,7 @@ class SaleController
     {
         $sale = $this->saleRepository->find($uuid);
 
-        if (!$sale) {
+        if (! $sale) {
             return response()->json(['message' => 'Sale not found'], 404);
         }
 
@@ -68,7 +68,7 @@ class SaleController
     {
         $sale = $this->saleRepository->find($uuid);
 
-        if (!$sale) {
+        if (! $sale) {
             return response()->json(['message' => 'Sale not found'], 404);
         }
 
@@ -95,7 +95,7 @@ class SaleController
     {
         $sale = $this->saleRepository->find($uuid);
 
-        if (!$sale) {
+        if (! $sale) {
             return response()->json(['message' => 'Sale not found'], 404);
         }
 
@@ -108,7 +108,7 @@ class SaleController
     {
         $sale = $this->saleRepository->find($uuid);
 
-        if (!$sale) {
+        if (! $sale) {
             return response()->json(['message' => 'Sale not found'], 404);
         }
 

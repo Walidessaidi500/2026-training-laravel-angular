@@ -6,6 +6,8 @@ use App\Family\Domain\Interfaces\FamilyRepositoryInterface;
 use App\Family\Infrastructure\Persistence\Repositories\EloquentFamilyRepository;
 use App\Product\Domain\Interfaces\ProductRepositoryInterface;
 use App\Product\Infrastructure\Persistence\Repositories\EloquentProductRepository;
+use App\Restaurant\Domain\Interfaces\RestaurantRepositoryInterface;
+use App\Restaurant\Infrastructure\Persistence\Repositories\EloquentRestaurantRepository;
 use App\Tax\Domain\Interfaces\TaxRepositoryInterface;
 use App\Tax\Infrastructure\Persistence\Repositories\EloquentTaxRepository;
 use App\User\Domain\Interfaces\PasswordHasherInterface;
@@ -28,28 +30,28 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // User
-        $this->app->bind(UserRepositoryInterface::class , EloquentUserRepository::class);
-        $this->app->bind(PasswordHasherInterface::class , LaravelPasswordHasher::class);
-        $this->app->bind(TokenGeneratorInterface::class , SanctumTokenGenerator::class);
+        $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
+        $this->app->bind(PasswordHasherInterface::class, LaravelPasswordHasher::class);
+        $this->app->bind(TokenGeneratorInterface::class, SanctumTokenGenerator::class);
 
         // Family
-        $this->app->bind(FamilyRepositoryInterface::class , EloquentFamilyRepository::class);
+        $this->app->bind(FamilyRepositoryInterface::class, EloquentFamilyRepository::class);
 
         // Tax
-        $this->app->bind(TaxRepositoryInterface::class , EloquentTaxRepository::class);
+        $this->app->bind(TaxRepositoryInterface::class, EloquentTaxRepository::class);
 
         // Product
-        $this->app->bind(ProductRepositoryInterface::class , EloquentProductRepository::class);
+        $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
 
         // Zone
-        $this->app->bind(ZoneRepositoryInterface::class , EloquentZoneRepository::class);
+        $this->app->bind(ZoneRepositoryInterface::class, EloquentZoneRepository::class);
 
         // Table
-        $this->app->bind(TableRepositoryInterface::class , EloquentTableRepository::class);
+        $this->app->bind(TableRepositoryInterface::class, EloquentTableRepository::class);
 
         // Restaurant
-        $this->app->bind(\App\Restaurant\Domain\Interfaces\RestaurantRepositoryInterface::class , \App\Restaurant\Infrastructure\Persistence\Repositories\EloquentRestaurantRepository::class);
-        $this->app->bind(\App\Restaurant\Domain\Interfaces\PasswordHasherInterface::class , \App\Restaurant\Infrastructure\Services\LaravelPasswordHasher::class);
+        $this->app->bind(RestaurantRepositoryInterface::class, EloquentRestaurantRepository::class);
+        $this->app->bind(\App\Restaurant\Domain\Interfaces\PasswordHasherInterface::class, \App\Restaurant\Infrastructure\Services\LaravelPasswordHasher::class);
     }
 
     /**
@@ -57,6 +59,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-    //
+        //
     }
 }

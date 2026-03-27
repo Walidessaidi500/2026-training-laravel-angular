@@ -25,7 +25,7 @@ class UpdateRestaurant
     ): RestaurantResponse {
         $restaurant = $this->restaurantRepository->search(Uuid::create($uuid));
 
-        if (null === $restaurant) {
+        if ($restaurant === null) {
             throw new \InvalidArgumentException('Restaurante no encontrado');
         }
 

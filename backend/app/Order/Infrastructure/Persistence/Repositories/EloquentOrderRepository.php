@@ -3,11 +3,11 @@
 namespace App\Order\Infrastructure\Persistence\Repositories;
 
 use App\Order\Infrastructure\Persistence\Models\EloquentOrder;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EloquentOrderRepository
 {
-    public function list(int $page = 1, int $perPage = 15): Paginator
+    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator
     {
         return EloquentOrder::paginate($perPage, ['*'], 'page', $page);
     }
@@ -25,6 +25,7 @@ class EloquentOrderRepository
     public function save(EloquentOrder $order): EloquentOrder
     {
         $order->save();
+
         return $order;
     }
 

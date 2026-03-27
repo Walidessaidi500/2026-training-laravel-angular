@@ -4,6 +4,7 @@ namespace App\Zone\Domain\Interfaces;
 
 use App\Shared\Domain\ValueObject\Uuid;
 use App\Zone\Domain\Entity\Table;
+use Illuminate\Pagination\Paginator;
 
 interface TableRepositoryInterface
 {
@@ -15,6 +16,8 @@ interface TableRepositoryInterface
      * @return Table[]
      */
     public function findAll(): array;
+
+    public function list(int $page = 1, int $perPage = 15): Paginator;
 
     public function delete(Uuid $id): void;
 }

@@ -34,7 +34,7 @@ class OrderController
     {
         $order = $this->orderRepository->find($uuid);
 
-        if (!$order) {
+        if (! $order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
@@ -67,7 +67,7 @@ class OrderController
     {
         $order = $this->orderRepository->find($uuid);
 
-        if (!$order) {
+        if (! $order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
@@ -96,7 +96,7 @@ class OrderController
     {
         $order = $this->orderRepository->find($uuid);
 
-        if (!$order) {
+        if (! $order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
@@ -109,7 +109,7 @@ class OrderController
     {
         $order = $this->orderRepository->find($uuid);
 
-        if (!$order) {
+        if (! $order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 

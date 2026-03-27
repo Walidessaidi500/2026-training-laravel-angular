@@ -16,8 +16,8 @@ class UserSeeder extends Seeder
             // Admin principal
             EloquentUser::factory()->admin()->create([
                 'restaurant_id' => $restaurant->id,
-                'name' => 'Admin - ' . $restaurant->name,
-                'email' => 'admin-' . $restaurant->id . '@tpv.com',
+                'name' => 'Admin - '.$restaurant->name,
+                'email' => 'admin-'.$restaurant->id.'@tpv.com',
                 'pin' => '1234',
             ]);
 
@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
             EloquentUser::factory()->supervisor()->create([
                 'restaurant_id' => $restaurant->id,
                 'name' => 'María García',
-                'email' => 'maria-' . $restaurant->id . '@tpv.com',
+                'email' => 'maria-'.$restaurant->id.'@tpv.com',
                 'pin' => '2345',
             ]);
 
@@ -33,21 +33,21 @@ class UserSeeder extends Seeder
             EloquentUser::factory()->create([
                 'restaurant_id' => $restaurant->id,
                 'name' => 'Carlos López',
-                'email' => 'carlos-' . $restaurant->id . '@tpv.com',
+                'email' => 'carlos-'.$restaurant->id.'@tpv.com',
                 'pin' => '3456',
             ]);
 
             EloquentUser::factory()->create([
                 'restaurant_id' => $restaurant->id,
                 'name' => 'Laura Martínez',
-                'email' => 'laura-' . $restaurant->id . '@tpv.com',
+                'email' => 'laura-'.$restaurant->id.'@tpv.com',
                 'pin' => '4567',
             ]);
 
             EloquentUser::factory()->create([
                 'restaurant_id' => $restaurant->id,
                 'name' => 'Pedro Sánchez',
-                'email' => 'pedro-' . $restaurant->id . '@tpv.com',
+                'email' => 'pedro-'.$restaurant->id.'@tpv.com',
                 'pin' => '5678',
             ]);
         }

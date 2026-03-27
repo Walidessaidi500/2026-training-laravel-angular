@@ -4,6 +4,7 @@ namespace App\Zone\Domain\Interfaces;
 
 use App\Shared\Domain\ValueObject\Uuid;
 use App\Zone\Domain\Entity\Zone;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface ZoneRepositoryInterface
 {
@@ -15,6 +16,8 @@ interface ZoneRepositoryInterface
      * @return Zone[]
      */
     public function findAll(): array;
+
+    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator;
 
     public function delete(Uuid $id): void;
 }

@@ -27,7 +27,7 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
     {
         $eloquent = EloquentRestaurant::where('uuid', $id->value())->first();
 
-        if (null === $eloquent) {
+        if ($eloquent === null) {
             return null;
         }
 

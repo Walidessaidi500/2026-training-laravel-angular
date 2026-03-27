@@ -5,28 +5,39 @@ namespace App\Family\Infrastructure\Entrypoint\Http;
 use App\Family\Application\CreateFamily\CreateFamily;
 use App\Family\Application\DeleteFamily\DeleteFamily;
 use App\Family\Application\GetFamily\GetFamily;
-use App\Family\Application\ListFamilies\ListFamilies;
 use App\Family\Application\ToggleFamilyActive\ToggleFamilyActive;
 use App\Family\Application\UpdateFamily\UpdateFamily;
+use App\Family\Domain\Interfaces\FamilyRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FamilyController
 {
     public function __construct(
+        private FamilyRepositoryInterface $familyRepository,
         private CreateFamily $createFamily,
         private UpdateFamily $updateFamily,
         private DeleteFamily $deleteFamily,
-        private ListFamilies $listFamilies,
         private GetFamily $getFamily,
         private ToggleFamilyActive $toggleFamilyActive,
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $families = ($this->listFamilies)();
+        $perPage = $request->query('per_page', 15);
+        $page = $request->query('page', 1);
 
-        return new JsonResponse($families, 200);
+        $families = $this->familyRepository->list($page, $perPage);
+
+        return response()->json([
+            'data' => $families->items(),
+            'meta' => [
+                'current_page' => $families->currentPage(),
+                'per_page' => $families->perPage(),
+                'total' => $families->total(),
+                'last_page' => $families->lastPage(),
+            ],
+        ]);
     }
 
     public function show(string $uuid): JsonResponse

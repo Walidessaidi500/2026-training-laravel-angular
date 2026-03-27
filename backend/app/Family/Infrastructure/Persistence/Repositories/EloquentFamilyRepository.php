@@ -6,6 +6,7 @@ use App\Family\Domain\Entity\Family;
 use App\Family\Domain\Interfaces\FamilyRepositoryInterface;
 use App\Family\Infrastructure\Persistence\Models\EloquentFamily;
 use App\Shared\Domain\ValueObject\Uuid;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EloquentFamilyRepository implements FamilyRepositoryInterface
 {
@@ -47,6 +48,14 @@ class EloquentFamilyRepository implements FamilyRepositoryInterface
             ->get()
             ->map(fn (EloquentFamily $model) => $this->toDomainEntity($model))
             ->all();
+    }
+
+    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->newQuery()
+            ->orderBy('name')
+            ->paginate($perPage, ['*'], 'page', $page)
+            ->through(fn (EloquentFamily $model) => $this->toDomainEntity($model));
     }
 
     public function delete(Uuid $id): void

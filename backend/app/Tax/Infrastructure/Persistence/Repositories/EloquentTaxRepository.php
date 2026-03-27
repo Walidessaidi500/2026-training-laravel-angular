@@ -6,6 +6,7 @@ use App\Shared\Domain\ValueObject\Uuid;
 use App\Tax\Domain\Entity\Tax;
 use App\Tax\Domain\Interfaces\TaxRepositoryInterface;
 use App\Tax\Infrastructure\Persistence\Models\EloquentTax;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EloquentTaxRepository implements TaxRepositoryInterface
 {
@@ -47,6 +48,14 @@ class EloquentTaxRepository implements TaxRepositoryInterface
             ->get()
             ->map(fn (EloquentTax $model) => $this->toDomainEntity($model))
             ->all();
+    }
+
+    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->newQuery()
+            ->orderBy('name')
+            ->paginate($perPage, ['*'], 'page', $page)
+            ->through(fn (EloquentTax $model) => $this->toDomainEntity($model));
     }
 
     public function delete(Uuid $id): void

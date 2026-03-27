@@ -7,6 +7,7 @@ use App\Zone\Domain\Entity\Table;
 use App\Zone\Domain\Interfaces\TableRepositoryInterface;
 use App\Zone\Infrastructure\Persistence\Models\EloquentTable;
 use App\Zone\Infrastructure\Persistence\Models\EloquentZone;
+use Illuminate\Pagination\Paginator;
 
 class EloquentTableRepository implements TableRepositoryInterface
 {
@@ -44,6 +45,16 @@ class EloquentTableRepository implements TableRepositoryInterface
             ->get()
             ->map(fn (EloquentTable $m) => $this->toDomainEntity($m))
             ->all();
+    }
+
+    public function list(int $page = 1, int $perPage = 15): Paginator
+    {
+        $items = $this->model->newQuery()
+            ->with('zone')
+            ->orderBy('name')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        return $items->map(fn (EloquentTable $m) => $this->toDomainEntity($m));
     }
 
     public function delete(Uuid $id): void

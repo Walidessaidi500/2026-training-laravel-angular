@@ -16,7 +16,7 @@ class DeleteRestaurant
         $id = Uuid::create($uuid);
         $restaurant = $this->restaurantRepository->search($id);
 
-        if (null === $restaurant) {
+        if ($restaurant === null) {
             throw new \InvalidArgumentException('Restaurante no encontrado');
         }
 

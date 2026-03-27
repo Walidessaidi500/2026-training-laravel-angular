@@ -30,7 +30,7 @@ class SaleSeeder extends Seeder
             $table = $tables->random();
             $restaurant = $table->restaurant;
 
-            if (!$restaurant) {
+            if (! $restaurant) {
                 continue;
             }
 
@@ -118,12 +118,12 @@ class SaleSeeder extends Seeder
         // Crear 3 órdenes abiertas (en curso)
         for ($i = 0; $i < 3; $i++) {
             $table = $tables[$i] ?? $tables->random();
-            if (!$table) {
+            if (! $table) {
                 continue;
             }
 
             $restaurant = $table->restaurant;
-            if (!$restaurant) {
+            if (! $restaurant) {
                 continue;
             }
 

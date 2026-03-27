@@ -6,6 +6,7 @@ use App\Shared\Domain\ValueObject\Uuid;
 use App\Zone\Domain\Entity\Zone;
 use App\Zone\Domain\Interfaces\ZoneRepositoryInterface;
 use App\Zone\Infrastructure\Persistence\Models\EloquentZone;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EloquentZoneRepository implements ZoneRepositoryInterface
 {
@@ -38,6 +39,14 @@ class EloquentZoneRepository implements ZoneRepositoryInterface
             ->get()
             ->map(fn (EloquentZone $m) => $this->toDomainEntity($m))
             ->all();
+    }
+
+    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->model->newQuery()
+            ->orderBy('name')
+            ->paginate($perPage, ['*'], 'page', $page)
+            ->through(fn (EloquentZone $m) => $this->toDomainEntity($m));
     }
 
     public function delete(Uuid $id): void

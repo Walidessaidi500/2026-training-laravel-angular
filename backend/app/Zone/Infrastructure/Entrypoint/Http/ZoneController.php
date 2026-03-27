@@ -5,24 +5,37 @@ namespace App\Zone\Infrastructure\Entrypoint\Http;
 use App\Zone\Application\CreateZone\CreateZone;
 use App\Zone\Application\DeleteZone\DeleteZone;
 use App\Zone\Application\GetZone\GetZone;
-use App\Zone\Application\ListZones\ListZones;
 use App\Zone\Application\UpdateZone\UpdateZone;
+use App\Zone\Domain\Interfaces\ZoneRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ZoneController
 {
     public function __construct(
+        private ZoneRepositoryInterface $zoneRepository,
         private CreateZone $createZone,
         private UpdateZone $updateZone,
         private DeleteZone $deleteZone,
-        private ListZones $listZones,
         private GetZone $getZone,
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return new JsonResponse(($this->listZones)(), 200);
+        $perPage = $request->query('per_page', 15);
+        $page = $request->query('page', 1);
+
+        $zones = $this->zoneRepository->list($page, $perPage);
+
+        return response()->json([
+            'data' => $zones->items(),
+            'meta' => [
+                'current_page' => $zones->currentPage(),
+                'per_page' => $zones->perPage(),
+                'total' => $zones->total(),
+                'last_page' => $zones->lastPage(),
+            ],
+        ]);
     }
 
     public function show(string $uuid): JsonResponse
