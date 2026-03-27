@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Restaurant\Infrastructure\Persistence\Models\EloquentRestaurant;
 use App\Tax\Infrastructure\Persistence\Models\EloquentTax;
 use Illuminate\Database\Seeder;
 
@@ -15,8 +16,16 @@ class TaxSeeder extends Seeder
             ['name' => 'IVA General', 'percentage' => 21],
         ];
 
-        foreach ($taxes as $tax) {
-            EloquentTax::factory()->create($tax);
+        $restaurants = EloquentRestaurant::all();
+
+        foreach ($restaurants as $restaurant) {
+            foreach ($taxes as $tax) {
+                EloquentTax::factory()->create([
+                    'restaurant_id' => $restaurant->id,
+                    'name' => $tax['name'],
+                    'percentage' => $tax['percentage'],
+                ]);
+            }
         }
     }
 }

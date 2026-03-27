@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Restaurant\Infrastructure\Persistence\Models\EloquentRestaurant;
 use App\Zone\Infrastructure\Persistence\Models\EloquentTable;
 use App\Zone\Infrastructure\Persistence\Models\EloquentZone;
 use Illuminate\Database\Seeder;
@@ -17,17 +18,25 @@ class ZoneSeeder extends Seeder
             'Salón Privado' => 3,
         ];
 
-        $tableCounter = 1;
+        $restaurants = EloquentRestaurant::all();
 
-        foreach ($zones as $zoneName => $tableCount) {
-            $zone = EloquentZone::factory()->create(['name' => $zoneName]);
+        foreach ($restaurants as $restaurant) {
+            $tableCounter = 1;
 
-            for ($i = 1; $i <= $tableCount; $i++) {
-                EloquentTable::factory()->create([
-                    'zone_id' => $zone->id,
-                    'name' => 'Mesa '.$tableCounter,
+            foreach ($zones as $zoneName => $tableCount) {
+                $zone = EloquentZone::factory()->create([
+                    'restaurant_id' => $restaurant->id,
+                    'name' => $zoneName,
                 ]);
-                $tableCounter++;
+
+                for ($i = 1; $i <= $tableCount; $i++) {
+                    EloquentTable::factory()->create([
+                        'restaurant_id' => $restaurant->id,
+                        'zone_id' => $zone->id,
+                        'name' => 'Mesa '.$tableCounter,
+                    ]);
+                    $tableCounter++;
+                }
             }
         }
     }

@@ -13,5 +13,5 @@ export class StatCardComponent {
   @Input() label: string = '';
   @Input() value: string | number = '0';
   @Input() icon: string = '';
-  @Input() color: 'primary' | 'secondary' | 'tertiary' | 'success' | 'danger' = 'primary';
+  @Input() color: 'primary' | 'secondary' | 'tertiary' | 'success' | 'danger' | 'warning' = 'primary';
 }

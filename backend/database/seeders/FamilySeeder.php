@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Family\Infrastructure\Persistence\Models\EloquentFamily;
+use App\Restaurant\Infrastructure\Persistence\Models\EloquentRestaurant;
 use Illuminate\Database\Seeder;
 
 class FamilySeeder extends Seeder
@@ -20,8 +21,15 @@ class FamilySeeder extends Seeder
             'Postres',
         ];
 
-        foreach ($families as $name) {
-            EloquentFamily::factory()->create(['name' => $name]);
+        $restaurants = EloquentRestaurant::all();
+
+        foreach ($restaurants as $restaurant) {
+            foreach ($families as $name) {
+                EloquentFamily::factory()->create([
+                    'restaurant_id' => $restaurant->id,
+                    'name' => $name,
+                ]);
+            }
         }
     }
 }

@@ -75,6 +75,19 @@
       color: var(--ion-color-danger-contrast);
     }
   }
+
+  &.stat-card--warning {
+    --background: var(--ion-color-warning);
+
+    .stat-icon {
+      background: rgba(255, 193, 7, 0.15);
+    }
+
+    .stat-label,
+    .stat-value {
+      color: var(--ion-color-warning-contrast);
+    }
+  }
 }
 
 .stat-icon {

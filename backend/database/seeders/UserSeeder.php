@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Restaurant\Infrastructure\Persistence\Models\EloquentRestaurant;
 use App\User\Infrastructure\Persistence\Models\EloquentUser;
 use Illuminate\Database\Seeder;
 
@@ -9,32 +10,46 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin principal
-        EloquentUser::factory()->admin()->create([
-            'name' => 'Admin',
-            'email' => 'admin@tpv.com',
-        ]);
+        $restaurants = EloquentRestaurant::all();
 
-        // Supervisor
-        EloquentUser::factory()->supervisor()->create([
-            'name' => 'María García',
-            'email' => 'maria@tpv.com',
-        ]);
+        foreach ($restaurants as $restaurant) {
+            // Admin principal
+            EloquentUser::factory()->admin()->create([
+                'restaurant_id' => $restaurant->id,
+                'name' => 'Admin - ' . $restaurant->name,
+                'email' => 'admin-' . $restaurant->id . '@tpv.com',
+                'pin' => '1234',
+            ]);
 
-        // Operadores (camareros)
-        EloquentUser::factory()->create([
-            'name' => 'Carlos López',
-            'email' => 'carlos@tpv.com',
-        ]);
+            // Supervisor
+            EloquentUser::factory()->supervisor()->create([
+                'restaurant_id' => $restaurant->id,
+                'name' => 'María García',
+                'email' => 'maria-' . $restaurant->id . '@tpv.com',
+                'pin' => '2345',
+            ]);
 
-        EloquentUser::factory()->create([
-            'name' => 'Laura Martínez',
-            'email' => 'laura@tpv.com',
-        ]);
+            // Operadores (camareros)
+            EloquentUser::factory()->create([
+                'restaurant_id' => $restaurant->id,
+                'name' => 'Carlos López',
+                'email' => 'carlos-' . $restaurant->id . '@tpv.com',
+                'pin' => '3456',
+            ]);
 
-        EloquentUser::factory()->create([
-            'name' => 'Pedro Sánchez',
-            'email' => 'pedro@tpv.com',
-        ]);
+            EloquentUser::factory()->create([
+                'restaurant_id' => $restaurant->id,
+                'name' => 'Laura Martínez',
+                'email' => 'laura-' . $restaurant->id . '@tpv.com',
+                'pin' => '4567',
+            ]);
+
+            EloquentUser::factory()->create([
+                'restaurant_id' => $restaurant->id,
+                'name' => 'Pedro Sánchez',
+                'email' => 'pedro-' . $restaurant->id . '@tpv.com',
+                'pin' => '5678',
+            ]);
+        }
     }
 }

@@ -185,8 +185,12 @@ Ticket o venta en el TPV.
 | `uuid` | VARCHAR | Identificador público único |
 | `restaurant_id` | BIGINT | FK → `restaurants` |
 | `order_id` | BIGINT | FK → `orders` |
-| `user_id` | BIGINT | FK → `users` |
+| `user_id` | BIGINT | FK → `users` (quien cierra la venta) |
+| `opened_by_user_id` | BIGINT | FK → `users` (quien abre la venta) |
+| `closed_by_user_id` | BIGINT | FK → `users` (nullable, quien cierra la venta) |
 | `ticket_number` | INT | Número visible en el ticket (se asigna al cerrar) |
+| `opened_at` | TIMESTAMP | Fecha de apertura |
+| `closed_at` | TIMESTAMP | Fecha de cierre (nullable) |
 | `value_date` | TIMESTAMP | Fecha valor |
 | `total` | INT | Total en céntimos (calculado al cerrar) |
 | `created_at` | TIMESTAMP | |
@@ -209,6 +213,7 @@ El precio y el impuesto se guardan en el momento de la venta para preservar el h
 | `restaurant_id` | BIGINT | FK → `restaurants` |
 | `sale_id` | BIGINT | FK → `sales` |
 | `order_line_id` | BIGINT | FK → `order_lines` |
+| `product_id` | BIGINT | FK → `products` |
 | `user_id` | BIGINT | FK → `users` |
 | `quantity` | INT | Cantidad |
 | `price` | INT | Precio en céntimos en el momento de la venta |

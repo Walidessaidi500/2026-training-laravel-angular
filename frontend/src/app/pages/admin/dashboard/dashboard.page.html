@@ -34,13 +34,41 @@
       ></app-stat-card>
     </div>
 
+    <!-- Operations Statistics -->
+    <div class="stats-grid">
+      <app-stat-card
+        label="Órdenes Abiertas"
+        [value]="openOrders"
+        icon="open"
+        color="danger"
+      ></app-stat-card>
+      <app-stat-card
+        label="Total Órdenes"
+        [value]="totalOrders"
+        icon="receipt"
+        color="warning"
+      ></app-stat-card>
+      <app-stat-card
+        label="Total Usuarios"
+        [value]="totalUsers"
+        icon="people"
+        color="secondary"
+      ></app-stat-card>
+      <app-stat-card
+        label="Total Ventas"
+        [value]="totalSales"
+        icon="cash"
+        color="success"
+      ></app-stat-card>
+    </div>
+
     <!-- Summary Cards -->
     <ion-grid>
       <ion-row>
         <ion-col sizeXl="6" sizeLg="6" sizeMd="12">
           <ion-card class="summary-card">
             <ion-card-header>
-              <ion-card-title>Resumen Rápido</ion-card-title>
+              <ion-card-title>Resumen Rápido - Catálogo</ion-card-title>
             </ion-card-header>
             <ion-card-content>
               <div class="summary-item">
@@ -66,11 +94,40 @@
         <ion-col sizeXl="6" sizeLg="6" sizeMd="12">
           <ion-card class="summary-card">
             <ion-card-header>
-              <ion-card-title>Actividad Reciente</ion-card-title>
+              <ion-card-title>Resumen Rápido - Operaciones</ion-card-title>
             </ion-card-header>
             <ion-card-content>
-              <div class="activity-empty">
-                <p>No hay actividad reciente</p>
+              <div class="summary-item">
+                <span class="summary-label">Órdenes abiertas</span>
+                <span class="summary-value danger">{{ openOrders }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Total órdenes</span>
+                <span class="summary-value">{{ totalOrders }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Total usuarios</span>
+                <span class="summary-value">{{ totalUsers }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Total ventas</span>
+                <span class="summary-value">{{ totalSales }}</span>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col sizeXl="12">
+          <ion-card class="summary-card revenue-card">
+            <ion-card-header>
+              <ion-card-title>Ingresos Totales</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="revenue-display">
+                <span class="revenue-value">{{ (totalRevenue / 100).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }) }}</span>
+                <span class="revenue-label">céntimos: {{ totalRevenue }}</span>
               </div>
             </ion-card-content>
           </ion-card>
