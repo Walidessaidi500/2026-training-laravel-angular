@@ -1,0 +1,36 @@
+.description {
+  font-size: 14px;
+  color: var(--ion-color-secondary);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.auth-card {
+  &.login-card {
+    ion-card-header {
+      background: linear-gradient(
+        135deg,
+        var(--ion-color-primary) 0%,
+        var(--ion-color-primary-tint) 100%
+      );
+    }
+
+    ion-card-header ion-card-title {
+      color: var(--ion-color-primary-contrast);
+    }
+  }
+
+  &.register-card {
+    ion-card-header {
+      background: linear-gradient(
+        135deg,
+        var(--ion-color-tertiary) 0%,
+        var(--ion-color-tertiary-tint) 100%
+      );
+    }
+
+    ion-card-header ion-card-title {
+      color: var(--ion-color-tertiary-contrast);
+    }
+  }
+}

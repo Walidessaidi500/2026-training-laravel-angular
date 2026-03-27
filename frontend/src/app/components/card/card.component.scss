@@ -1,0 +1,20 @@
+.app-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  ion-card-header {
+    padding: 20px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+  }
+
+  ion-card-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  ion-card-content {
+    padding: 20px;
+  }
+}

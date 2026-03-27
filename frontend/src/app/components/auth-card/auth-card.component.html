@@ -1,0 +1,9 @@
+<app-card [title]="title" [cardClass]="'auth-card ' + cardType + '-card'">
+  <p class="description">{{ description }}</p>
+  <app-button
+    [label]="buttonLabel"
+    [color]="buttonColor"
+    expand="block"
+    (buttonClick)="onButtonClick()"
+  ></app-button>
+</app-card>

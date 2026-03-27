@@ -1,0 +1,13 @@
+ion-button {
+  --border-radius: 8px;
+  text-transform: none;
+  font-weight: 600;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
