@@ -1,9 +1,67 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Login</ion-title>
+    <ion-title>Iniciar Sesión</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <p>Login page</p>
+<ion-content [fullscreen]="true" class="auth-content">
+  <div class="auth-container">
+    <ion-card class="auth-card login-card">
+      <ion-card-header>
+        <ion-card-title>Bienvenido</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p class="subtitle">Accede con tus credenciales</p>
+
+        <!-- Error Message -->
+        <ion-text *ngIf="errorMessage" color="danger" class="error-message">
+          <p>{{ errorMessage }}</p>
+        </ion-text>
+
+        <!-- Login Form -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <!-- Email Field -->
+          <ion-item class="form-item">
+            <ion-label position="floating">Email</ion-label>
+            <ion-input formControlName="email" type="email" placeholder="ejemplo@correo.com" [class.input-error]="email?.invalid && email?.touched">
+            </ion-input>
+          </ion-item>
+          <ion-text *ngIf="email?.invalid && email?.touched" color="danger" class="error-text">
+            <p *ngIf="email?.errors?.['required']">El email es requerido</p>
+            <p *ngIf="email?.errors?.['email']">Email inválido</p>
+          </ion-text>
+
+          <!-- Password Field -->
+          <ion-item class="form-item">
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input formControlName="password" type="password" placeholder="Mínimo 6 caracteres" [class.input-error]="password?.invalid && password?.touched">
+            </ion-input>
+          </ion-item>
+          <ion-text *ngIf="password?.invalid && password?.touched" color="danger" class="error-text">
+            <p *ngIf="password?.errors?.['required']">
+              La contraseña es requerida
+            </p>
+            <p *ngIf="password?.errors?.['minlength']">
+              Mínimo 6 caracteres
+            </p>
+          </ion-text>
+
+          <!-- Submit Button -->
+          <ion-button expand="block" color="primary" type="submit" [disabled]="loginForm.invalid || isLoading" class="submit-button">
+            <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+            <span *ngIf="!isLoading">Iniciar Sesión</span>
+          </ion-button>
+        </form>
+
+        <!-- Register Link -->
+        <div class="auth-footer">
+          <p>
+            ¿No tienes cuenta?
+            <a class="link" (click)="navigateToRegister()">Crear una nueva</a>
+          </p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
