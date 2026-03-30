@@ -1,0 +1,28 @@
+ion-header {
+  --background: var(--ion-color-primary);
+}
+
+.admin-header-wrapper {
+  ion-toolbar.custom-toolbar {
+    --background: var(--ion-color-primary) !important;
+    --color: white !important;
+  }
+}
+
+ion-toolbar {
+  --padding-top: 12px !important;
+  --padding-bottom: 12px !important;
+
+  ion-title {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0 12px;
+    text-transform: capitalize;
+    color: white !important;
+  }
+}
+
+ion-menu-button {
+  --color: white !important;
+  margin-left: 8px;
+}

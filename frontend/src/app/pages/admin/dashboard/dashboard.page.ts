@@ -88,7 +88,7 @@ export class DashboardPage implements OnInit {
         this.totalProducts = response.meta.total;
         this.activeProducts = response.data.filter((p) => p.active).length;
       },
-      error: (error) => console.error('Error loading products:', error),
+      error: (error) => console.error('Error cargando los productos:', error),
     });
 
     // Cargar familias
@@ -97,7 +97,7 @@ export class DashboardPage implements OnInit {
         this.totalFamilies = response.meta.total;
         this.activeFamilies = response.data.filter((f) => f.active).length;
       },
-      error: (error) => console.error('Error loading families:', error),
+      error: (error) => console.error('Error cargando las familias:', error),
     });
 
     // Cargar impuestos
@@ -105,7 +105,7 @@ export class DashboardPage implements OnInit {
       next: (response) => {
         this.totalTaxes = response.meta.total;
       },
-      error: (error) => console.error('Error loading taxes:', error),
+      error: (error) => console.error('Error cargando los impuestos:', error),
     });
 
     // Cargar zonas
@@ -113,7 +113,7 @@ export class DashboardPage implements OnInit {
       next: (response) => {
         this.totalZones = response.meta.total;
       },
-      error: (error) => console.error('Error loading zones:', error),
+      error: (error) => console.error('Error cargando las zonas:', error),
     });
 
     // Cargar órdenes
@@ -122,7 +122,7 @@ export class DashboardPage implements OnInit {
         this.totalOrders = response.meta.total;
         this.openOrders = response.data.filter((o) => o.status === 'open').length;
       },
-      error: (error) => console.error('Error loading orders:', error),
+      error: (error) => console.error('Error cargando los pedidos:', error),
     });
 
     // Cargar usuarios
@@ -130,7 +130,7 @@ export class DashboardPage implements OnInit {
       next: (response) => {
         this.totalUsers = response.meta.total;
       },
-      error: (error) => console.error('Error loading users:', error),
+      error: (error) => console.error('Error cargando los usuarios:', error),
     });
 
     // Cargar ventas
@@ -141,7 +141,7 @@ export class DashboardPage implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading sales:', error);
+        console.error('Error cargando las ventas:', error);
         this.isLoading = false;
       },
     });

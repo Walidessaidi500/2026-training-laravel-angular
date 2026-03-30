@@ -1,0 +1,8 @@
+<ion-header [translucent]="false">
+  <ion-toolbar color="primary" class="custom-toolbar">
+    <div slot="start" *ngIf="showMenuButton" style="padding-left: 8px;">
+      <ion-menu-button></ion-menu-button>
+    </div>
+    <ion-title>{{ restaurantName || 'Cargando...' }}</ion-title>
+  </ion-toolbar>
+</ion-header>

@@ -2,23 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
-  IonSplitPane,
-  IonMenu,
-  IonMenuButton,
-  IonList,
-  IonListHeader,
-  IonItem,
-  IonLabel,
+  IonToolbar,
   IonButton,
   IonIcon,
 } from '@ionic/angular/standalone';
 import { AuthService } from '@services/auth/auth.service';
-import { RestaurantService, Restaurant } from '@services/domain/restaurant.service';
 import { RouterOutlet } from '@angular/router';
+import { AdminHeaderComponent } from '@components/admin-header/admin-header.component';
 
 @Component({
   selector: 'app-admin-layout',
@@ -28,50 +19,36 @@ import { RouterOutlet } from '@angular/router';
   imports: [
     CommonModule,
     RouterOutlet,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
-    IonSplitPane,
-    IonMenu,
-    IonMenuButton,
-    IonList,
-    IonListHeader,
-    IonItem,
-    IonLabel,
+    IonToolbar,
     IonButton,
     IonIcon,
+    AdminHeaderComponent,
   ],
 })
 export class AdminLayoutComponent implements OnInit {
-  restaurants: Restaurant[] = [];
-  selectedRestaurant: Restaurant | null = null;
   selectedMenu = 'dashboard';
+  restaurantName: string | undefined;
 
   constructor(
-    private restaurantService: RestaurantService,
     private authService: AuthService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.loadRestaurants();
+    this.loadAuthenticatedUser();
   }
 
-  private loadRestaurants(): void {
-    this.restaurantService.list().subscribe({
-      next: (response) => {
-        this.restaurants = response.data;
-        if (this.restaurants.length > 0) {
-          this.selectedRestaurant = this.restaurants[0];
-        }
-      },
-      error: (error) => console.error('Error loading restaurants:', error),
-    });
-  }
+  private loadAuthenticatedUser(): void {
+    const user = this.authService.getUser();
+    
+    if (!user) {
+      this.restaurantName = 'Restaurante';
+      return;
+    }
 
-  selectRestaurant(restaurant: Restaurant): void {
-    this.selectedRestaurant = restaurant;
+    // Mostrar el nombre del usuario como título del header
+    this.restaurantName = user.name || 'Restaurante';
   }
 
   navigateTo(path: string): void {

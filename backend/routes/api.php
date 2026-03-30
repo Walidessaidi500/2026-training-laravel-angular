@@ -6,6 +6,7 @@ use App\Product\Infrastructure\Entrypoint\Http\ProductController;
 use App\Restaurant\Infrastructure\Entrypoint\Http\RestaurantController;
 use App\Sale\Infrastructure\Entrypoint\Http\SaleController;
 use App\Tax\Infrastructure\Entrypoint\Http\TaxController;
+use App\User\Infrastructure\Entrypoint\Http\GetAuthenticatedUserController;
 use App\User\Infrastructure\Entrypoint\Http\LoginController;
 use App\User\Infrastructure\Entrypoint\Http\PostController;
 use App\User\Infrastructure\Entrypoint\Http\UserController;
@@ -19,6 +20,9 @@ Route::post('/login', LoginController::class);
 
 // Rutas protegidas (requieren token Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
+    // Autenticación
+    Route::get('/me', GetAuthenticatedUserController::class);
+
     // Restaurantes
     Route::get('/restaurants', [RestaurantController::class, 'index']);
     Route::get('/restaurants/{uuid}', [RestaurantController::class, 'show']);

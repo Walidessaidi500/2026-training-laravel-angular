@@ -1,112 +1,79 @@
-<ion-split-pane contentId="main-content" when="md">
-  <!-- Sidebar - Restaurantes -->
-  <ion-menu contentId="main-content" side="start" type="overlay">
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>Restaurantes</ion-title>
-      </ion-toolbar>
-    </ion-header>
+<!-- Main Content -->
+<div id="main-content" class="ion-page ion-page-full">
+  <!-- Header with Restaurant Name and Logout -->
+  <app-admin-header 
+    [restaurantName]="restaurantName"
+    [showMenuButton]="false">
+  </app-admin-header>
 
-    <ion-content>
-      <ion-list>
-        <ion-list-header>
-          <ion-label>Mis Restaurantes</ion-label>
-        </ion-list-header>
+  <!-- Navigation Tabs -->
+  <ion-toolbar color="light" class="nav-toolbar">
+    <div class="nav-buttons">
+      <ion-button
+        fill="clear"
+        [color]="selectedMenu === 'dashboard' ? 'primary' : 'medium'"
+        (click)="navigateTo('dashboard')"
+      >
+        <ion-icon name="home" slot="start"></ion-icon>
+        Dashboard
+      </ion-button>
+      <ion-button
+        fill="clear"
+        [color]="selectedMenu === 'productos' ? 'primary' : 'medium'"
+        (click)="navigateTo('productos')"
+      >
+        <ion-icon name="layers" slot="start"></ion-icon>
+        Productos
+      </ion-button>
+      <ion-button
+        fill="clear"
+        [color]="selectedMenu === 'familias' ? 'primary' : 'medium'"
+        (click)="navigateTo('familias')"
+      >
+        <ion-icon name="folder" slot="start"></ion-icon>
+        Familias
+      </ion-button>
+      <ion-button
+        fill="clear"
+        [color]="selectedMenu === 'impuestos' ? 'primary' : 'medium'"
+        (click)="navigateTo('impuestos')"
+      >
+        <ion-icon name="calculator" slot="start"></ion-icon>
+        Impuestos
+      </ion-button>
+      <ion-button
+        fill="clear"
+        [color]="selectedMenu === 'zonas' ? 'primary' : 'medium'"
+        (click)="navigateTo('zonas')"
+      >
+        <ion-icon name="map" slot="start"></ion-icon>
+        Zonas
+      </ion-button>
+      <ion-button
+        fill="clear"
+        [color]="selectedMenu === 'mesas' ? 'primary' : 'medium'"
+        (click)="navigateTo('mesas')"
+      >
+        <ion-icon name="grid" slot="start"></ion-icon>
+        Mesas
+      </ion-button>
+      
+      <div class="logout-spacer"></div>
+      
+      <ion-button
+        fill="clear"
+        color="danger"
+        (click)="logout()"
+        class="logout-button"
+      >
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Salir
+      </ion-button>
+    </div>
+  </ion-toolbar>
 
-        <ion-item
-          *ngFor="let restaurant of restaurants"
-          (click)="selectRestaurant(restaurant)"
-          button
-          detail
-          [class.selected]="selectedRestaurant?.uuid === restaurant.uuid"
-        >
-          <ion-icon name="storefront" slot="start"></ion-icon>
-          <ion-label>
-            <h2>{{ restaurant.name }}</h2>
-            <p>{{ restaurant.city }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-content>
-  </ion-menu>
-
-  <!-- Main Content -->
-  <div id="main-content" class="ion-page">
-    <!-- Header -->
-    <ion-header>
-      <ion-toolbar>
-        <ion-menu-button slot="start"></ion-menu-button>
-        <ion-title *ngIf="selectedRestaurant">
-          {{ selectedRestaurant.name }}
-        </ion-title>
-      </ion-toolbar>
-
-      <!-- Navigation Tabs -->
-      <ion-toolbar color="light" class="nav-toolbar">
-        <div class="nav-buttons">
-          <ion-button
-            fill="clear"
-            [color]="selectedMenu === 'dashboard' ? 'primary' : 'medium'"
-            (click)="navigateTo('dashboard')"
-          >
-            <ion-icon name="home" slot="start"></ion-icon>
-            Dashboard
-          </ion-button>
-          <ion-button
-            fill="clear"
-            [color]="selectedMenu === 'productos' ? 'primary' : 'medium'"
-            (click)="navigateTo('productos')"
-          >
-            <ion-icon name="layers" slot="start"></ion-icon>
-            Productos
-          </ion-button>
-          <ion-button
-            fill="clear"
-            [color]="selectedMenu === 'familias' ? 'primary' : 'medium'"
-            (click)="navigateTo('familias')"
-          >
-            <ion-icon name="folder" slot="start"></ion-icon>
-            Familias
-          </ion-button>
-          <ion-button
-            fill="clear"
-            [color]="selectedMenu === 'impuestos' ? 'primary' : 'medium'"
-            (click)="navigateTo('impuestos')"
-          >
-            <ion-icon name="calculator" slot="start"></ion-icon>
-            Impuestos
-          </ion-button>
-          <ion-button
-            fill="clear"
-            [color]="selectedMenu === 'zonas' ? 'primary' : 'medium'"
-            (click)="navigateTo('zonas')"
-          >
-            <ion-icon name="map" slot="start"></ion-icon>
-            Zonas
-          </ion-button>
-          <ion-button
-            fill="clear"
-            [color]="selectedMenu === 'mesas' ? 'primary' : 'medium'"
-            (click)="navigateTo('mesas')"
-          >
-            <ion-icon name="grid" slot="start"></ion-icon>
-            Mesas
-          </ion-button>
-          <ion-button
-            fill="clear"
-            color="danger"
-            (click)="logout()"
-          >
-            <ion-icon name="log-out" slot="start"></ion-icon>
-            Salir
-          </ion-button>
-        </div>
-      </ion-toolbar>
-    </ion-header>
-
-    <!-- Content -->
-    <ion-content>
-      <router-outlet></router-outlet>
-    </ion-content>
-  </div>
-</ion-split-pane>
+  <!-- Content -->
+  <ion-content>
+    <router-outlet></router-outlet>
+  </ion-content>
+</div>
