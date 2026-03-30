@@ -1,0 +1,76 @@
+/* --- SIDEBAR --- */
+.admin-split-pane {
+  --side-width: 80px; /* Sidebar estrecho como en la imagen */
+  --side-max-width: 80px;
+  --side-min-width: 80px;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: var(--ion-color-primary-light);
+    color: var(--ion-color-primary);
+    border-radius: 12px;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 24px;
+  }
+}
+.nav-menu {
+  background: transparent;
+  padding: 0 12px;
+
+  ion-item {
+    --background: transparent;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    
+    .nav-icon {
+      width: 100%;
+      padding: 12px 0;
+      color: var(--ion-color-medium);
+      font-size: 22px;
+      display: flex;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    &.active {
+      --background: var(--ion-color-primary-light);
+      .nav-icon { color: var(--ion-color-primary); }
+    }
+    
+    &:hover:not(.active) .nav-icon {
+      color: var(--ion-color-dark);
+    }
+  }
+}
+
+.sidebar-footer {
+  padding-bottom: 20px;
+  background: transparent;
+  
+  .logout-item {
+    --background: transparent;
+    --padding-start: 0; --inner-padding-end: 0;
+    display: flex; justify-content: center;
+    
+    .avatar-circle {
+      width: 40px; height: 40px;
+      background: var(--ion-color-danger); /* Usa tu color primary o danger */
+      color: white;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 14px;
+    }
+  }
+}

@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
   IonContent,
-  IonToolbar,
-  IonButton,
-  IonIcon,
+  IonSplitPane,
+  IonMenu,
 } from '@ionic/angular/standalone';
 import { AuthService } from '@services/auth/auth.service';
 import { RouterOutlet } from '@angular/router';
 import { AdminHeaderComponent } from '@components/admin-header/admin-header.component';
+import { SidebarComponent } from '@components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-admin-layout',
@@ -20,11 +20,12 @@ import { AdminHeaderComponent } from '@components/admin-header/admin-header.comp
     CommonModule,
     RouterOutlet,
     IonContent,
-    IonToolbar,
-    IonButton,
-    IonIcon,
+    IonSplitPane,
+    IonMenu,
     AdminHeaderComponent,
+    SidebarComponent,
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AdminLayoutComponent implements OnInit {
   selectedMenu = 'dashboard';
@@ -51,9 +52,10 @@ export class AdminLayoutComponent implements OnInit {
     this.restaurantName = user.name || 'Restaurante';
   }
 
-  navigateTo(path: string): void {
-    this.selectedMenu = path;
-    this.router.navigate(['/admin', path]);
+  navigateTo(path: string | Event): void {
+    const pathString = typeof path === 'string' ? path : String(path);
+    this.selectedMenu = pathString;
+    this.router.navigate(['/admin', pathString]);
   }
 
   logout(): void {

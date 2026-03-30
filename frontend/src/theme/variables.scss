@@ -3,80 +3,37 @@
 
 /** Ionic CSS Variables **/
 :root {
-  /** primary **/
+  /** primary (Coral Red de la imagen) **/
   --ion-color-primary: #ff5330;
   --ion-color-primary-rgb: 255, 83, 48;
   --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
   --ion-color-primary-shade: #e0492a;
   --ion-color-primary-tint: #ff6445;
+  --ion-color-primary-light: rgba(255, 83, 48, 0.1); /* Para fondos de badges/botones */
 
-  /** secondary **/
-  --ion-color-secondary: #111111;
-  --ion-color-secondary-rgb: 17, 17, 17;
-  --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #0f0f0f;
-  --ion-color-secondary-tint: #292929;
+  /** secondary (Textos oscuros) **/
+  --ion-color-secondary: #1a1b1e;
+  --ion-color-secondary-rgb: 26, 27, 30;
 
-  /** tertiary **/
-  --ion-color-tertiary: #015eb9;
-  --ion-color-tertiary-rgb: 1, 94, 185;
-  --ion-color-tertiary-contrast: #ffffff;
-  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #0153a3;
-  --ion-color-tertiary-tint: #1a6ec0;
-
-  /** success **/
+  /** success (Verde de badges) **/
   --ion-color-success: #2dd36f;
-  --ion-color-success-rgb: 45, 211, 111;
-  --ion-color-success-contrast: #ffffff;
-  --ion-color-success-contrast-rgb: 255, 255, 255;
-  --ion-color-success-shade: #28ba62;
-  --ion-color-success-tint: #42d77d;
+  --ion-color-success-light: rgba(45, 211, 111, 0.1);
 
-  /** warning **/
+  /** warning (Naranja/Amarillo de badges) **/
   --ion-color-warning: #ffc409;
-  --ion-color-warning-rgb: 255, 196, 9;
-  --ion-color-warning-contrast: #000000;
-  --ion-color-warning-contrast-rgb: 0, 0, 0;
-  --ion-color-warning-shade: #e0ad08;
-  --ion-color-warning-tint: #ffca22;
+  --ion-color-warning-light: rgba(255, 196, 9, 0.1);
 
-  /** danger **/
+  /** danger (Rojo de badges de cancelación) **/
   --ion-color-danger: #eb445a;
-  --ion-color-danger-rgb: 235, 68, 90;
-  --ion-color-danger-contrast: #ffffff;
-  --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: #cf3c4f;
-  --ion-color-danger-tint: #ed576b;
+  --ion-color-danger-light: rgba(235, 68, 90, 0.1);
 
-  /** dark **/
-  --ion-color-dark: #222428;
-  --ion-color-dark-rgb: 34, 36, 40;
-  --ion-color-dark-contrast: #ffffff;
-  --ion-color-dark-contrast-rgb: 255, 255, 255;
-  --ion-color-dark-shade: #1e2023;
-  --ion-color-dark-tint: #383a3e;
+  /** light (Gris muy sutil para fondos) **/
+  --ion-color-light: #f7f8fa;
+  
+  /** medium (Textos secundarios) **/
+  --ion-color-medium: #8a8d93;
 
-  /** medium **/
-  --ion-color-medium: #92949c;
-  --ion-color-medium-rgb: 146, 148, 156;
-  --ion-color-medium-contrast: #ffffff;
-  --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: #808289;
-  --ion-color-medium-tint: #9d9fa6;
-
-  /** light **/
-  --ion-color-light: #f4f5f8;
-  --ion-color-light-rgb: 244, 245, 248;
-  --ion-color-light-contrast: #000000;
-  --ion-color-light-contrast-rgb: 0, 0, 0;
-  --ion-color-light-shade: #d7d8da;
-  --ion-color-light-tint: #f5f6f9;
-}
-
-body {
-  --ion-background-color: #f7f8f9;
-  --ion-text-color: #111111;
+  /** Backgrounds de la App **/
+  --ion-background-color: #f7f8fa;
+  --ion-text-color: #1a1b1e;
 }

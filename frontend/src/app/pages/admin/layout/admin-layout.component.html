@@ -1,79 +1,23 @@
-<!-- Main Content -->
-<div id="main-content" class="ion-page ion-page-full">
-  <!-- Header with Restaurant Name and Logout -->
-  <app-admin-header 
-    [restaurantName]="restaurantName"
-    [showMenuButton]="false">
-  </app-admin-header>
+<ion-split-pane contentId="main-content" class="admin-split-pane">
+  
+  <ion-menu contentId="main-content" type="overlay">
+    <app-sidebar 
+      [activeItem]="selectedMenu" 
+      (onNavigate)="navigateTo($event)"
+      (onLogout)="logout()">
+    </app-sidebar>
+  </ion-menu>
 
-  <!-- Navigation Tabs -->
-  <ion-toolbar color="light" class="nav-toolbar">
-    <div class="nav-buttons">
-      <ion-button
-        fill="clear"
-        [color]="selectedMenu === 'dashboard' ? 'primary' : 'medium'"
-        (click)="navigateTo('dashboard')"
-      >
-        <ion-icon name="home" slot="start"></ion-icon>
-        Dashboard
-      </ion-button>
-      <ion-button
-        fill="clear"
-        [color]="selectedMenu === 'productos' ? 'primary' : 'medium'"
-        (click)="navigateTo('productos')"
-      >
-        <ion-icon name="layers" slot="start"></ion-icon>
-        Productos
-      </ion-button>
-      <ion-button
-        fill="clear"
-        [color]="selectedMenu === 'familias' ? 'primary' : 'medium'"
-        (click)="navigateTo('familias')"
-      >
-        <ion-icon name="folder" slot="start"></ion-icon>
-        Familias
-      </ion-button>
-      <ion-button
-        fill="clear"
-        [color]="selectedMenu === 'impuestos' ? 'primary' : 'medium'"
-        (click)="navigateTo('impuestos')"
-      >
-        <ion-icon name="calculator" slot="start"></ion-icon>
-        Impuestos
-      </ion-button>
-      <ion-button
-        fill="clear"
-        [color]="selectedMenu === 'zonas' ? 'primary' : 'medium'"
-        (click)="navigateTo('zonas')"
-      >
-        <ion-icon name="map" slot="start"></ion-icon>
-        Zonas
-      </ion-button>
-      <ion-button
-        fill="clear"
-        [color]="selectedMenu === 'mesas' ? 'primary' : 'medium'"
-        (click)="navigateTo('mesas')"
-      >
-        <ion-icon name="grid" slot="start"></ion-icon>
-        Mesas
-      </ion-button>
-      
-      <div class="logout-spacer"></div>
-      
-      <ion-button
-        fill="clear"
-        color="danger"
-        (click)="logout()"
-        class="logout-button"
-      >
-        <ion-icon name="log-out-outline" slot="start"></ion-icon>
-        Salir
-      </ion-button>
-    </div>
-  </ion-toolbar>
+  <div class="ion-page" id="main-content">
+    
+    <app-admin-header 
+      [restaurantName]="restaurantName"
+      [isLive]="true">
+    </app-admin-header>
 
-  <!-- Content -->
-  <ion-content>
-    <router-outlet></router-outlet>
-  </ion-content>
-</div>
+    <ion-content class="bg-light">
+      <router-outlet></router-outlet>
+    </ion-content>
+
+  </div>
+</ion-split-pane>

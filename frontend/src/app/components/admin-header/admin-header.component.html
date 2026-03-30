@@ -1,8 +1,27 @@
-<ion-header [translucent]="false">
-  <ion-toolbar color="primary" class="custom-toolbar">
-    <div slot="start" *ngIf="showMenuButton" style="padding-left: 8px;">
-      <ion-menu-button></ion-menu-button>
+<ion-header class="ion-no-border header-custom">
+  <ion-toolbar>
+    <ion-buttons slot="start" class="ion-hide-lg-up">
+      <ion-menu-button color="dark"></ion-menu-button>
+    </ion-buttons>
+
+    <div class="header-container">
+      <div class="breadcrumbs">
+        <span class="text-muted">{{ restaurantName }} /</span>
+        <strong>Overview</strong>
+        <span class="live-badge" *ngIf="isLive">● LIVE</span>
+      </div>
+      
+      <div class="header-actions">
+        <div class="search-bar ion-hide-sm-down">
+          <ion-icon name="search-outline"></ion-icon>
+          <input type="text" placeholder="Search..." />
+        </div>
+        <ion-button fill="clear" color="dark" class="action-btn">All</ion-button>
+        <ion-button fill="clear" color="dark" class="action-btn notification-btn">
+          <ion-icon name="notifications-outline"></ion-icon>
+          <span class="dot"></span>
+        </ion-button>
+      </div>
     </div>
-    <ion-title>{{ restaurantName || 'Cargando...' }}</ion-title>
   </ion-toolbar>
 </ion-header>

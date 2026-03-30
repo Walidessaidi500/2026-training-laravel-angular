@@ -1,17 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonText,
+  IonIcon,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonSkeletonText,
 } from '@ionic/angular/standalone';
-import { StatCardComponent } from '@components/stat-card/stat-card.component';
 import { ProductService } from '@services/domain/product.service';
 import { FamilyService } from '@services/domain/family.service';
 import { TaxService } from '@services/domain/tax.service';
@@ -28,16 +24,13 @@ import { SaleService } from '@services/domain/sale.service';
   imports: [
     CommonModule,
     IonContent,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonText,
-    StatCardComponent,
+    IonIcon,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonSkeletonText,
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class DashboardPage implements OnInit {
   // Productos
@@ -67,6 +60,25 @@ export class DashboardPage implements OnInit {
 
   isLoading = true;
 
+  dashboardData = {
+    revenue: {
+      total: 0,
+      trendPercentage: 0,
+      thisWeek: 0,
+      avgOrder: 0,
+      mrr: 0,
+    },
+    metrics: {
+      activeUsers: 0,
+      ordersToday: 0,
+      conversionRate: 0,
+      totalProducts: 0,
+    },
+    recentOrders: [] as any[],
+    alerts: [] as any[],
+    activities: [] as any[],
+  };
+
   constructor(
     private productService: ProductService,
     private familyService: FamilyService,
@@ -87,6 +99,7 @@ export class DashboardPage implements OnInit {
       next: (response) => {
         this.totalProducts = response.meta.total;
         this.activeProducts = response.data.filter((p) => p.active).length;
+        this.dashboardData.metrics.totalProducts = this.totalProducts;
       },
       error: (error) => console.error('Error cargando los productos:', error),
     });
@@ -121,6 +134,8 @@ export class DashboardPage implements OnInit {
       next: (response) => {
         this.totalOrders = response.meta.total;
         this.openOrders = response.data.filter((o) => o.status === 'open').length;
+        this.dashboardData.metrics.ordersToday = this.openOrders;
+        this.dashboardData.recentOrders = response.data.slice(0, 5) as any[];
       },
       error: (error) => console.error('Error cargando los pedidos:', error),
     });
@@ -129,6 +144,7 @@ export class DashboardPage implements OnInit {
     this.userService.list().subscribe({
       next: (response) => {
         this.totalUsers = response.meta.total;
+        this.dashboardData.metrics.activeUsers = this.totalUsers;
       },
       error: (error) => console.error('Error cargando los usuarios:', error),
     });
@@ -138,6 +154,12 @@ export class DashboardPage implements OnInit {
       next: (response) => {
         this.totalSales = response.meta.total;
         this.totalRevenue = response.data.reduce((sum, sale) => sum + sale.total, 0);
+        this.dashboardData.revenue.total = this.totalRevenue;
+        this.dashboardData.revenue.thisWeek = this.totalRevenue * 0.3;
+        this.dashboardData.revenue.avgOrder = this.totalRevenue / Math.max(this.totalSales, 1);
+        this.dashboardData.revenue.mrr = this.totalRevenue;
+        this.dashboardData.revenue.trendPercentage = 12.5;
+        this.dashboardData.metrics.conversionRate = 3.5;
         this.isLoading = false;
       },
       error: (error) => {
@@ -145,5 +167,15 @@ export class DashboardPage implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  crearOrden(): void {
+    console.log('Crear una nueva orden');
+    // TODO: Implementar navegación a crear orden
+  }
+
+  agregarProducto(): void {
+    console.log('Agregar un nuevo producto');
+    // TODO: Implementar navegación a crear producto
   }
 }
