@@ -26,6 +26,7 @@ class EloquentSale extends Model
 
     protected $fillable = [
         'uuid',
+        'restaurant_id',
         'ticket_number',
         'status',
         'table_id',

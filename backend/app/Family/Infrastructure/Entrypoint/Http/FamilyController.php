@@ -26,8 +26,9 @@ class FamilyController
     {
         $perPage = $request->query('per_page', 15);
         $page = $request->query('page', 1);
+        $restaurantId = $request->user()?->restaurant_id;
 
-        $families = $this->familyRepository->list($page, $perPage);
+        $families = $this->familyRepository->list($page, $perPage, $restaurantId);
 
         return response()->json([
             'data' => $families->items(),

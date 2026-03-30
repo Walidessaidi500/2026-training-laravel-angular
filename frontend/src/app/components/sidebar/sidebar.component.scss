@@ -1,76 +1,161 @@
-/* --- SIDEBAR --- */
-.admin-split-pane {
-  --side-width: 80px; /* Sidebar estrecho como en la imagen */
-  --side-max-width: 80px;
-  --side-min-width: 80px;
+:host {
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
 }
 
-.logo-container {
+.sidebar-header {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px 0;
+  padding: 24px 0 20px 0;
+  border-bottom: 1px solid var(--sidebar-border);
+  --background: var(--sidebar-bg);
+  --padding-top: 0;
+  --padding-bottom: 0;
+  flex-shrink: 0;
   
-  .logo-icon {
-    width: 40px; height: 40px;
-    background: var(--ion-color-primary-light);
-    color: var(--ion-color-primary);
-    border-radius: 12px;
-    display: flex; justify-content: center; align-items: center;
-    font-size: 24px;
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--ion-color-primary) 0%, #6b4ec9 100%);
+      color: white;
+      border-radius: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      box-shadow: 0 4px 12px rgba(107, 78, 201, 0.2);
+      transition: transform 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
   }
 }
-.nav-menu {
-  background: transparent;
-  padding: 0 12px;
 
-  ion-item {
+.sidebar-content {
+  --background: var(--sidebar-bg);
+  padding: 16px 8px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.nav-menu {
+  --background: transparent;
+  padding: 8px 0;
+  
+  .nav-item {
     --background: transparent;
     --padding-start: 0;
     --inner-padding-end: 0;
-    margin-bottom: 8px;
+    --border-width: 0;
+    margin-bottom: 16px;
     border-radius: 12px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
+    min-height: 56px;
+    cursor: pointer;
     
     .nav-icon {
       width: 100%;
-      padding: 12px 0;
-      color: var(--ion-color-medium);
-      font-size: 22px;
+      height: 100%;
+      padding: 12px;
+      color: #9ca3af;
+      font-size: 24px;
       display: flex;
       justify-content: center;
-      transition: all 0.2s ease;
+      align-items: center;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 12px;
     }
 
     &.active {
-      --background: var(--ion-color-primary-light);
-      .nav-icon { color: var(--ion-color-primary); }
+      .nav-icon {
+        background: linear-gradient(135deg, var(--ion-color-primary) 0%, #6b4ec9 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(107, 78, 201, 0.2);
+      }
     }
     
-    &:hover:not(.active) .nav-icon {
-      color: var(--ion-color-dark);
+    &:hover:not(.active) {
+      .nav-icon {
+        background: #f3f4f6;
+        color: #374151;
+      }
     }
+    
+    &:active .nav-icon {
+      transform: scale(0.95);
+    }
+  }
+  
+  .nav-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--sidebar-border), transparent);
+    margin: 12px 4px;
   }
 }
 
 .sidebar-footer {
-  padding-bottom: 20px;
-  background: transparent;
+  padding: 16px 8px 20px 8px;
+  background: var(--sidebar-bg);
+  border-top: 1px solid var(--sidebar-border);
+  --background: var(--sidebar-bg);
+  flex-shrink: 0;
+  
+  ion-list {
+    padding: 0;
+    --background: transparent;
+  }
   
   .logout-item {
     --background: transparent;
-    --padding-start: 0; --inner-padding-end: 0;
-    display: flex; justify-content: center;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --border-width: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 56px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: #f3f4f6;
+    }
     
     .avatar-circle {
-      width: 40px; height: 40px;
-      background: var(--ion-color-danger); /* Usa tu color primary o danger */
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--ion-color-danger) 0%, #dc2626 100%);
       color: white;
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 600; font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+      transition: transform 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-menu ion-item .nav-icon {
+    font-size: 20px;
   }
 }

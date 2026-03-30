@@ -24,8 +24,9 @@ class TableController
     {
         $perPage = $request->query('per_page', 15);
         $page = $request->query('page', 1);
+        $restaurantId = $request->user()?->restaurant_id;
 
-        $tables = $this->tableRepository->list($page, $perPage);
+        $tables = $this->tableRepository->list($page, $perPage, $restaurantId);
 
         return response()->json([
             'data' => $tables->items(),

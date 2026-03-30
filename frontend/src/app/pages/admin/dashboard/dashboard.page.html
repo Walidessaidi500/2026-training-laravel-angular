@@ -1,6 +1,18 @@
 <ion-content class="dashboard-background">
   
-  <div class="dashboard-grid" *ngIf="!dashboardData">
+  <!-- Mensaje si no es admin -->
+  <div *ngIf="!isAdmin && !isLoading" class="admin-required-message">
+    <div class="alert-icon">
+      <ion-icon name="alert-circle"></ion-icon>
+    </div>
+    <h2>Acceso denegado</h2>
+    <p>Este dashboard solo está disponible para administradores.</p>
+    <p class="user-info">Usuario actual: {{ currentUser?.name }}</p>
+    <p class="user-role">Rol: {{ currentUser?.role }}</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="dashboard-grid" *ngIf="isLoading">
     <div class="main-column">
       <ion-skeleton-text animated style="height: 250px; border-radius: 16px; margin-bottom: 24px;"></ion-skeleton-text>
       <div class="micro-stats-grid">
@@ -12,7 +24,8 @@
     </div>
   </div>
 
-  <div class="dashboard-grid" *ngIf="dashboardData">
+  <!-- Dashboard content - solo para admin -->
+  <div class="dashboard-grid" *ngIf="dashboardData && isAdmin">
     
     <div class="main-column">
       
@@ -22,31 +35,34 @@
             <div class="icon-box primary">
               <ion-icon name="cash-outline"></ion-icon>
             </div>
-            <span class="label">TOTAL REVENUE</span>
+            <div>
+              <span class="label">INGRESOS TOTALES</span>
+              <small class="restaurant-info">Restaurante #{{ restaurantId }}</small>
+            </div>
           </div>
-          <button class="btn-soft">Details <ion-icon name="chevron-forward"></ion-icon></button>
+          <button class="btn-soft">Detalles <ion-icon name="chevron-forward"></ion-icon></button>
         </div>
         
         <div class="hero-content">
-          <div class="amount-large">{{ dashboardData.revenue.total | currency:'USD':'symbol':'1.0-0' }}</div>
+          <div class="amount-large">{{ dashboardData.revenue.total | currency:'EUR':'symbol':'1.0-0' }}</div>
           
           <div class="trend-badge" [ngClass]="{'success': dashboardData.revenue.trendPercentage >= 0, 'danger': dashboardData.revenue.trendPercentage < 0}">
             <ion-icon [name]="dashboardData.revenue.trendPercentage >= 0 ? 'arrow-up' : 'arrow-down'"></ion-icon> 
-            {{ dashboardData.revenue.trendPercentage }}% <span>vs last month</span>
+            {{ dashboardData.revenue.trendPercentage }}% <span>vs mes pasado</span>
           </div>
           
           <div class="sub-stats">
             <div class="stat-item">
-              <span class="label">THIS WEEK</span>
-              <strong>{{ dashboardData.revenue.thisWeek | currency:'USD':'symbol':'1.1-1' }}</strong>
+              <span class="label">ESTA SEMANA</span>
+              <strong>{{ dashboardData.revenue.thisWeek | currency:'EUR':'symbol':'1.1-1' }}</strong>
             </div>
             <div class="stat-item">
-              <span class="label">AVG ORDER</span>
-              <strong>{{ dashboardData.revenue.avgOrder | currency:'USD':'symbol':'1.2-2' }}</strong>
+              <span class="label">VALOR MEDIO DEL PEDIDO</span>
+              <strong>{{ dashboardData.revenue.avgOrder | currency:'EUR':'symbol':'1.2-2' }}</strong>
             </div>
             <div class="stat-item">
-              <span class="label">MRR</span>
-              <strong>{{ dashboardData.revenue.mrr | currency:'USD':'symbol':'1.1-1' }}</strong>
+              <span class="label">INGRESOS RECURRENTES MENSUALES</span>
+              <strong>{{ dashboardData.revenue.mrr | currency:'EUR':'symbol':'1.1-1' }}</strong>
             </div>
           </div>
         </div>
@@ -59,7 +75,7 @@
             <span class="trend-badge success small">+12.5%</span>
           </div>
           <div class="value">{{ dashboardData.metrics.activeUsers | number }}</div>
-          <div class="label">ACTIVE USERS</div>
+          <div class="label">USUARIOS ACTIVOS</div>
         </div>
         
         <div class="panel-card micro-card">
@@ -68,7 +84,7 @@
             <span class="trend-badge success small">+8.2%</span>
           </div>
           <div class="value">{{ dashboardData.metrics.ordersToday | number }}</div>
-          <div class="label">ORDERS TODAY</div>
+          <div class="label">PEDIDOS HOY</div>
         </div>
         
         <div class="panel-card micro-card">
@@ -86,7 +102,7 @@
             <span class="trend-badge success small">+3</span>
           </div>
           <div class="value">{{ dashboardData.metrics.totalProducts | number }}</div>
-          <div class="label">PRODUCTS</div>
+          <div class="label">PRODUCTOS</div>
         </div>
       </div>
 
@@ -101,7 +117,7 @@
           </div>
         </div>
         <div class="chart-header-stats">
-          <div class="amount-medium">{{ dashboardData.revenue.thisWeek | currency:'USD':'symbol':'1.0-0' }}</div>
+          <div class="amount-medium">{{ dashboardData.revenue.thisWeek | currency:'EUR':'symbol':'1.0-0' }}</div>
           <span class="trend-badge success"><ion-icon name="arrow-up"></ion-icon> 12.5%</span>
         </div>
         <div class="chart-placeholder">
@@ -112,10 +128,10 @@
       <div class="panel-card">
         <div class="card-header">
           <div>
-            <span class="label">RECENT ORDERS</span>
-            <h3>{{ dashboardData.recentOrders.length }} transactions</h3>
+            <span class="label">PEDIDOS RECIENTES</span>
+            <h3>{{ dashboardData.recentOrders.length }} transacciones</h3>
           </div>
-          <button class="btn-soft">View all <ion-icon name="arrow-forward-outline"></ion-icon></button>
+          <button class="btn-soft">Ver todo <ion-icon name="arrow-forward-outline"></ion-icon></button>
         </div>
         
         <ion-list class="transaction-list">

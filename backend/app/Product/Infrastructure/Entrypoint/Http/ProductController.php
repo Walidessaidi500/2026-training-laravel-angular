@@ -26,8 +26,9 @@ class ProductController
     {
         $perPage = $request->query('per_page', 15);
         $page = $request->query('page', 1);
+        $restaurantId = $request->user()?->restaurant_id;
 
-        $products = $this->productRepository->list($page, $perPage);
+        $products = $this->productRepository->list($page, $perPage, $restaurantId);
 
         return response()->json([
             'data' => $products->items(),

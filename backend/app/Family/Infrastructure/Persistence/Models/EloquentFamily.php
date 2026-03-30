@@ -22,6 +22,7 @@ class EloquentFamily extends Model
 
     protected $fillable = [
         'uuid',
+        'restaurant_id',
         'name',
         'active',
     ];

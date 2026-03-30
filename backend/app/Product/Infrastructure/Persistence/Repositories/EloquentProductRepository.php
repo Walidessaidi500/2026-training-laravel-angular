@@ -61,11 +61,17 @@ class EloquentProductRepository implements ProductRepositoryInterface
             ->all();
     }
 
-    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator
+    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator
     {
-        return $this->model->newQuery()
+        $query = $this->model->newQuery()
             ->with(['family', 'tax'])
-            ->orderBy('name')
+            ->orderBy('name');
+
+        if ($restaurantId !== null) {
+            $query->where('restaurant_id', $restaurantId);
+        }
+
+        return $query
             ->paginate($perPage, ['*'], 'page', $page)
             ->through(fn (EloquentProduct $model) => $this->toDomainEntity($model));
     }

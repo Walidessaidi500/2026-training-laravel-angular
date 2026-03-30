@@ -22,6 +22,7 @@ class EloquentTax extends Model
 
     protected $fillable = [
         'uuid',
+        'restaurant_id',
         'name',
         'percentage',
     ];

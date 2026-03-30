@@ -47,12 +47,17 @@ class EloquentTableRepository implements TableRepositoryInterface
             ->all();
     }
 
-    public function list(int $page = 1, int $perPage = 15): Paginator
+    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): Paginator
     {
-        $items = $this->model->newQuery()
+        $query = $this->model->newQuery()
             ->with('zone')
-            ->orderBy('name')
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->orderBy('name');
+
+        if ($restaurantId !== null) {
+            $query->where('restaurant_id', $restaurantId);
+        }
+
+        $items = $query->paginate($perPage, ['*'], 'page', $page);
 
         return $items->map(fn (EloquentTable $m) => $this->toDomainEntity($m));
     }

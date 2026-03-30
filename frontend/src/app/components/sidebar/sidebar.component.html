@@ -1,34 +1,45 @@
 <ion-header class="ion-no-border sidebar-header">
   <div class="logo-container">
-    <div class="logo-icon">
-      <ion-icon name="flame"></ion-icon> </div>
+    <div class="logo-icon" title="Restaurante App">
+      <ion-icon name="flame"></ion-icon>
+    </div>
   </div>
 </ion-header>
 
 <ion-content class="sidebar-content">
   <ion-list lines="none" class="nav-menu">
     
-    <ion-item button [class.active]="activeItem === 'dashboard'" (click)="navigate('dashboard')">
+    <!-- Dashboard -->
+    <ion-item button [class.active]="activeItem === 'dashboard'" (click)="navigate('dashboard')" title="Dashboard" class="nav-item">
       <div class="nav-icon"><ion-icon name="grid-outline"></ion-icon></div>
     </ion-item>
-
-    <ion-item button [class.active]="activeItem === 'productos'" (click)="navigate('productos')">
+    
+    <!-- Catálogo -->
+    <div class="nav-divider"></div>
+    
+    <ion-item button [class.active]="activeItem === 'productos'" (click)="navigate('productos')" title="Productos" class="nav-item">
       <div class="nav-icon"><ion-icon name="cube-outline"></ion-icon></div>
     </ion-item>
 
-    <ion-item button [class.active]="activeItem === 'familias'" (click)="navigate('familias')">
+    <ion-item button [class.active]="activeItem === 'familias'" (click)="navigate('familias')" title="Familias" class="nav-item">
       <div class="nav-icon"><ion-icon name="folder-outline"></ion-icon></div>
     </ion-item>
 
-    <ion-item button [class.active]="activeItem === 'impuestos'" (click)="navigate('impuestos')">
+    <!-- Configuración -->
+    <div class="nav-divider"></div>
+    
+    <ion-item button [class.active]="activeItem === 'impuestos'" (click)="navigate('impuestos')" title="Impuestos" class="nav-item">
       <div class="nav-icon"><ion-icon name="calculator-outline"></ion-icon></div>
     </ion-item>
 
-    <ion-item button [class.active]="activeItem === 'zonas'" (click)="navigate('zonas')">
+    <ion-item button [class.active]="activeItem === 'zonas'" (click)="navigate('zonas')" title="Zonas" class="nav-item">
       <div class="nav-icon"><ion-icon name="map-outline"></ion-icon></div>
     </ion-item>
 
-    <ion-item button [class.active]="activeItem === 'mesas'" (click)="navigate('mesas')">
+    <!-- Servicio -->
+    <div class="nav-divider"></div>
+    
+    <ion-item button [class.active]="activeItem === 'mesas'" (click)="navigate('mesas')" title="Mesas" class="nav-item">
       <div class="nav-icon"><ion-icon name="restaurant-outline"></ion-icon></div>
     </ion-item>
 
@@ -37,9 +48,10 @@
 
 <ion-footer class="ion-no-border sidebar-footer">
   <ion-list lines="none">
-    <ion-item button class="logout-item" (click)="logout()">
+    <ion-item button class="logout-item" (click)="logout()" title="Logout">
       <div class="avatar-circle">
-        <span>JD</span> </div>
+        <span>JD</span>
+      </div>
     </ion-item>
   </ion-list>
 </ion-footer>

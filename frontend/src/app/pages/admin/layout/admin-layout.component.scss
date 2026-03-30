@@ -1,4 +1,37 @@
+:host {
+  display: flex;
+  height: 100%;
+}
+
+ion-split-pane {
+  --side-width: 80px;
+  --side-min-width: 80px;
+  --side-max-width: 80px;
+  
+  ion-menu {
+    --width: 80px;
+    --min-width: 80px;
+    --max-width: 80px;
+  }
+}
+
+.ion-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  
+  app-admin-header {
+    flex-shrink: 0;
+  }
+  
+  ion-content {
+    flex: 1;
+    overflow: auto;
+  }
+}
+
 /* Fondo global para las vistas (el gris muy claro de la imagen) */
 .bg-light {
-  --background: var(--ion-color-light); 
+  --background: var(--ion-color-light);
 }

@@ -7,9 +7,15 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class EloquentSaleRepository
 {
-    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator
+    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator
     {
-        return EloquentSale::paginate($perPage, ['*'], 'page', $page);
+        $query = EloquentSale::query();
+
+        if ($restaurantId !== null) {
+            $query->where('restaurant_id', $restaurantId);
+        }
+
+        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function find(string $uuid): ?EloquentSale

@@ -16,8 +16,9 @@ class OrderController
     {
         $perPage = $request->query('per_page', 15);
         $page = $request->query('page', 1);
+        $restaurantId = $request->user()?->restaurant_id;
 
-        $orders = $this->orderRepository->list($page, $perPage);
+        $orders = $this->orderRepository->list($page, $perPage, $restaurantId);
 
         return response()->json([
             'data' => $orders->items(),

@@ -24,8 +24,9 @@ class ZoneController
     {
         $perPage = $request->query('per_page', 15);
         $page = $request->query('page', 1);
+        $restaurantId = $request->user()?->restaurant_id;
 
-        $zones = $this->zoneRepository->list($page, $perPage);
+        $zones = $this->zoneRepository->list($page, $perPage, $restaurantId);
 
         return response()->json([
             'data' => $zones->items(),

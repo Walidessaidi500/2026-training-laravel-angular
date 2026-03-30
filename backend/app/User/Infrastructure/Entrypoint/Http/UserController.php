@@ -16,8 +16,15 @@ class UserController
     {
         $perPage = $request->query('per_page', 15);
         $page = $request->query('page', 1);
+        $restaurantId = $request->user()?->restaurant_id;
 
-        $users = EloquentUser::paginate($perPage, ['*'], 'page', $page);
+        $query = EloquentUser::query();
+
+        if ($restaurantId !== null) {
+            $query->where('restaurant_id', $restaurantId);
+        }
+
+        $users = $query->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
             'data' => $users->items(),

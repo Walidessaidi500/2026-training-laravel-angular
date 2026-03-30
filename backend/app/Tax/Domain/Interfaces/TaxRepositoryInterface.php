@@ -17,7 +17,7 @@ interface TaxRepositoryInterface
      */
     public function findAll(): array;
 
-    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator;
+    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator;
 
     public function delete(Uuid $id): void;
 }

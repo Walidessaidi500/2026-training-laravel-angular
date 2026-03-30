@@ -50,10 +50,16 @@ class EloquentFamilyRepository implements FamilyRepositoryInterface
             ->all();
     }
 
-    public function list(int $page = 1, int $perPage = 15): LengthAwarePaginator
+    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator
     {
-        return $this->model->newQuery()
-            ->orderBy('name')
+        $query = $this->model->newQuery()
+            ->orderBy('name');
+
+        if ($restaurantId !== null) {
+            $query->where('restaurant_id', $restaurantId);
+        }
+
+        return $query
             ->paginate($perPage, ['*'], 'page', $page)
             ->through(fn (EloquentFamily $model) => $this->toDomainEntity($model));
     }
