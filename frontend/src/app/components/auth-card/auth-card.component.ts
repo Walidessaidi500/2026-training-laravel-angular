@@ -15,7 +15,6 @@ export class AuthCardComponent {
   @Input() description: string = '';
   @Input() buttonLabel: string = '';
   @Input() buttonColor: string = 'primary';
-  @Input() cardType: 'login' | 'register' = 'login';
   @Output() buttonClick = new EventEmitter<void>();
 
   onButtonClick(): void {

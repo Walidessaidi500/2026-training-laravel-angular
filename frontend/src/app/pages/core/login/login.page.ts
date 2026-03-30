@@ -66,7 +66,4 @@ export class LoginPage implements OnInit {
     });
   }
 
-  navigateToRegister(): void {
-    this.router.navigate(['/register']);
-  }
 }
