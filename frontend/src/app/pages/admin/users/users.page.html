@@ -1,0 +1,163 @@
+<ion-content class="users-background">
+  
+  <!-- Mensaje si no es admin -->
+  <div *ngIf="!isAdmin && !isLoading" class="admin-required-message">
+    <div class="alert-icon">
+      <ion-icon name="alert-circle"></ion-icon>
+    </div>
+    <h2>Acceso denegado</h2>
+    <p>Esta página solo está disponible para administradores.</p>
+    <p class="user-info">Usuario actual: {{ currentUser?.name }}</p>
+    <p class="user-role">Rol: {{ currentUser?.role }}</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="users-container" *ngIf="isLoading">
+    <div class="page-header">
+      <ion-skeleton-text animated style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text>
+    </div>
+    <div class="stats-grid">
+      <ion-skeleton-text animated style="height: 100px; border-radius: 16px;" *ngFor="let i of [1,2,3,4]"></ion-skeleton-text>
+    </div>
+    <div class="table-skeleton">
+      <ion-skeleton-text animated style="height: 500px; border-radius: 16px;"></ion-skeleton-text>
+    </div>
+  </div>
+
+  <!-- Users content - solo para admin -->
+  <div class="users-container" *ngIf="!isLoading && isAdmin">
+    
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="icon-box primary">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <div>
+          <h1>Gestión de Usuarios</h1>
+          <p class="subtitle">Administra todos los usuarios del sistema</p>
+        </div>
+      </div>
+      <button class="btn-primary" (click)="addNewUser()">
+        <ion-icon name="add-outline"></ion-icon>
+        Nuevo Usuario
+      </button>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="panel-card stat-card">
+        <div class="stat-content">
+          <div class="icon-box primary-light">
+            <ion-icon name="people" color="primary"></ion-icon>
+          </div>
+          <div>
+            <div class="stat-value">{{ userStats.total }}</div>
+            <div class="stat-label">TOTAL DE USUARIOS</div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel-card stat-card">
+        <div class="stat-content">
+          <div class="icon-box warning-light">
+            <ion-icon name="shield" color="warning"></ion-icon>
+          </div>
+          <div>
+            <div class="stat-value">{{ userStats.admins }}</div>
+            <div class="stat-label">ADMINISTRADORES</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter and Search Panel -->
+    <div class="panel-card filter-panel">
+      <div class="search-section">
+        <ion-icon name="search-outline" class="search-icon"></ion-icon>
+        <ion-searchbar
+          placeholder="Buscar por nombre o email..."
+          (ionChange)="onSearchChange($event)"
+          [value]="searchTerm"
+          class="custom-searchbar"
+        ></ion-searchbar>
+      </div>
+
+      <div class="filter-section">
+        <span class="filter-label">FILTRAR POR ROL:</span>
+        <ion-segment
+          [value]="selectedRole"
+          (ionChange)="onRoleChange($event)"
+          class="role-segment"
+        >
+          <ion-segment-button value="all">
+            <ion-label>Todos</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="admin">
+            <ion-label>Admin</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="supervisor">
+            <ion-label>Supervisor</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="operator">
+            <ion-label>Operador</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+    </div>
+
+    <!-- Users Table Panel -->
+    <div class="panel-card table-panel">
+      <div class="card-header">
+        <div>
+          <span class="label">USUARIOS {{ selectedRole !== 'all' ? '- ' + selectedRole.toUpperCase() : '' }}</span>
+          <h3>{{ filteredUsers.length }} usuario{{ filteredUsers.length !== 1 ? 's' : '' }}</h3>
+        </div>
+        <span class="result-count">{{ filteredUsers.length }} de {{ users.length }}</span>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredUsers.length === 0">
+        <div class="empty-icon">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <p class="empty-title">No hay usuarios</p>
+        <p class="empty-description">
+          {{ searchTerm || selectedRole !== 'all' ? 'No se encontraron usuarios con los filtros aplicados' : 'Comienza agregando el primer usuario' }}
+        </p>
+      </div>
+
+      <!-- Users List -->
+      <ion-list class="users-list" *ngIf="filteredUsers.length > 0">
+        <ion-item lines="none" class="user-item" *ngFor="let user of filteredUsers">
+          <!-- Avatar -->
+          <div slot="start" class="avatar-circle" [style.background-color]="'var(--ion-color-primary)'">
+            {{ getInitials(user.name) }}
+          </div>
+
+          <!-- User Info -->
+          <ion-label class="user-info">
+            <h2>{{ user.name }}</h2>
+            <p class="user-email">{{ user.email }}</p>
+            <div class="user-meta">
+              <span class="badge-role" [ngClass]="getRoleBadgeClass(user.role)">
+                {{ user.role | uppercase }}
+              </span>
+            </div>
+          </ion-label>
+
+          <!-- Actions -->
+          <div slot="end" class="actions">
+            <button class="action-btn edit-btn" (click)="editUser(user)" title="Editar">
+              <ion-icon name="create-outline"></ion-icon>
+            </button>
+            <button class="action-btn delete-btn" (click)="deleteUser(user)" title="Eliminar">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>
