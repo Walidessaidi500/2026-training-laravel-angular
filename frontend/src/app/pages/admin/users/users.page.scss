@@ -355,35 +355,62 @@
 // ==================== ACTION BUTTONS ====================
 .action-btn {
   background: transparent;
-  border: none;
+  border: 1.5px solid;
   border-radius: 8px;
-  width: 36px;
-  height: 36px;
-  display: flex;
+  min-width: 40px;
+  min-height: 40px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 18px;
+  transition: all 0.2s ease;
+  padding: 0;
+  position: relative;
 
   &.edit-btn {
     color: var(--ion-color-primary);
+    border-color: var(--ion-color-primary);
+    background: rgba(255, 83, 48, 0.08);
 
     &:hover {
       background: var(--ion-color-primary-light);
+      border-color: var(--ion-color-primary-shade);
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(255, 83, 48, 0.15);
+    }
+
+    ion-icon {
+      color: var(--ion-color-primary) !important;
     }
   }
 
   &.delete-btn {
     color: var(--ion-color-danger);
+    border-color: var(--ion-color-danger);
+    background: rgba(255, 107, 107, 0.08);
 
     &:hover {
       background: var(--ion-color-danger-light);
+      border-color: var(--ion-color-danger-shade);
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(255, 107, 107, 0.15);
+    }
+
+    ion-icon {
+      color: var(--ion-color-danger) !important;
     }
   }
 
   &:active {
     transform: scale(0.95);
+  }
+
+  ion-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
   }
 }
 

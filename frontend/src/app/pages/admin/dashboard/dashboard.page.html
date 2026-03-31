@@ -165,7 +165,7 @@
       
       <div class="panel-card list-card">
         <div class="card-header">
-          <span class="label">QUICK ACTIONS</span>
+          <span class="label">SHORTCUTS</span>
           <ion-icon name="flash-outline" color="medium"></ion-icon>
         </div>
         <ion-list>
@@ -174,8 +174,8 @@
               <ion-icon name="cart" color="primary"></ion-icon>
             </div>
             <ion-label>
-              <h2>New Order</h2>
-              <p>Create transaction</p>
+              <h2>Nuevo Pedidor</h2>
+              <p>Crear una transacción</p>
             </ion-label>
           </ion-item>
           <ion-item lines="none" button class="action-item" detail="true" (click)="agregarProducto()">
@@ -183,8 +183,8 @@
               <ion-icon name="cube" color="primary"></ion-icon>
             </div>
             <ion-label>
-              <h2>Add Product</h2>
-              <p>List new item</p>
+              <h2>Añadir productot</h2>
+              <p>Listar nuevo item</p>
             </ion-label>
           </ion-item>
         </ion-list>
@@ -192,7 +192,7 @@
 
       <div class="panel-card list-card">
         <div class="card-header">
-          <span class="label">ALERTS</span>
+          <span class="label">ALERTAS</span>
           <div class="badge-count">{{ dashboardData.alerts.length }}</div>
         </div>
         
@@ -210,10 +210,10 @@
 
       <div class="panel-card timeline-card">
         <div class="card-header">
-          <span class="label">ACTIVITY FEED</span>
+          <span class="label">CENTRO DE ACTIVIDAD</span>
           <div class="badge-count outline">{{ dashboardData.activities.length }} events</div>
         </div>
-        <h3>Live updates</h3>
+        <h3>ACTUALIZACIONES EN DIRECTO</h3>
         
         <div class="timeline">
           <div class="timeline-item" *ngFor="let activity of dashboardData.activities">
