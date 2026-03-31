@@ -23,6 +23,7 @@ class EloquentUserRepository implements UserRepositoryInterface
                 'name' => $user->name(),
                 'email' => $user->email()->value(),
                 'password' => $user->passwordHash(),
+                'role' => $user->role(),
                 'created_at' => $user->createdAt()->value(),
                 'updated_at' => $user->updatedAt()->value(),
             ]
@@ -61,6 +62,7 @@ class EloquentUserRepository implements UserRepositoryInterface
             $model->restaurant_id,
             $model->created_at->toDateTimeImmutable(),
             $model->updated_at->toDateTimeImmutable(),
+            $model->role
         );
     }
 }

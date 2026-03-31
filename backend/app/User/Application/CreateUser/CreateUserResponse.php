@@ -21,6 +21,7 @@ final readonly class CreateUserResponse
             id: $user->id()->value(),
             name: $user->name(),
             email: $user->email()->value(),
+            role: $user->role(),
             createdAt: $user->createdAt()->format(\DateTimeInterface::ATOM),
             updatedAt: $user->updatedAt()->format(\DateTimeInterface::ATOM),
         );
@@ -31,8 +32,10 @@ final readonly class CreateUserResponse
     {
         return [
             'id' => $this->id,
+            'uuid' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'role' => $this->role,
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
         ];

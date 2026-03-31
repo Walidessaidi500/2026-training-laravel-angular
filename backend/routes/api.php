@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', GetAuthenticatedUserController::class);
 
     // Usuarios
-    Route::post('/users', PostController::class);
+    // (Movido a role:admin)
 
     // Restaurantes
     Route::get('/restaurants', [RestaurantController::class, 'index']);
@@ -70,12 +70,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/tables/{uuid}', [TableController::class, 'destroy']);
 
     // Usuarios
-    Route::get('/users', [UserController::class, 'index']);
-    Route::get('/users/{uuid}', [UserController::class, 'show']);
-    Route::post('/users-admin', [UserController::class, 'store']);
-    Route::put('/users/{uuid}', [UserController::class, 'update']);
-    Route::delete('/users/{uuid}', [UserController::class, 'destroy']);
-    Route::patch('/users/{uuid}/toggle-active', [UserController::class, 'toggleActive']);
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/users', [UserController::class, 'index']);
+        Route::get('/users/{uuid}', [UserController::class, 'show']);
+        Route::post('/users', PostController::class);
+        Route::put('/users/{uuid}', [UserController::class, 'update']);
+        Route::delete('/users/{uuid}', [UserController::class, 'destroy']);
+        Route::patch('/users/{uuid}/toggle-active', [UserController::class, 'toggleActive']);
+    });
 
     // Órdenes
     Route::get('/orders', [OrderController::class, 'index']);

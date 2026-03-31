@@ -14,12 +14,14 @@
       <div class="nav-icon"><ion-icon name="grid-outline"></ion-icon></div>
     </ion-item>
 
-      <!-- Sistema -->
-    <div class="nav-divider"></div>
-    
-    <ion-item button [class.active]="activeItem === 'users'" (click)="navigate('users')" title="Usuarios" class="nav-item">
-      <div class="nav-icon"><ion-icon name="people-outline"></ion-icon></div>
-    </ion-item>
+    <!-- Sistema -->
+    <ng-container *ngIf="isAdmin">
+      <div class="nav-divider"></div>
+      
+      <ion-item button [class.active]="activeItem === 'users'" (click)="navigate('users')" title="Usuarios" class="nav-item">
+        <div class="nav-icon"><ion-icon name="people-outline"></ion-icon></div>
+      </ion-item>
+    </ng-container>
 
     
     <!-- Catálogo -->

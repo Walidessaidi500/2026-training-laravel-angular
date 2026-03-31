@@ -18,20 +18,24 @@ class PostController
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['sometimes', 'string', 'in:admin,supervisor,operator'],
         ]);
 
         // Obtener restaurant_id del usuario autenticado
         $authenticatedUser = $request->user();
 
-        if (!$authenticatedUser || !$authenticatedUser->restaurant_id) {
+        if (! $authenticatedUser || ! $authenticatedUser->restaurant_id) {
             return new JsonResponse(['message' => 'Usuario no autenticado o sin restaurante asignado'], 401);
         }
+
+        $role = $validated['role'] ?? 'operator';
 
         $response = ($this->createUser)(
             $validated['email'],
             $validated['name'],
             $validated['password'],
             $authenticatedUser->restaurant_id,
+            $role
         );
 
         return new JsonResponse($response->toArray(), 201);
