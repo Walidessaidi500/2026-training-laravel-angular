@@ -6,6 +6,7 @@ use App\Shared\Domain\ValueObject\DomainDateTime;
 use App\Shared\Domain\ValueObject\Email;
 use App\Shared\Domain\ValueObject\Uuid;
 use App\User\Domain\ValueObject\PasswordHash;
+use App\User\Domain\ValueObject\RestaurantId;
 use App\User\Domain\ValueObject\UserName;
 
 class User
@@ -15,11 +16,12 @@ class User
         private UserName $name,
         private Email $email,
         private PasswordHash $passwordHash,
+        private RestaurantId $restaurantId,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
     ) {}
 
-    public static function dddCreate(Email $email, UserName $name, PasswordHash $passwordHash): self
+    public static function dddCreate(Email $email, UserName $name, PasswordHash $passwordHash, RestaurantId $restaurantId): self
     {
         $now = DomainDateTime::now();
 
@@ -28,6 +30,7 @@ class User
             $name,
             $email,
             $passwordHash,
+            $restaurantId,
             $now,
             $now,
         );
@@ -38,6 +41,7 @@ class User
         string $name,
         string $email,
         string $passwordHash,
+        int $restaurantId,
         \DateTimeImmutable $createdAt,
         \DateTimeImmutable $updatedAt,
     ): self {
@@ -46,6 +50,7 @@ class User
             UserName::create($name),
             Email::create($email),
             PasswordHash::create($passwordHash),
+            RestaurantId::create($restaurantId),
             DomainDateTime::create($createdAt),
             DomainDateTime::create($updatedAt),
         );
@@ -69,6 +74,11 @@ class User
     public function passwordHash(): string
     {
         return $this->passwordHash->value();
+    }
+
+    public function restaurantId(): RestaurantId
+    {
+        return $this->restaurantId;
     }
 
     public function createdAt(): DomainDateTime

@@ -15,13 +15,15 @@ use App\Zone\Infrastructure\Entrypoint\Http\ZoneController;
 use Illuminate\Support\Facades\Route;
 
 // Rutas públicas
-Route::post('/users', PostController::class);
 Route::post('/login', LoginController::class);
 
 // Rutas protegidas (requieren token Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
     // Autenticación
     Route::get('/me', GetAuthenticatedUserController::class);
+
+    // Usuarios
+    Route::post('/users', PostController::class);
 
     // Restaurantes
     Route::get('/restaurants', [RestaurantController::class, 'index']);

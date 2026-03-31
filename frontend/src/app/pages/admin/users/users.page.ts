@@ -11,9 +11,13 @@ import {
   IonSearchbar,
   IonSegment,
   IonSegmentButton,
+  ModalController,
+  AlertController,
+  ToastController,
 } from '@ionic/angular/standalone';
 import { AuthService } from '@services/auth/auth.service';
 import { UserService } from '@services/domain/user.service';
+import { UserFormComponent, UserFormData } from '@components/user-form/user-form.component';
 
 interface User {
   uuid: string;
@@ -70,7 +74,10 @@ export class UsersPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private modalController: ModalController,
+    private alertController: AlertController,
+    private toastController: ToastController
   ) {}
 
   ngOnInit(): void {
@@ -150,18 +157,138 @@ export class UsersPage implements OnInit {
     return this.roleColors[role] || 'medium';
   }
 
-  editUser(user: User): void {
-    console.log('Edit user:', user);
-    // Implementar navegación a página de edición
+ async addNewUser(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: UserFormComponent,
+      componentProps: {
+        user: null,
+      },
+      cssClass: 'fullscreen-modal', // Cambiamos la clase
+      backdropDismiss: false,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data) {
+      this.handleCreateUser(data);
+    }
   }
 
-  deleteUser(user: User): void {
-    console.log('Delete user:', user);
-    // Implementar eliminación con confirmación
+  async editUser(user: User): Promise<void> {
+    const modal = await this.modalController.create({
+      component: UserFormComponent,
+      componentProps: {
+        user: {
+          uuid: user.uuid,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          status: user.status,
+        },
+      },
+      cssClass: 'user-form-modal',
+      backdropDismiss: false,
+      // --- CONFIGURACIÓN PARA PANTALLA COMPLETA ---
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+      // --------------------------------------------
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data) {
+      this.handleUpdateUser(user.uuid, data);
+    }
   }
 
-  addNewUser(): void {
-    console.log('Add new user');
-    // Implementar navegación a página de crear usuario
+  async deleteUser(user: User): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Eliminar Usuario',
+      message: `¿Estás seguro de que deseas eliminar a <strong>${user.name}</strong>? Esta acción no se puede deshacer.`,
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('Delete cancelled');
+          },
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: () => {
+            this.performDeleteUser(user.uuid);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  private handleCreateUser(formData: UserFormData): void {
+    this.userService.create(formData).subscribe({
+      next: (response) => {
+        this.showSuccessToast('Usuario creado exitosamente');
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error('Error creating user:', error);
+        this.showErrorToast('Error al crear el usuario');
+      },
+    });
+  }
+
+  private handleUpdateUser(uuid: string, formData: UserFormData): void {
+    this.userService.update(uuid, formData).subscribe({
+      next: (response) => {
+        this.showSuccessToast('Usuario actualizado exitosamente');
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error('Error updating user:', error);
+        this.showErrorToast('Error al actualizar el usuario');
+      },
+    });
+  }
+
+  private performDeleteUser(uuid: string): void {
+    this.userService.delete(uuid).subscribe({
+      next: (response) => {
+        this.showSuccessToast('Usuario eliminado exitosamente');
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error('Error deleting user:', error);
+        this.showErrorToast('Error al eliminar el usuario');
+      },
+    });
+  }
+
+  private async showSuccessToast(message: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'top',
+      color: 'success',
+      icon: 'checkmark-circle',
+    });
+    await toast.present();
+  }
+
+  private async showErrorToast(message: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'top',
+      color: 'danger',
+      icon: 'alert-circle',
+    });
+    await toast.present();
   }
 }

@@ -19,6 +19,7 @@ class EloquentUserRepository implements UserRepositoryInterface
         $this->model->newQuery()->updateOrCreate(
             ['uuid' => $user->id()->value()],
             [
+                'restaurant_id' => $user->restaurantId()->value(),
                 'name' => $user->name(),
                 'email' => $user->email()->value(),
                 'password' => $user->passwordHash(),
@@ -57,6 +58,7 @@ class EloquentUserRepository implements UserRepositoryInterface
             $model->name,
             $model->email,
             $model->password,
+            $model->restaurant_id,
             $model->created_at->toDateTimeImmutable(),
             $model->updated_at->toDateTimeImmutable(),
         );

@@ -10,6 +10,7 @@ final readonly class CreateUserResponse
         public string $id,
         public string $name,
         public string $email,
+        public string $role,
         public string $createdAt,
         public string $updatedAt,
     ) {}

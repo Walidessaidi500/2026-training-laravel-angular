@@ -7,6 +7,7 @@ use App\User\Domain\Entity\User;
 use App\User\Domain\Interfaces\PasswordHasherInterface;
 use App\User\Domain\Interfaces\UserRepositoryInterface;
 use App\User\Domain\ValueObject\PasswordHash;
+use App\User\Domain\ValueObject\RestaurantId;
 use App\User\Domain\ValueObject\UserName;
 
 class CreateUser
@@ -16,12 +17,13 @@ class CreateUser
         private PasswordHasherInterface $passwordHasher,
     ) {}
 
-    public function __invoke(string $email, string $name, string $plainPassword): CreateUserResponse
+    public function __invoke(string $email, string $name, string $plainPassword, int $restaurantId): CreateUserResponse
     {
         $emailVO = Email::create($email);
         $nameVO = UserName::create($name);
         $passwordHashVO = PasswordHash::create($this->passwordHasher->hash($plainPassword));
-        $user = User::dddCreate($emailVO, $nameVO, $passwordHashVO);
+        $restaurantIdVO = RestaurantId::create($restaurantId);
+        $user = User::dddCreate($emailVO, $nameVO, $passwordHashVO, $restaurantIdVO);
         $this->userRepository->save($user);
 
         return CreateUserResponse::create($user);
