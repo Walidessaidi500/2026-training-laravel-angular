@@ -7,7 +7,6 @@ export interface Tax {
   uuid: string;
   name: string;
   percentage: number;
-  active: boolean;
   created_at: string;
 }
 

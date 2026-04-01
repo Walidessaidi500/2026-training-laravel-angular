@@ -1,0 +1,45 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>{{ isEditMode ? 'Editar Familia' : 'Nueva Familia' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" color="medium">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding custom-form-content">
+  <form [formGroup]="familyForm" (ngSubmit)="onSubmit()" class="yurest-form">
+
+    <div class="form-group">
+      <ion-label class="form-label">Nombre de la Familia <span class="required">*</span></ion-label>
+      <ion-item lines="none" class="custom-input-item" [class.has-error]="f['name'].invalid && f['name'].touched">
+        <ion-input formControlName="name" type="text" placeholder="Ej: Bebidas, Postres, Principales..."
+          clearInput></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="f['name'].invalid && f['name'].touched" class="error-msg">
+        El nombre es obligatorio (2-50 caracteres).
+      </ion-note>
+    </div>
+
+    <div class="form-group toggle-group">
+      <ion-item lines="none" class="custom-toggle-item">
+        <ion-label>
+          <h3>Estado</h3>
+          <p>{{ familyForm.get('active')?.value ? 'Activa (Visible en TPV)' : 'Inactiva (Oculta)' }}</p>
+        </ion-label>
+        <ion-toggle slot="end" formControlName="active" color="success"></ion-toggle>
+      </ion-item>
+    </div>
+
+  </form>
+</ion-content>
+
+<div class="modal-footer">
+  <button type="button" class="btn-cancel" (click)="dismiss()">Cancelar</button>
+  <button type="submit" class="btn-primary" [disabled]="familyForm.invalid" (click)="onSubmit()">
+    <ion-icon name="save-outline"></ion-icon>
+    {{ isEditMode ? 'Guardar Cambios' : 'Crear Familia' }}
+  </button>
+</div>

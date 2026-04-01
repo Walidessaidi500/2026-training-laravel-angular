@@ -19,6 +19,7 @@ class EloquentFamilyRepository implements FamilyRepositoryInterface
         $this->model->newQuery()->updateOrCreate(
             ['uuid' => $family->id()->value()],
             [
+                'restaurant_id' => $family->restaurantId(),
                 'name' => $family->name(),
                 'active' => $family->isActive(),
                 'created_at' => $family->createdAt()->value(),
@@ -73,6 +74,7 @@ class EloquentFamilyRepository implements FamilyRepositoryInterface
     {
         return Family::fromPersistence(
             $model->uuid,
+            (int) $model->restaurant_id,
             $model->name,
             (bool) $model->active,
             $model->created_at->toDateTimeImmutable(),

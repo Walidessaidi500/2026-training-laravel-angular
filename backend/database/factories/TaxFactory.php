@@ -17,6 +17,7 @@ class TaxFactory extends Factory
     {
         return [
             'uuid' => (string) Str::uuid(),
+            'restaurant_id' => 1,
             'name' => fake()->unique()->word(),
             'percentage' => fake()->randomElement([4, 10, 21]),
         ];

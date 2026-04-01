@@ -14,11 +14,12 @@ class CreateTax
         private TaxRepositoryInterface $taxRepository,
     ) {}
 
-    public function __invoke(string $name, int $percentage): TaxResponse
+    public function __invoke(string $name, int $percentage, int $restaurantId): TaxResponse
     {
         $tax = Tax::dddCreate(
             TaxName::create($name),
             TaxPercentage::create($percentage),
+            $restaurantId,
         );
 
         $this->taxRepository->save($tax);

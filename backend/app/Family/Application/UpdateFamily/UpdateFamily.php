@@ -13,7 +13,7 @@ class UpdateFamily
         private FamilyRepositoryInterface $familyRepository,
     ) {}
 
-    public function __invoke(string $id, string $name): FamilyResponse
+    public function __invoke(string $id, string $name, bool $active): FamilyResponse
     {
         $uuid = Uuid::create($id);
         $family = $this->familyRepository->findById($uuid);
@@ -23,6 +23,10 @@ class UpdateFamily
         }
 
         $family->updateName(FamilyName::create($name));
+        
+        if ($family->isActive() !== $active) {
+            $family->toggleActive();
+        }
 
         $this->familyRepository->save($family);
 

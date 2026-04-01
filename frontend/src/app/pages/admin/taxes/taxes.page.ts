@@ -37,7 +37,6 @@ interface Tax {
   uuid: string;
   name: string;
   rate: number;
-  active: boolean;
   restaurant_id?: number;
 }
 
@@ -70,8 +69,7 @@ export class TaxesPage implements OnInit {
   searchTerm = '';
 
   taxStats = {
-    total: 0,
-    active: 0,
+    total: 0
   };
 
   constructor(
@@ -131,7 +129,6 @@ export class TaxesPage implements OnInit {
 
   private calculateStats(): void {
     this.taxStats.total = this.taxes.length;
-    this.taxStats.active = this.taxes.filter((t) => t.active).length;
   }
 
   onSearchChange(event: any): void {
@@ -196,8 +193,7 @@ export class TaxesPage implements OnInit {
     // Mapeamos 'rate' a 'percentage' para el backend
     const apiData = {
       name: formData.name,
-      percentage: formData.rate,
-      active: formData.active
+      percentage: formData.rate
     };
 
     this.taxService.create(apiData).subscribe({
@@ -218,8 +214,7 @@ export class TaxesPage implements OnInit {
     // Mapeamos 'rate' a 'percentage' para el backend
     const apiData = {
       name: formData.name,
-      percentage: formData.rate,
-      active: formData.active
+      percentage: formData.rate
     };
 
     this.taxService.update(uuid, apiData).subscribe({

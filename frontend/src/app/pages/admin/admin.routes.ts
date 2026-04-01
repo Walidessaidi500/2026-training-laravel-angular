@@ -23,6 +23,10 @@ export const ADMIN_ROUTES: Routes = [
         path: 'taxes',
         loadComponent: () => import('./taxes/taxes.page').then((m) => m.TaxesPage),
       },
+      {
+        path: 'families',
+        loadComponent: () => import('./families/families.page').then((m) => m.FamiliesPage),
+      },
     ],
   },
 ];

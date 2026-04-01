@@ -19,6 +19,7 @@ class EloquentTaxRepository implements TaxRepositoryInterface
         $this->model->newQuery()->updateOrCreate(
             ['uuid' => $tax->id()->value()],
             [
+                'restaurant_id' => $tax->restaurantId(),
                 'name' => $tax->name(),
                 'percentage' => $tax->percentage(),
                 'created_at' => $tax->createdAt()->value(),
@@ -73,6 +74,7 @@ class EloquentTaxRepository implements TaxRepositoryInterface
     {
         return Tax::fromPersistence(
             $model->uuid,
+            (int) $model->restaurant_id,
             $model->name,
             (int) $model->percentage,
             $model->created_at->toDateTimeImmutable(),

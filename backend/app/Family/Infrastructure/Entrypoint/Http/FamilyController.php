@@ -56,9 +56,12 @@ class FamilyController
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'active' => ['sometimes', 'boolean'],
         ]);
 
-        $response = ($this->createFamily)($validated['name']);
+        $restaurantId = $request->user()->restaurant_id;
+
+        $response = ($this->createFamily)($validated['name'], (int) $restaurantId, (bool) ($validated['active'] ?? true));
 
         return new JsonResponse($response->toArray(), 201);
     }
@@ -67,10 +70,11 @@ class FamilyController
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'active' => ['required', 'boolean'],
         ]);
 
         try {
-            $response = ($this->updateFamily)($uuid, $validated['name']);
+            $response = ($this->updateFamily)($uuid, $validated['name'], (bool) $validated['active']);
 
             return new JsonResponse($response->toArray(), 200);
         } catch (\InvalidArgumentException $e) {

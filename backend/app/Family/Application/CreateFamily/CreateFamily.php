@@ -13,10 +13,12 @@ class CreateFamily
         private FamilyRepositoryInterface $familyRepository,
     ) {}
 
-    public function __invoke(string $name): FamilyResponse
+    public function __invoke(string $name, int $restaurantId, bool $active = true): FamilyResponse
     {
         $family = Family::dddCreate(
             FamilyName::create($name),
+            $restaurantId,
+            $active,
         );
 
         $this->familyRepository->save($family);

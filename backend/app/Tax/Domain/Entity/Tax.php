@@ -11,18 +11,20 @@ class Tax implements \JsonSerializable
 {
     private function __construct(
         private Uuid $id,
+        private int $restaurantId,
         private TaxName $name,
         private TaxPercentage $percentage,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
     ) {}
 
-    public static function dddCreate(TaxName $name, TaxPercentage $percentage): self
+    public static function dddCreate(TaxName $name, TaxPercentage $percentage, int $restaurantId): self
     {
         $now = DomainDateTime::now();
 
         return new self(
             Uuid::generate(),
+            $restaurantId,
             $name,
             $percentage,
             $now,
@@ -32,6 +34,7 @@ class Tax implements \JsonSerializable
 
     public static function fromPersistence(
         string $id,
+        int $restaurantId,
         string $name,
         int $percentage,
         \DateTimeImmutable $createdAt,
@@ -39,6 +42,7 @@ class Tax implements \JsonSerializable
     ): self {
         return new self(
             Uuid::create($id),
+            $restaurantId,
             TaxName::create($name),
             TaxPercentage::create($percentage),
             DomainDateTime::create($createdAt),
@@ -49,6 +53,11 @@ class Tax implements \JsonSerializable
     public function id(): Uuid
     {
         return $this->id;
+    }
+
+    public function restaurantId(): int
+    {
+        return $this->restaurantId;
     }
 
     public function name(): string
@@ -82,6 +91,7 @@ class Tax implements \JsonSerializable
     {
         return [
             'uuid' => $this->id->value(),
+            'restaurant_id' => $this->restaurantId,
             'name' => $this->name->value(),
             'percentage' => $this->percentage->value(),
             'created_at' => $this->createdAt->value()->format('Y-m-d\TH:i:s.u\Z'),

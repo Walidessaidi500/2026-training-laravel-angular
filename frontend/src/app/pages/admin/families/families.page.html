@@ -1,0 +1,112 @@
+<ion-content class="families-background">
+  <app-access-denied *ngIf="!isAdmin && !isLoading" [user]="currentUser"
+    message="Esta página solo está disponible para administradores."></app-access-denied>
+
+  <div class="families-container" *ngIf="isLoading">
+    <div class="page-header"><ion-skeleton-text animated
+        style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text></div>
+    <div class="stats-grid"><ion-skeleton-text animated style="height: 100px; border-radius: 16px;"
+        *ngFor="let i of [1,2]"></ion-skeleton-text></div>
+    <div class="table-skeleton"><ion-skeleton-text animated
+        style="height: 500px; border-radius: 16px;"></ion-skeleton-text></div>
+  </div>
+
+  <div class="families-container" *ngIf="!isLoading && isAdmin">
+    <div class="page-header">
+      <div class="header-content">
+        <div class="icon-box primary">
+          <ion-icon name="folder-outline"></ion-icon>
+        </div>
+        <div>
+          <h1>Familias de Productos</h1>
+          <p class="subtitle">Organiza tu catálogo en categorías</p>
+        </div>
+      </div>
+      <button class="btn-primary" (click)="addNewFamily()">
+        <ion-icon name="add-outline"></ion-icon> Nueva Familia
+      </button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="panel-card stat-card">
+        <div class="stat-content">
+          <div class="icon-box primary-light"><ion-icon name="folder" color="primary"></ion-icon></div>
+          <div>
+            <div class="stat-value">{{ familyStats.total }}</div>
+            <div class="stat-label">TOTAL FAMILIAS</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-card stat-card">
+        <div class="stat-content">
+          <div class="icon-box success-light"><ion-icon name="checkmark-circle" color="success"></ion-icon></div>
+          <div>
+            <div class="stat-value">{{ familyStats.active }}</div>
+            <div class="stat-label">FAMILIAS ACTIVAS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card filter-panel">
+      <div class="search-section">
+        <ion-icon name="search-outline" class="search-icon"></ion-icon>
+        <ion-searchbar placeholder="Buscar familia..." (ionChange)="onSearchChange($event)" [value]="searchTerm"
+          class="custom-searchbar"></ion-searchbar>
+      </div>
+
+
+      <div class="filter-section">
+        <span class="filter-label">FILTRAR POR ESTADO:</span>
+        <ion-segment [value]="selectedStatus" (ionChange)="onStatusChange($event)" class="status-segment">
+          <ion-segment-button value="all">
+            <ion-label>Todas</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="active">
+            <ion-label>Activas</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="inactive">
+            <ion-label>Inactivas</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+    </div>
+
+    <div class="panel-card table-panel">
+      <div class="card-header">
+        <div>
+          <span class="label">LISTADO DE FAMILIAS</span>
+          <h3>{{ filteredFamilies.length }} familia{{ filteredFamilies.length !== 1 ? 's' : '' }}</h3>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="filteredFamilies.length === 0">
+        <div class="empty-icon"><ion-icon name="folder-outline"></ion-icon></div>
+        <p class="empty-title">No hay familias</p>
+        <p class="empty-description">{{ searchTerm ? 'No se encontraron familias' : 'Comienza agregando la primera
+          familia' }}</p>
+      </div>
+
+      <ion-list class="families-list" *ngIf="filteredFamilies.length > 0">
+        <ion-item lines="none" class="family-item" *ngFor="let family of filteredFamilies">
+          <ion-label class="family-info">
+            <h2>{{ family.name }}</h2>
+            <div class="family-meta">
+              <span class="status-badge" [ngClass]="family.active ? 'active' : 'inactive'"
+                (click)="toggleFamilyStatus(family)" style="cursor: pointer;">
+                <ion-icon [name]="family.active ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+                {{ family.active ? 'ACTIVA' : 'INACTIVA' }}
+              </span>
+            </div>
+          </ion-label>
+          <div slot="end" class="actions">
+            <button class="action-btn edit-btn" (click)="editFamily(family)"><ion-icon
+                name="create-outline"></ion-icon></button>
+            <button class="action-btn delete-btn" (click)="deleteFamily(family)"><ion-icon
+                name="trash-outline"></ion-icon></button>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>

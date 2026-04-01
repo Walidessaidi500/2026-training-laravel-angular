@@ -33,6 +33,13 @@
       <div class="nav-icon"><ion-icon name="calculator-outline"></ion-icon></div>
     </ion-item>
 
+    <!-- Familias -->
+    <div class="nav-divider"></div>
+    <ion-item button [class.active]="activeItem === 'families'" (click)="navigate('families')" title="Familias"
+      class="nav-item">
+      <div class="nav-icon"><ion-icon name="folder-outline"></ion-icon></div>
+    </ion-item>
+
 
     <!-- Catálogo -->
     <div class="nav-divider"></div>
@@ -42,10 +49,7 @@
       <div class="nav-icon"><ion-icon name="cube-outline"></ion-icon></div>
     </ion-item>
 
-    <ion-item button [class.active]="activeItem === 'familias'" (click)="navigate('familias')" title="Familias"
-      class="nav-item">
-      <div class="nav-icon"><ion-icon name="folder-outline"></ion-icon></div>
-    </ion-item>
+
 
 
 

@@ -8,6 +8,7 @@ class FamilyResponse
 {
     private function __construct(
         public readonly string $uuid,
+        public readonly int $restaurantId,
         public readonly string $name,
         public readonly bool $active,
         public readonly string $createdAt,
@@ -18,6 +19,7 @@ class FamilyResponse
     {
         return new self(
             $family->id()->value(),
+            $family->restaurantId(),
             $family->name(),
             $family->isActive(),
             $family->createdAt()->format('Y-m-d\TH:i:s'),
@@ -32,6 +34,7 @@ class FamilyResponse
     {
         return [
             'uuid' => $this->uuid,
+            'restaurant_id' => $this->restaurantId,
             'name' => $this->name,
             'active' => $this->active,
             'created_at' => $this->createdAt,

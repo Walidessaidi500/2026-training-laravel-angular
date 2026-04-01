@@ -8,6 +8,7 @@ class TaxResponse
 {
     private function __construct(
         public readonly string $uuid,
+        public readonly int $restaurantId,
         public readonly string $name,
         public readonly int $percentage,
         public readonly string $createdAt,
@@ -18,6 +19,7 @@ class TaxResponse
     {
         return new self(
             $tax->id()->value(),
+            $tax->restaurantId(),
             $tax->name(),
             $tax->percentage(),
             $tax->createdAt()->format('Y-m-d\TH:i:s'),
@@ -32,6 +34,7 @@ class TaxResponse
     {
         return [
             'uuid' => $this->uuid,
+            'restaurant_id' => $this->restaurantId,
             'name' => $this->name,
             'percentage' => $this->percentage,
             'created_at' => $this->createdAt,

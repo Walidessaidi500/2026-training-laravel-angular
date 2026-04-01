@@ -10,20 +10,22 @@ class Family implements \JsonSerializable
 {
     private function __construct(
         private Uuid $id,
+        private int $restaurantId,
         private FamilyName $name,
         private bool $active,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
     ) {}
 
-    public static function dddCreate(FamilyName $name): self
+    public static function dddCreate(FamilyName $name, int $restaurantId, bool $active = true): self
     {
         $now = DomainDateTime::now();
 
         return new self(
             Uuid::generate(),
+            $restaurantId,
             $name,
-            true,
+            $active,
             $now,
             $now,
         );
@@ -31,6 +33,7 @@ class Family implements \JsonSerializable
 
     public static function fromPersistence(
         string $id,
+        int $restaurantId,
         string $name,
         bool $active,
         \DateTimeImmutable $createdAt,
@@ -38,6 +41,7 @@ class Family implements \JsonSerializable
     ): self {
         return new self(
             Uuid::create($id),
+            $restaurantId,
             FamilyName::create($name),
             $active,
             DomainDateTime::create($createdAt),
@@ -48,6 +52,11 @@ class Family implements \JsonSerializable
     public function id(): Uuid
     {
         return $this->id;
+    }
+
+    public function restaurantId(): int
+    {
+        return $this->restaurantId;
     }
 
     public function name(): string
@@ -86,6 +95,7 @@ class Family implements \JsonSerializable
     {
         return [
             'uuid' => $this->id->value(),
+            'restaurant_id' => $this->restaurantId,
             'name' => $this->name->value(),
             'active' => $this->active,
             'created_at' => $this->createdAt->value()->format('Y-m-d\TH:i:s.u\Z'),
