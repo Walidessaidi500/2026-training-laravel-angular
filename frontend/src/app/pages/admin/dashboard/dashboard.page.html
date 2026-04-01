@@ -1,22 +1,15 @@
 <ion-content class="dashboard-background">
-  
-  <!-- Mensaje si no es admin -->
-  <div *ngIf="!isAdmin && !isLoading" class="admin-required-message">
-    <div class="alert-icon">
-      <ion-icon name="alert-circle"></ion-icon>
-    </div>
-    <h2>Acceso denegado</h2>
-    <p>Este dashboard solo está disponible para administradores.</p>
-    <p class="user-info">Usuario actual: {{ currentUser?.name }}</p>
-    <p class="user-role">Rol: {{ currentUser?.role }}</p>
-  </div>
 
+  <!-- Mensaje si no es admin -->
+  <app-access-denied *ngIf="!isAdmin && !isLoading" [user]="currentUser" message="Este dashboard solo está disponible para administradores.">
+  </app-access-denied>
   <!-- Loading -->
   <div class="dashboard-grid" *ngIf="isLoading">
     <div class="main-column">
       <ion-skeleton-text animated style="height: 250px; border-radius: 16px; margin-bottom: 24px;"></ion-skeleton-text>
       <div class="micro-stats-grid">
-        <ion-skeleton-text animated style="height: 120px; border-radius: 16px;" *ngFor="let i of [1,2,3,4]"></ion-skeleton-text>
+        <ion-skeleton-text animated style="height: 120px; border-radius: 16px;"
+          *ngFor="let i of [1,2,3,4]"></ion-skeleton-text>
       </div>
     </div>
     <div class="side-column">
@@ -26,9 +19,9 @@
 
   <!-- Dashboard content - solo para admin -->
   <div class="dashboard-grid" *ngIf="dashboardData && isAdmin">
-    
+
     <div class="main-column">
-      
+
       <div class="panel-card hero-card">
         <div class="card-header">
           <div class="title-group">
@@ -42,15 +35,16 @@
           </div>
           <button class="btn-soft">Detalles <ion-icon name="chevron-forward"></ion-icon></button>
         </div>
-        
+
         <div class="hero-content">
           <div class="amount-large">{{ dashboardData.revenue.total | currency:'EUR':'symbol':'1.0-0' }}</div>
-          
-          <div class="trend-badge" [ngClass]="{'success': dashboardData.revenue.trendPercentage >= 0, 'danger': dashboardData.revenue.trendPercentage < 0}">
-            <ion-icon [name]="dashboardData.revenue.trendPercentage >= 0 ? 'arrow-up' : 'arrow-down'"></ion-icon> 
+
+          <div class="trend-badge"
+            [ngClass]="{'success': dashboardData.revenue.trendPercentage >= 0, 'danger': dashboardData.revenue.trendPercentage < 0}">
+            <ion-icon [name]="dashboardData.revenue.trendPercentage >= 0 ? 'arrow-up' : 'arrow-down'"></ion-icon>
             {{ dashboardData.revenue.trendPercentage }}% <span>vs mes pasado</span>
           </div>
-          
+
           <div class="sub-stats">
             <div class="stat-item">
               <span class="label">ESTA SEMANA</span>
@@ -77,7 +71,7 @@
           <div class="value">{{ dashboardData.metrics.activeUsers | number }}</div>
           <div class="label">USUARIOS ACTIVOS</div>
         </div>
-        
+
         <div class="panel-card micro-card">
           <div class="micro-header">
             <div class="icon-box primary-light"><ion-icon name="cart" color="primary"></ion-icon></div>
@@ -86,7 +80,7 @@
           <div class="value">{{ dashboardData.metrics.ordersToday | number }}</div>
           <div class="label">PEDIDOS HOY</div>
         </div>
-        
+
         <div class="panel-card micro-card">
           <div class="micro-header">
             <div class="icon-box primary-light"><ion-icon name="pie-chart" color="primary"></ion-icon></div>
@@ -95,7 +89,7 @@
           <div class="value">{{ dashboardData.metrics.conversionRate }}%</div>
           <div class="label">CONVERSION</div>
         </div>
-        
+
         <div class="panel-card micro-card">
           <div class="micro-header">
             <div class="icon-box primary-light"><ion-icon name="cube" color="primary"></ion-icon></div>
@@ -133,10 +127,11 @@
           </div>
           <button class="btn-soft">Ver todo <ion-icon name="arrow-forward-outline"></ion-icon></button>
         </div>
-        
+
         <ion-list class="transaction-list">
           <ion-item lines="none" class="transaction-item" *ngFor="let order of dashboardData.recentOrders">
-            <div slot="start" class="avatar-circle" [style.background-color]="order.colorAvatar || 'var(--ion-color-primary)'">
+            <div slot="start" class="avatar-circle"
+              [style.background-color]="order.colorAvatar || 'var(--ion-color-primary)'">
               {{ order.customerInitials }}
             </div>
             <ion-label>
@@ -162,7 +157,7 @@
     </div>
 
     <div class="side-column">
-      
+
       <div class="panel-card list-card">
         <div class="card-header">
           <span class="label">SHORTCUTS</span>
@@ -195,10 +190,11 @@
           <span class="label">ALERTAS</span>
           <div class="badge-count">{{ dashboardData.alerts.length }}</div>
         </div>
-        
+
         <div class="alert-item" [ngClass]="alert.type" *ngFor="let alert of dashboardData.alerts">
           <div class="alert-icon-wrapper">
-            <ion-icon [name]="alert.type === 'success' ? 'checkmark-circle' : (alert.type === 'danger' ? 'alert-circle' : 'warning')"></ion-icon>
+            <ion-icon
+              [name]="alert.type === 'success' ? 'checkmark-circle' : (alert.type === 'danger' ? 'alert-circle' : 'warning')"></ion-icon>
           </div>
           <div class="alert-content">
             <h4>{{ alert.title }}</h4>
@@ -214,7 +210,7 @@
           <div class="badge-count outline">{{ dashboardData.activities.length }} events</div>
         </div>
         <h3>ACTUALIZACIONES EN DIRECTO</h3>
-        
+
         <div class="timeline">
           <div class="timeline-item" *ngFor="let activity of dashboardData.activities">
             <div class="timeline-icon" [ngClass]="activity.type">

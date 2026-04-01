@@ -16,6 +16,7 @@ import { ZoneService } from '@services/domain/table.service';
 import { OrderService } from '@services/domain/order.service';
 import { UserService } from '@services/domain/user.service';
 import { SaleService } from '@services/domain/sale.service';
+import { AccessDeniedComponent } from '@app/components/access-denied/access-denied.component';
 
 interface User {
   uuid: string;
@@ -31,6 +32,7 @@ interface User {
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
   imports: [
+    AccessDeniedComponent,
     CommonModule,
     IonContent,
     IonIcon,
@@ -102,12 +104,12 @@ export class DashboardPage implements OnInit {
     private orderService: OrderService,
     private userService: UserService,
     private saleService: SaleService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Obtener usuario actual
     this.currentUser = this.authService.getUser();
-    
+
     // Verificar si el usuario es admin
     if (!this.currentUser || this.currentUser.role !== 'admin') {
       this.isAdmin = false;
@@ -205,12 +207,12 @@ export class DashboardPage implements OnInit {
       next: (response) => {
         // El backend filtra automáticamente por restaurant_id del usuario autenticado
         const userOrders = response.data || [];
-        
+
         this.totalOrders = userOrders.length;
         this.openOrders = userOrders.filter((o: any) => o.status === 'open').length;
-        
+
         this.dashboardData.metrics.ordersToday = this.openOrders;
-        
+
         // Mapear órdenes a formato esperado
         this.dashboardData.recentOrders = userOrders.slice(0, 5).map((order: any) => ({
           id: order.uuid || order.id,
@@ -247,7 +249,7 @@ export class DashboardPage implements OnInit {
       next: (response) => {
         // El backend filtra automáticamente por restaurant_id del usuario autenticado
         const restaurantUsers = response.data || [];
-        
+
         this.totalUsers = restaurantUsers.length;
         this.dashboardData.metrics.activeUsers = this.totalUsers;
 
@@ -275,10 +277,10 @@ export class DashboardPage implements OnInit {
       next: (response) => {
         // El backend filtra automáticamente por restaurant_id del usuario autenticado
         const restaurantSales = response.data || [];
-        
+
         this.totalSales = restaurantSales.length;
         this.totalRevenue = restaurantSales.reduce((sum, sale: any) => sum + (sale.total || 0), 0);
-        
+
         this.dashboardData.revenue.total = this.totalRevenue;
         this.dashboardData.revenue.thisWeek = this.totalRevenue * 0.4; // Aproximado
         this.dashboardData.revenue.avgOrder = this.totalRevenue / Math.max(this.totalSales, 1);

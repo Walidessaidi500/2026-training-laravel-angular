@@ -18,6 +18,7 @@ import {
 import { AuthService } from '@services/auth/auth.service';
 import { UserService } from '@services/domain/user.service';
 import { UserFormComponent, UserFormData } from '@components/user-form/user-form.component';
+import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 
 interface User {
   uuid: string;
@@ -47,6 +48,7 @@ interface User {
     IonSearchbar,
     IonSegment,
     IonSegmentButton,
+    AccessDeniedComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
