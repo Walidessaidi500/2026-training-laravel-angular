@@ -8,39 +8,46 @@
 
 <ion-content class="sidebar-content">
   <ion-list lines="none" class="nav-menu">
-    
+
     <!-- Dashboard -->
-    <ion-item button [class.active]="activeItem === 'dashboard'" (click)="navigate('dashboard')" title="Dashboard" class="nav-item">
+    <ion-item button [class.active]="activeItem === 'dashboard'" (click)="navigate('dashboard')" title="Dashboard"
+      class="nav-item">
       <div class="nav-icon"><ion-icon name="grid-outline"></ion-icon></div>
     </ion-item>
 
-    <!-- Sistema -->
+    <!-- Usuarios -->
     <ng-container *ngIf="isAdmin">
       <div class="nav-divider"></div>
-      
-      <ion-item button [class.active]="activeItem === 'users'" (click)="navigate('users')" title="Usuarios" class="nav-item">
+
+      <ion-item button [class.active]="activeItem === 'users'" (click)="navigate('users')" title="Usuarios"
+        class="nav-item">
         <div class="nav-icon"><ion-icon name="people-outline"></ion-icon></div>
       </ion-item>
     </ng-container>
 
-    
+    <!-- Impuestos -->
+    <div class="nav-divider"></div>
+
+    <ion-item button [class.active]="activeItem === 'taxes'" (click)="navigate('taxes')" title="Impuestos"
+      class="nav-item">
+      <div class="nav-icon"><ion-icon name="calculator-outline"></ion-icon></div>
+    </ion-item>
+
+
     <!-- Catálogo -->
     <div class="nav-divider"></div>
-    
-    <ion-item button [class.active]="activeItem === 'productos'" (click)="navigate('productos')" title="Productos" class="nav-item">
+
+    <ion-item button [class.active]="activeItem === 'productos'" (click)="navigate('productos')" title="Productos"
+      class="nav-item">
       <div class="nav-icon"><ion-icon name="cube-outline"></ion-icon></div>
     </ion-item>
 
-    <ion-item button [class.active]="activeItem === 'familias'" (click)="navigate('familias')" title="Familias" class="nav-item">
+    <ion-item button [class.active]="activeItem === 'familias'" (click)="navigate('familias')" title="Familias"
+      class="nav-item">
       <div class="nav-icon"><ion-icon name="folder-outline"></ion-icon></div>
     </ion-item>
 
-    <!-- Configuración -->
-    <div class="nav-divider"></div>
-    
-    <ion-item button [class.active]="activeItem === 'impuestos'" (click)="navigate('impuestos')" title="Impuestos" class="nav-item">
-      <div class="nav-icon"><ion-icon name="calculator-outline"></ion-icon></div>
-    </ion-item>
+
 
     <ion-item button [class.active]="activeItem === 'zonas'" (click)="navigate('zonas')" title="Zonas" class="nav-item">
       <div class="nav-icon"><ion-icon name="map-outline"></ion-icon></div>
@@ -48,12 +55,12 @@
 
     <!-- Servicio -->
     <div class="nav-divider"></div>
-    
+
     <ion-item button [class.active]="activeItem === 'mesas'" (click)="navigate('mesas')" title="Mesas" class="nav-item">
       <div class="nav-icon"><ion-icon name="restaurant-outline"></ion-icon></div>
     </ion-item>
 
-  
+
   </ion-list>
 </ion-content>
 
