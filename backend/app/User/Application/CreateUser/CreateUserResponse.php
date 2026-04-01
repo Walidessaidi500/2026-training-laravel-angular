@@ -13,6 +13,7 @@ final readonly class CreateUserResponse
         public string $role,
         public string $createdAt,
         public string $updatedAt,
+        public ?string $pin = null,
     ) {}
 
     public static function create(User $user): self
@@ -24,6 +25,7 @@ final readonly class CreateUserResponse
             role: $user->role(),
             createdAt: $user->createdAt()->format(\DateTimeInterface::ATOM),
             updatedAt: $user->updatedAt()->format(\DateTimeInterface::ATOM),
+            pin: $user->pin(),
         );
     }
 
@@ -36,6 +38,7 @@ final readonly class CreateUserResponse
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,
+            'pin' => $this->pin,
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
         ];

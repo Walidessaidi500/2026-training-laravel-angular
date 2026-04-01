@@ -39,8 +39,8 @@
       <p>{{ getFieldError('email') }}</p>
     </ion-text>
 
-    <ion-item class="form-item" *ngIf="!isEditMode">
-      <ion-label position="floating">Contraseña</ion-label>
+    <ion-item class="form-item">
+      <ion-label position="floating">Contraseña {{ isEditMode ? '(Opcional)' : '' }}</ion-label>
       <ion-input
         formControlName="password"
         type="password"
@@ -52,8 +52,8 @@
       <p>{{ getFieldError('password') }}</p>
     </ion-text>
 
-    <ion-item class="form-item" *ngIf="!isEditMode">
-      <ion-label position="floating">Confirmar Contraseña</ion-label>
+    <ion-item class="form-item">
+      <ion-label position="floating">Confirmar Contraseña {{ isEditMode ? '(Opcional)' : '' }}</ion-label>
       <ion-input
         formControlName="password_confirmation"
         type="password"
@@ -69,12 +69,25 @@
       <ion-label position="floating">Rol</ion-label>
       <ion-select formControlName="role" [class.invalid]="isFieldInvalid('role')">
         <ion-select-option *ngFor="let role of roles" [value]="role.value">
-          {{ role.label }}
+           {{ role.label }}
         </ion-select-option>
       </ion-select>
     </ion-item>
     <ion-text *ngIf="getFieldError('role')" class="error-text">
       <p>{{ getFieldError('role') }}</p>
+    </ion-text>
+
+    <ion-item class="form-item">
+      <ion-label position="floating">PIN (Opcional)</ion-label>
+      <ion-input
+        formControlName="pin"
+        type="text"
+        placeholder="Ej: 1234"
+        [class.invalid]="isFieldInvalid('pin')"
+      ></ion-input>
+    </ion-item>
+    <ion-text *ngIf="getFieldError('pin')" class="error-text">
+      <p>{{ getFieldError('pin') }}</p>
     </ion-text>
 
     <div class="form-actions ion-padding-top">

@@ -24,6 +24,7 @@ class EloquentUserRepository implements UserRepositoryInterface
                 'email' => $user->email()->value(),
                 'password' => $user->passwordHash(),
                 'role' => $user->role(),
+                'pin' => $user->pin(),
                 'created_at' => $user->createdAt()->value(),
                 'updated_at' => $user->updatedAt()->value(),
             ]
@@ -52,6 +53,11 @@ class EloquentUserRepository implements UserRepositoryInterface
         return $this->toDomainEntity($model);
     }
 
+    public function delete(Uuid $id): void
+    {
+        $this->model->newQuery()->where('uuid', $id->value())->delete();
+    }
+
     private function toDomainEntity(EloquentUser $model): User
     {
         return User::fromPersistence(
@@ -62,7 +68,8 @@ class EloquentUserRepository implements UserRepositoryInterface
             $model->restaurant_id,
             $model->created_at->toDateTimeImmutable(),
             $model->updated_at->toDateTimeImmutable(),
-            $model->role
+            $model->role,
+            $model->pin
         );
     }
 }

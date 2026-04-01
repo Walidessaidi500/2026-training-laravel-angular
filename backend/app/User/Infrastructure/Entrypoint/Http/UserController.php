@@ -39,96 +39,18 @@ class UserController
 
     public function show(string $uuid): JsonResponse
     {
-        $user = $this->userRepository->find($uuid);
+        $user = EloquentUser::where('uuid', $uuid)->first();
 
         if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
         return response()->json($user);
-    }
-
-    public function store(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'restaurant_id' => 'required|integer|exists:restaurants,id',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'role' => 'string|in:admin,supervisor,operator',
-            'pin' => 'nullable|string|max:10',
-        ]);
-
-        $user = EloquentUser::create([
-            'uuid' => Str::uuid()->toString(),
-            'restaurant_id' => $validated['restaurant_id'],
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-            'role' => $validated['role'] ?? 'operator',
-            'pin' => $validated['pin'] ?? null,
-        ]);
-
-        return response()->json($user, 201);
-    }
-
-    public function update(Request $request, string $uuid): JsonResponse
-    {
-        $user = $this->userRepository->find($uuid);
-
-        if (! $user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
-        $validated = $request->validate([
-            'name' => 'string|max:255',
-            'email' => 'email|unique:users,email,'.$user->id,
-            'password' => 'nullable|string|min:6',
-            'role' => 'string|in:admin,supervisor,operator',
-            'pin' => 'nullable|string|max:10',
-        ]);
-
-        if (isset($validated['name'])) {
-            $user->name = $validated['name'];
-        }
-
-        if (isset($validated['email'])) {
-            $user->email = $validated['email'];
-        }
-
-        if (isset($validated['password'])) {
-            $user->password = bcrypt($validated['password']);
-        }
-
-        if (isset($validated['role'])) {
-            $user->role = $validated['role'];
-        }
-
-        if (isset($validated['pin'])) {
-            $user->pin = $validated['pin'];
-        }
-
-        $this->userRepository->save($user);
-
-        return response()->json($user);
-    }
-
-    public function destroy(string $uuid): JsonResponse
-    {
-        $user = $this->userRepository->find($uuid);
-
-        if (! $user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
-        $this->userRepository->delete($user);
-
-        return response()->json(['message' => 'User deleted']);
     }
 
     public function toggleActive(string $uuid): JsonResponse
     {
-        $user = $this->userRepository->find($uuid);
+        $user = EloquentUser::where('uuid', $uuid)->first();
 
         if (! $user) {
             return response()->json(['message' => 'User not found'], 404);

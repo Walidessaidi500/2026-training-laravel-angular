@@ -26,6 +26,7 @@ interface User {
   role: string;
   restaurant_id?: number;
   status?: string;
+  pin?: string;
   created_at?: string;
 }
 
@@ -186,14 +187,11 @@ export class UsersPage implements OnInit {
           email: user.email,
           role: user.role,
           status: user.status,
+          pin: user.pin,
         },
       },
-      cssClass: 'user-form-modal',
+      cssClass: 'fullscreen-modal',
       backdropDismiss: false,
-      // --- CONFIGURACIÓN PARA PANTALLA COMPLETA ---
-      breakpoints: [0, 1],
-      initialBreakpoint: 1,
-      // --------------------------------------------
     });
 
     await modal.present();

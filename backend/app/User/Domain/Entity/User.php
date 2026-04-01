@@ -20,9 +20,10 @@ class User
         private string $role,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
+        private ?string $pin = null
     ) {}
 
-    public static function dddCreate(Email $email, UserName $name, PasswordHash $passwordHash, RestaurantId $restaurantId, string $role = 'operator'): self
+    public static function dddCreate(Email $email, UserName $name, PasswordHash $passwordHash, RestaurantId $restaurantId, string $role = 'operator', ?string $pin = null): self
     {
         $now = DomainDateTime::now();
 
@@ -35,6 +36,7 @@ class User
             $role,
             $now,
             $now,
+            $pin
         );
     }
 
@@ -46,7 +48,8 @@ class User
         int $restaurantId,
         \DateTimeImmutable $createdAt,
         \DateTimeImmutable $updatedAt,
-        string $role = 'operator'
+        string $role = 'operator',
+        ?string $pin = null
     ): self {
         return new self(
             Uuid::create($id),
@@ -57,7 +60,20 @@ class User
             $role,
             DomainDateTime::create($createdAt),
             DomainDateTime::create($updatedAt),
+            $pin
         );
+    }
+
+    public function update(UserName $name, Email $email, string $role, ?PasswordHash $passwordHash = null, ?string $pin = null): void
+    {
+        $this->name = $name;
+        $this->email = $email;
+        $this->role = $role;
+        $this->pin = $pin;
+        if ($passwordHash !== null) {
+            $this->passwordHash = $passwordHash;
+        }
+        $this->updatedAt = DomainDateTime::now();
     }
 
     public function id(): Uuid
@@ -98,5 +114,10 @@ class User
     public function updatedAt(): DomainDateTime
     {
         return $this->updatedAt;
+    }
+
+    public function pin(): ?string
+    {
+        return $this->pin;
     }
 }

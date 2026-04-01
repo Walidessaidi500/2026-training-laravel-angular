@@ -19,6 +19,7 @@ class PostController
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['sometimes', 'string', 'in:admin,supervisor,operator'],
+            'pin' => ['nullable', 'string', 'max:10'],
         ]);
 
         // Obtener restaurant_id del usuario autenticado
@@ -35,7 +36,8 @@ class PostController
             $validated['name'],
             $validated['password'],
             $authenticatedUser->restaurant_id,
-            $role
+            $role,
+            $validated['pin'] ?? null
         );
 
         return new JsonResponse($response->toArray(), 201);

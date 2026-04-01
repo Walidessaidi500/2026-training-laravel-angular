@@ -6,9 +6,11 @@ use App\Product\Infrastructure\Entrypoint\Http\ProductController;
 use App\Restaurant\Infrastructure\Entrypoint\Http\RestaurantController;
 use App\Sale\Infrastructure\Entrypoint\Http\SaleController;
 use App\Tax\Infrastructure\Entrypoint\Http\TaxController;
+use App\User\Infrastructure\Entrypoint\Http\DeleteController;
 use App\User\Infrastructure\Entrypoint\Http\GetAuthenticatedUserController;
 use App\User\Infrastructure\Entrypoint\Http\LoginController;
 use App\User\Infrastructure\Entrypoint\Http\PostController;
+use App\User\Infrastructure\Entrypoint\Http\PutController;
 use App\User\Infrastructure\Entrypoint\Http\UserController;
 use App\Zone\Infrastructure\Entrypoint\Http\TableController;
 use App\Zone\Infrastructure\Entrypoint\Http\ZoneController;
@@ -74,8 +76,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users', [UserController::class, 'index']);
         Route::get('/users/{uuid}', [UserController::class, 'show']);
         Route::post('/users', PostController::class);
-        Route::put('/users/{uuid}', [UserController::class, 'update']);
-        Route::delete('/users/{uuid}', [UserController::class, 'destroy']);
+        Route::put('/users/{uuid}', PutController::class);
+        Route::delete('/users/{uuid}', DeleteController::class);
         Route::patch('/users/{uuid}/toggle-active', [UserController::class, 'toggleActive']);
     });
 

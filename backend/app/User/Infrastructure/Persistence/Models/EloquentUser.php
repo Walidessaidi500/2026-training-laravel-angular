@@ -30,6 +30,7 @@ class EloquentUser extends Authenticatable
         'name',
         'email',
         'password',
+        'pin',
     ];
 
     protected $hidden = [

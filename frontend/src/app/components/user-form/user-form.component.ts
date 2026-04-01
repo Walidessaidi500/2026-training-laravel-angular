@@ -25,6 +25,7 @@ export interface UserFormData {
   role: string;
   password?: string;
   password_confirmation?: string;
+  pin?: string;
 }
 
 export interface UserFormModel {
@@ -33,6 +34,7 @@ export interface UserFormModel {
   email: string;
   role: string;
   status?: string;
+  pin?: string;
 }
 
 @Component({
@@ -100,6 +102,7 @@ export class UserFormComponent implements OnInit {
         name: ['', [Validators.required, Validators.minLength(3)]],
         email: ['', [Validators.required, Validators.email]],
         role: ['operator', Validators.required],
+        pin: ['', [Validators.maxLength(10)]],
         password: ['', passwordValidators],
         password_confirmation: ['', passwordValidators],
       },
@@ -140,6 +143,7 @@ export class UserFormComponent implements OnInit {
       name: user.name,
       email: user.email,
       role: user.role,
+      pin: user.pin || '',
     });
   }
 
@@ -204,6 +208,10 @@ export class UserFormComponent implements OnInit {
       return 'La contraseña debe tener al menos 8 caracteres';
     }
 
+    if (fieldName === 'pin' && control.errors['maxlength']) {
+      return 'El PIN no puede exceder 10 caracteres';
+    }
+
     if (fieldName === 'password_confirmation' && control.errors['mismatch']) {
       return 'Las contraseñas no coinciden';
     }
@@ -216,6 +224,7 @@ export class UserFormComponent implements OnInit {
       name: 'Nombre',
       email: 'Email',
       role: 'Rol',
+      pin: 'PIN',
       password: 'Contraseña',
       password_confirmation: 'Confirmar Contraseña',
     };
