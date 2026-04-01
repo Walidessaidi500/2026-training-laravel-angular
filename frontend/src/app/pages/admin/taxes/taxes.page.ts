@@ -30,6 +30,7 @@ import {
 import { AuthService } from '@services/auth/auth.service';
 import { TaxService } from '@services/domain/tax.service';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
+import { TaxFormComponent, TaxFormData } from '@components/tax-form/tax-form.component';
 
 
 interface Tax {
@@ -110,7 +111,13 @@ export class TaxesPage implements OnInit {
     this.isLoading = true;
     this.taxService.list().subscribe({
       next: (response: any) => {
-        this.taxes = response.data || response || [];
+        // Mapeamos 'percentage' del backend a 'rate' para el frontend
+        const rawData = response.data || response || [];
+        this.taxes = rawData.map((t: any) => ({
+          ...t,
+          rate: t.percentage !== undefined ? t.percentage : (t.rate || 0)
+        }));
+
         this.calculateStats();
         this.applyFilters();
         this.isLoading = false;
@@ -144,24 +151,88 @@ export class TaxesPage implements OnInit {
   }
 
   async addNewTax(): Promise<void> {
-    // Implementar lógica con el Modal cuando acabe TaxFormComponent
-    console.log('Abrir modal para nuevo impuesto');
-    /*
     const modal = await this.modalController.create({
       component: TaxFormComponent,
+      componentProps: {
+        tax: null,
+      },
       cssClass: 'fullscreen-modal',
       backdropDismiss: false,
     });
+
     await modal.present();
-    const { data } = await modal.onDidDismiss();
+
+    const { data } = await modal.onDidDismiss<TaxFormData>();
+
     if (data) {
-       this.handleCreateTax(data);
+      this.handleCreateTax(data);
     }
-    */
   }
 
   async editTax(tax: Tax): Promise<void> {
-    console.log('Editar impuesto', tax);
+    const modal = await this.modalController.create({
+      component: TaxFormComponent,
+      componentProps: {
+        tax: {
+          ...tax,
+          rate: tax.rate // Aseguramos que pasamos 'rate' al componente
+        },
+      },
+      cssClass: 'fullscreen-modal',
+      backdropDismiss: false,
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss<TaxFormData>();
+
+    if (data) {
+      this.handleUpdateTax(tax.uuid, data);
+    }
+  }
+
+  private handleCreateTax(formData: TaxFormData): void {
+    this.isLoading = true;
+    // Mapeamos 'rate' a 'percentage' para el backend
+    const apiData = {
+      name: formData.name,
+      percentage: formData.rate,
+      active: formData.active
+    };
+
+    this.taxService.create(apiData).subscribe({
+      next: () => {
+        this.showToast('Impuesto creado exitosamente', 'success', 'checkmark-circle');
+        this.loadTaxes();
+      },
+      error: (error) => {
+        console.error('Error creating tax:', error);
+        this.showToast('Error al crear el impuesto', 'danger', 'alert-circle');
+        this.isLoading = false;
+      },
+    });
+  }
+
+  private handleUpdateTax(uuid: string, formData: TaxFormData): void {
+    this.isLoading = true;
+    // Mapeamos 'rate' a 'percentage' para el backend
+    const apiData = {
+      name: formData.name,
+      percentage: formData.rate,
+      active: formData.active
+    };
+
+    this.taxService.update(uuid, apiData).subscribe({
+      next: () => {
+        this.showToast('Impuesto actualizado exitosamente', 'success', 'checkmark-circle');
+        this.loadTaxes();
+      },
+      error: (error) => {
+        console.error('Error updating tax:', error);
+        this.showToast('Error al actualizar el impuesto', 'danger', 'alert-circle');
+        this.isLoading = false;
+      },
+    });
   }
 
   async deleteTax(tax: Tax): Promise<void> {
@@ -188,6 +259,7 @@ export class TaxesPage implements OnInit {
   }
 
   private performDeleteTax(uuid: string): void {
+    this.isLoading = true;
     this.taxService.delete(uuid).subscribe({
       next: () => {
         this.showToast('Impuesto eliminado exitosamente', 'success', 'checkmark-circle');
@@ -196,6 +268,7 @@ export class TaxesPage implements OnInit {
       error: (error) => {
         console.error('Error deleting tax:', error);
         this.showToast('Error al eliminar el impuesto', 'danger', 'alert-circle');
+        this.isLoading = false;
       },
     });
   }

@@ -47,18 +47,6 @@
           </div>
         </div>
       </div>
-
-      <div class="panel-card stat-card">
-        <div class="stat-content">
-          <div class="icon-box success-light">
-            <ion-icon name="checkmark-circle" color="success"></ion-icon>
-          </div>
-          <div>
-            <div class="stat-value">{{ taxStats.active }}</div>
-            <div class="stat-label">IMPUESTOS ACTIVOS</div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div class="panel-card filter-panel">
@@ -96,10 +84,6 @@
             <div class="tax-meta">
               <span class="badge-rate primary">
                 {{ tax.rate }}%
-              </span>
-              <span class="status-badge" [ngClass]="tax.active ? 'active' : 'inactive'">
-                <ion-icon [name]="tax.active ? 'checkmark-circle' : 'close-circle'"></ion-icon>
-                {{ tax.active ? 'ACTIVO' : 'INACTIVO' }}
               </span>
             </div>
           </ion-label>
