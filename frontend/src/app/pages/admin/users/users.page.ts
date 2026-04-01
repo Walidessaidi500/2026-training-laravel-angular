@@ -15,6 +15,18 @@ import {
   AlertController,
   ToastController,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  peopleOutline,
+  addOutline,
+  people,
+  shield,
+  searchOutline,
+  createOutline,
+  trashOutline,
+  checkmarkCircle,
+  alertCircle
+} from 'ionicons/icons';
 import { AuthService } from '@services/auth/auth.service';
 import { UserService } from '@services/domain/user.service';
 import { UserFormComponent, UserFormData } from '@components/user-form/user-form.component';
@@ -81,7 +93,19 @@ export class UsersPage implements OnInit {
     private modalController: ModalController,
     private alertController: AlertController,
     private toastController: ToastController
-  ) {}
+  ) {
+    addIcons({
+      'people-outline': peopleOutline,
+      'add-outline': addOutline,
+      'people': people,
+      'shield': shield,
+      'search-outline': searchOutline,
+      'create-outline': createOutline,
+      'trash-outline': trashOutline,
+      'checkmark-circle': checkmarkCircle,
+      'alert-circle': alertCircle
+    });
+  }
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
@@ -155,12 +179,12 @@ export class UsersPage implements OnInit {
       .slice(0, 2);
   }
 
-  
+
   getRoleBadgeClass(role: string): string {
     return this.roleColors[role] || 'medium';
   }
 
- async addNewUser(): Promise<void> {
+  async addNewUser(): Promise<void> {
     const modal = await this.modalController.create({
       component: UserFormComponent,
       componentProps: {

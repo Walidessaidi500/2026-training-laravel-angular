@@ -8,6 +8,26 @@ import {
   IonLabel,
   IonSkeletonText,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  cashOutline,
+  chevronForward,
+  arrowUp,
+  arrowDown,
+  people,
+  cart,
+  pieChart,
+  cube,
+  arrowForwardOutline,
+  checkmarkCircle,
+  time,
+  closeCircle,
+  flashOutline,
+  alertCircle,
+  warning,
+  person,
+  cash
+} from 'ionicons/icons';
 import { AuthService } from '@services/auth/auth.service';
 import { ProductService } from '@services/domain/product.service';
 import { FamilyService } from '@services/domain/family.service';
@@ -104,7 +124,27 @@ export class DashboardPage implements OnInit {
     private orderService: OrderService,
     private userService: UserService,
     private saleService: SaleService
-  ) { }
+  ) {
+    addIcons({
+      'cash-outline': cashOutline,
+      'chevron-forward': chevronForward,
+      'arrow-up': arrowUp,
+      'arrow-down': arrowDown,
+      'people': people,
+      'cart': cart,
+      'pie-chart': pieChart,
+      'cube': cube,
+      'arrow-forward-outline': arrowForwardOutline,
+      'checkmark-circle': checkmarkCircle,
+      'time': time,
+      'close-circle': closeCircle,
+      'flash-outline': flashOutline,
+      'alert-circle': alertCircle,
+      'warning': warning,
+      'person': person,
+      'cash': cash
+    });
+  }
 
   ngOnInit(): void {
     // Obtener usuario actual
