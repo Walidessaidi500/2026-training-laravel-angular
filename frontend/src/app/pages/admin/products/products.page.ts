@@ -4,14 +4,15 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonIcon, IonList, IonItem, IonLabel,
   IonSkeletonText, IonSearchbar, IonSelect, IonSelectOption,
-  ModalController, AlertController, ToastController,
+  IonNote, ModalController, AlertController, ToastController,
+  IonInfiniteScroll, IonInfiniteScrollContent
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
 import {
   cubeOutline, cube, addOutline, searchOutline,
   createOutline, trashOutline, checkmarkCircle,
-  closeCircle, alertCircle, optionsOutline, warningOutline
+  closeCircle, alertCircle, optionsOutline, warningOutline, receiptOutline
 } from 'ionicons/icons';
 
 import { AuthService } from '@services/auth/auth.service';
@@ -71,6 +72,12 @@ export class ProductsPage implements OnInit {
     outOfStock: 0
   };
 
+  // Pagination state
+  currentPage = 1;
+  lastPage = 1;
+  perPage = 20;
+  isInfiniteDisabled = false;
+
   constructor(
     private authService: AuthService,
     private productService: ProductService,
@@ -91,7 +98,8 @@ export class ProductsPage implements OnInit {
       'close-circle': closeCircle,
       'alert-circle': alertCircle,
       'options-outline': optionsOutline,
-      'warning-outline': warningOutline
+      'warning-outline': warningOutline,
+      'receipt-outline': receiptOutline,
     });
   }
 
@@ -120,18 +128,31 @@ export class ProductsPage implements OnInit {
     });
   }
 
-  private loadProducts(): void {
-    this.productService.list().subscribe({
+  private loadProducts(isAppend: boolean = false): void {
+    if (!isAppend) {
+      this.isLoading = true;
+      this.currentPage = 1;
+    }
+
+    this.productService.list(this.currentPage, this.perPage).subscribe({
       next: (response: any) => {
         const rawProducts = response.data || response || [];
+        this.lastPage = response.meta?.last_page || 1;
 
-        // Mapeamos para inyectar el nombre de la familia y el impuesto y facilitar la vista
-        this.products = rawProducts.map((p: Product) => ({
+        const mappedProducts = rawProducts.map((p: Product) => ({
           ...p,
-          family_name: this.families.find(f => f.id === p.family_id)?.name || 'Sin Familia',
-          tax_name: this.taxes.find(t => t.id === p.tax_id)?.name || 'Sin Impuesto'
+          family_name: this.families.find(f => f.uuid === p.family_id)?.name || 'Sin Familia',
+          tax_name: this.taxes.find(t => t.uuid === p.tax_id)?.name || 'Sin Impuesto'
         }));
 
+        if (isAppend) {
+          this.products = [...this.products, ...mappedProducts];
+        } else {
+          this.products = mappedProducts;
+        }
+
+        this.isInfiniteDisabled = this.currentPage >= this.lastPage;
+        
         this.calculateStats();
         this.applyFilters();
         this.isLoading = false;
@@ -141,6 +162,19 @@ export class ProductsPage implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  loadMore(event: any) {
+    if (this.currentPage < this.lastPage) {
+      this.currentPage++;
+      this.loadProducts(true);
+      setTimeout(() => {
+        event.target.complete();
+      }, 500);
+    } else {
+      event.target.complete();
+      this.isInfiniteDisabled = true;
+    }
   }
 
   private calculateStats(): void {
@@ -183,28 +217,26 @@ export class ProductsPage implements OnInit {
       filtered = filtered.filter(p => p.active === isActive);
     }
 
-    // 5. Filtro por Cantidad/Stock
     if (this.selectedStock !== 'all') {
       if (this.selectedStock === 'in_stock') {
         filtered = filtered.filter(p => p.stock > 0);
       } else if (this.selectedStock === 'out_of_stock') {
         filtered = filtered.filter(p => p.stock <= 0);
       } else if (this.selectedStock === 'low_stock') {
-        filtered = filtered.filter(p => p.stock > 0 && p.stock <= 5); // Consideramos low_stock <= 5
+        filtered = filtered.filter(p => p.stock > 0 && p.stock <= 5);
       }
     }
 
     this.filteredProducts = filtered;
   }
 
-  // --- CRUD METHODS ---
   async addNewProduct(): Promise<void> {
     const modal = await this.modalController.create({
       component: ProductFormComponent,
       componentProps: {
         product: null,
-        families: this.families, // Pasamos las familias cargadas
-        taxes: this.taxes        // Pasamos los impuestos cargados
+        families: this.families,
+        taxes: this.taxes
       },
       cssClass: 'fullscreen-modal',
       backdropDismiss: false,
@@ -233,16 +265,14 @@ export class ProductsPage implements OnInit {
     if (data) this.handleUpdateProduct(product.uuid, data);
   }
 
-  // --- MÉTODOS DE CONEXIÓN CON EL SERVICIO ---
 
   private handleCreateProduct(formData: ProductFormData): void {
     this.isLoading = true;
 
-    // Delegamos al servicio de infraestructura pasando el DTO
     this.productService.create(formData).subscribe({
       next: () => {
         this.showToast('Producto creado exitosamente', 'success', 'checkmark-circle');
-        this.loadProducts(); // Recargamos para obtener el UUID generado y cruzar datos
+        this.loadProducts();
       },
       error: (error) => {
         console.error('Error creating product:', error);
@@ -255,11 +285,10 @@ export class ProductsPage implements OnInit {
   private handleUpdateProduct(uuid: string, formData: ProductFormData): void {
     this.isLoading = true;
 
-    // Delegamos al servicio de infraestructura pasando el UUID y el DTO
     this.productService.update(uuid, formData).subscribe({
       next: () => {
         this.showToast('Producto actualizado exitosamente', 'success', 'checkmark-circle');
-        this.loadProducts(); // Recargamos para refrescar la vista
+        this.loadProducts();
       },
       error: (error) => {
         console.error('Error updating product:', error);
@@ -282,7 +311,7 @@ export class ProductsPage implements OnInit {
   async deleteProduct(product: Product): Promise<void> {
     const alert = await this.alertController.create({
       header: 'Eliminar Producto',
-      message: `¿Estás seguro de que deseas eliminar <strong>${product.name}</strong>? Esta acción no se puede deshacer.`,
+      message: '¿Estás seguro de que deseas eliminar <strong>' + product.name + '</strong>? Esta acción no se puede deshacer.',
       backdropDismiss: false,
       buttons: [
         {
@@ -305,13 +334,11 @@ export class ProductsPage implements OnInit {
   private performDeleteProduct(uuid: string): void {
     this.isLoading = true;
 
-    // Delegamos al adaptador de infraestructura (ProductService)
-    // Este servicio hará la petición HTTP hacia tu controlador en Laravel,
-    // el cual invocará tu Caso de Uso (ej. DeleteProductUseCase).
+
     this.productService.delete(uuid).subscribe({
       next: () => {
         this.showToast('Producto eliminado exitosamente', 'success', 'checkmark-circle');
-        this.loadProducts(); // Recargamos el catálogo
+        this.loadProducts();
       },
       error: (error) => {
         console.error('Error deleting product:', error);

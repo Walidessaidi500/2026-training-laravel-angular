@@ -85,6 +85,7 @@ class ProductController
             'name' => ['required', 'string', 'max:255'],
             'price_in_cents' => ['required', 'integer', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
+            'active' => ['required', 'boolean'],
             'image_src' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -97,6 +98,7 @@ class ProductController
                 $validated['price_in_cents'],
                 $validated['stock'],
                 (int) $request->user()->restaurant_id,
+                (bool) $validated['active'],
                 $validated['image_src'] ?? null,
             );
 

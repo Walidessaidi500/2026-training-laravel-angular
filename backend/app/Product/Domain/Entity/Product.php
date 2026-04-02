@@ -131,6 +131,7 @@ class Product implements \JsonSerializable
         ProductName $name,
         Price $price,
         Stock $stock,
+        bool $active,
         ?string $imageSrc = null,
     ): void {
         $this->familyId = $familyId;
@@ -138,6 +139,7 @@ class Product implements \JsonSerializable
         $this->name = $name;
         $this->price = $price;
         $this->stock = $stock;
+        $this->active = $active;
         $this->imageSrc = $imageSrc;
         $this->updatedAt = DomainDateTime::now();
     }
@@ -162,8 +164,8 @@ class Product implements \JsonSerializable
     {
         return [
             'uuid' => $this->id->value(),
-            'family_uuid' => $this->familyId->value(),
-            'tax_uuid' => $this->taxId->value(),
+            'family_id' => $this->familyId->value(),
+            'tax_id' => $this->taxId->value(),
             'name' => $this->name->value(),
             'priceInCents' => $this->price->value(),
             'stock' => $this->stock->value(),

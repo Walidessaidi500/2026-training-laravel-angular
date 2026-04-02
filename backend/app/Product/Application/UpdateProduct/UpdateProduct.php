@@ -24,6 +24,7 @@ class UpdateProduct
         int $priceInCents,
         int $stock,
         int $restaurantId,
+        bool $active,
         ?string $imageSrc = null,
     ): ProductResponse {
         $uuid = Uuid::create($id);
@@ -39,6 +40,7 @@ class UpdateProduct
             ProductName::create($name),
             Price::create($priceInCents),
             Stock::create($stock),
+            $active,
             $imageSrc,
         );
 

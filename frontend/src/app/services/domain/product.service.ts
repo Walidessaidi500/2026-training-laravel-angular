@@ -30,8 +30,8 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  list(): Observable<ProductListResponse> {
-    return this.http.get<ProductListResponse>(this.apiUrl);
+  list(page: number = 1, perPage: number = 100): Observable<ProductListResponse> {
+    return this.http.get<ProductListResponse>(`${this.apiUrl}?page=${page}&per_page=${perPage}`);
   }
 
   get(uuid: string): Observable<Product> {
