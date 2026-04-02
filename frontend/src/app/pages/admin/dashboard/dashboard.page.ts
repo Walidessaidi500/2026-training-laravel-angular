@@ -7,6 +7,8 @@ import {
   IonItem,
   IonLabel,
   IonSkeletonText,
+  ModalController,
+  ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -26,7 +28,9 @@ import {
   alertCircle,
   warning,
   person,
-  cash
+  cash,
+  folder,
+  receipt
 } from 'ionicons/icons';
 import { AuthService } from '@services/auth/auth.service';
 import { ProductService } from '@services/domain/product.service';
@@ -37,6 +41,10 @@ import { OrderService } from '@services/domain/order.service';
 import { UserService } from '@services/domain/user.service';
 import { SaleService } from '@services/domain/sale.service';
 import { AccessDeniedComponent } from '@app/components/access-denied/access-denied.component';
+import { ProductFormComponent } from '@app/components/product-form/product-form.component';
+import { FamilyFormComponent } from '@app/components/families-form/families-form.component';
+import { TaxFormComponent } from '@app/components/tax-form/tax-form.component';
+import { UserFormComponent } from '@app/components/user-form/user-form.component';
 
 interface User {
   uuid: string;
@@ -60,6 +68,10 @@ interface User {
     IonItem,
     IonLabel,
     IonSkeletonText,
+    ProductFormComponent,
+    FamilyFormComponent,
+    TaxFormComponent,
+    UserFormComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -68,6 +80,10 @@ export class DashboardPage implements OnInit {
   currentUser: User | null = null;
   isAdmin = false;
   restaurantId: number | undefined;
+
+  // Datos para formularios
+  families: any[] = [];
+  taxes: any[] = [];
 
   // Productos
   totalProducts = 0;
@@ -123,7 +139,9 @@ export class DashboardPage implements OnInit {
     private zoneService: ZoneService,
     private orderService: OrderService,
     private userService: UserService,
-    private saleService: SaleService
+    private saleService: SaleService,
+    private modalController: ModalController,
+    private toastController: ToastController
   ) {
     addIcons({
       'cash-outline': cashOutline,
@@ -142,7 +160,9 @@ export class DashboardPage implements OnInit {
       'alert-circle': alertCircle,
       'warning': warning,
       'person': person,
-      'cash': cash
+      'cash': cash,
+      'folder': folder,
+      'receipt': receipt
     });
   }
 
@@ -217,9 +237,9 @@ export class DashboardPage implements OnInit {
     // Cargar familias del restaurante
     this.familyService.list().subscribe({
       next: (response) => {
-        // El backend filtra automáticamente por restaurant_id del usuario autenticado
+        this.families = response.data || [];
         this.totalFamilies = response.meta.total;
-        this.activeFamilies = response.data.filter((f) => f.active).length;
+        this.activeFamilies = this.families.filter((f) => f.active).length;
       },
       error: (error) => console.error('Error cargando las familias:', error),
     });
@@ -227,7 +247,7 @@ export class DashboardPage implements OnInit {
     // Cargar impuestos del restaurante
     this.taxService.list().subscribe({
       next: (response) => {
-        // El backend filtra automáticamente por restaurant_id del usuario autenticado
+        this.taxes = response.data || [];
         this.totalTaxes = response.meta.total;
       },
       error: (error) => console.error('Error cargando los impuestos:', error),
@@ -356,8 +376,191 @@ export class DashboardPage implements OnInit {
     // TODO: Implementar navegación a crear orden
   }
 
-  agregarProducto(): void {
-    console.log('Agregar un nuevo producto');
-    // TODO: Implementar navegación a crear producto
+  async agregarProducto(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: ProductFormComponent,
+      cssClass: 'fullscreen-modal',
+      componentProps: {
+        families: this.families,
+        taxes: this.taxes
+      }
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    
+    if (data) {
+      this.isLoading = true;
+      // Guardar producto
+      this.productService.create(data).subscribe({
+        next: async () => {
+          const toast = await this.toastController.create({
+            message: 'Producto creado correctamente',
+            duration: 2000,
+            color: 'success',
+            position: 'bottom'
+          });
+          await toast.present();
+          
+          // Añadir alerta y actividad
+          this.dashboardData.alerts.unshift({
+            type: 'success',
+            title: 'Inventario actualizado',
+            description: `Se ha añadido el producto "${data.name}" al catálogo.`,
+            timeAgo: 'Justo ahora'
+          });
+          
+          this.dashboardData.activities.unshift({
+            type: 'info',
+            icon: 'cube',
+            title: 'Nuevo producto',
+            description: `${this.currentUser?.name} añadió "${data.name}"`,
+            timeAgo: 'Justo ahora'
+          });
+
+          this.loadStatistics(); // Recargar estadísticas
+        },
+        error: async (error) => {
+          const toast = await this.toastController.create({
+            message: 'Error al crear el producto: ' + (error.error?.message || 'Error desconocido'),
+            duration: 3000,
+            color: 'danger',
+            position: 'bottom'
+          });
+          await toast.present();
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  async agregarFamilia(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: FamilyFormComponent,
+      cssClass: 'fullscreen-modal'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    
+    if (data) {
+      this.isLoading = true;
+      this.familyService.create(data).subscribe({
+        next: async () => {
+          const toast = await this.toastController.create({
+            message: 'Familia creada con éxito',
+            duration: 2000,
+            color: 'success'
+          });
+          await toast.present();
+          
+          this.dashboardData.alerts.unshift({
+            type: 'success',
+            title: 'Categoría añadida',
+            description: `Nueva familia: "${data.name}"`,
+            timeAgo: 'Justo ahora'
+          });
+          
+          this.dashboardData.activities.unshift({
+            type: 'info',
+            icon: 'folder',
+            title: 'Nueva familia',
+            description: `${this.currentUser?.name} creó "${data.name}"`,
+            timeAgo: 'Justo ahora'
+          });
+
+          this.loadStatistics();
+        },
+        error: () => this.isLoading = false
+      });
+    }
+  }
+
+  async agregarImpuesto(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: TaxFormComponent,
+      cssClass: 'fullscreen-modal'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    
+    if (data) {
+      this.isLoading = true;
+      this.taxService.create(data).subscribe({
+        next: async () => {
+          const toast = await this.toastController.create({
+            message: 'Impuesto creado con éxito',
+            duration: 2000,
+            color: 'success'
+          });
+          await toast.present();
+          
+          this.dashboardData.alerts.unshift({
+            type: 'success',
+            title: 'Impuesto configurado',
+            description: `Añadido: ${data.name} (${data.rate}%)`,
+            timeAgo: 'Justo ahora'
+          });
+          
+          this.dashboardData.activities.unshift({
+            type: 'info',
+            icon: 'receipt',
+            title: 'Nuevo impuesto',
+            description: `${this.currentUser?.name} configuró "${data.name}"`,
+            timeAgo: 'Justo ahora'
+          });
+
+          this.loadStatistics();
+        },
+        error: () => this.isLoading = false
+      });
+    }
+  }
+
+  async agregarUsuario(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: UserFormComponent,
+      cssClass: 'fullscreen-modal'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    
+    if (data) {
+      this.isLoading = true;
+      this.userService.create(data).subscribe({
+        next: async () => {
+          const toast = await this.toastController.create({
+            message: 'Usuario creado con éxito',
+            duration: 2000,
+            color: 'success'
+          });
+          await toast.present();
+          
+          this.dashboardData.alerts.unshift({
+            type: 'success',
+            title: 'Nuevo acceso',
+            description: `Usuario creado: ${data.name}`,
+            timeAgo: 'Justo ahora'
+          });
+          
+          this.dashboardData.activities.unshift({
+            type: 'info',
+            icon: 'people',
+            title: 'Nuevo compañero',
+            description: `${this.currentUser?.name} registró a ${data.name}`,
+            timeAgo: 'Justo ahora'
+          });
+
+          this.loadStatistics();
+        },
+        error: () => this.isLoading = false
+      });
+    }
   }
 }

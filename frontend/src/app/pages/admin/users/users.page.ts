@@ -21,11 +21,11 @@ import {
   addOutline,
   people,
   shield,
-  searchOutline,
   createOutline,
   trashOutline,
   checkmarkCircle,
-  alertCircle
+  alertCircle,
+  personOutline
 } from 'ionicons/icons';
 import { AuthService } from '@services/auth/auth.service';
 import { UserService } from '@services/domain/user.service';
@@ -99,11 +99,11 @@ export class UsersPage implements OnInit {
       'add-outline': addOutline,
       'people': people,
       'shield': shield,
-      'search-outline': searchOutline,
       'create-outline': createOutline,
       'trash-outline': trashOutline,
       'checkmark-circle': checkmarkCircle,
-      'alert-circle': alertCircle
+      'alert-circle': alertCircle,
+      'person-outline': personOutline,
     });
   }
 
@@ -190,7 +190,7 @@ export class UsersPage implements OnInit {
       componentProps: {
         user: null,
       },
-      cssClass: 'fullscreen-modal', // Cambiamos la clase
+      cssClass: 'fullscreen-modal',
       backdropDismiss: false,
     });
 

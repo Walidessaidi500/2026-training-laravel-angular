@@ -10,7 +10,7 @@ import {
 
 import { addIcons } from 'ionicons';
 import {
-  cubeOutline, cube, addOutline, searchOutline,
+  cubeOutline, cube, addOutline,
   createOutline, trashOutline, checkmarkCircle,
   closeCircle, alertCircle, optionsOutline, warningOutline, receiptOutline
 } from 'ionicons/icons';
@@ -91,7 +91,6 @@ export class ProductsPage implements OnInit {
       'cube-outline': cubeOutline,
       'cube': cube,
       'add-outline': addOutline,
-      'search-outline': searchOutline,
       'create-outline': createOutline,
       'trash-outline': trashOutline,
       'checkmark-circle': checkmarkCircle,

@@ -67,7 +67,6 @@
     <!-- Filters -->
     <div class="panel-card filter-panel">
       <div class="search-section">
-        <ion-icon name="search-outline" class="search-icon"></ion-icon>
         <ion-searchbar placeholder="Buscar por nombre o email..." (ionChange)="onSearchChange($event)"
           [value]="searchTerm" class="custom-searchbar"></ion-searchbar>
       </div>
@@ -105,7 +104,8 @@
         <div class="empty-icon"><ion-icon name="people-outline"></ion-icon></div>
         <p class="empty-title">No hay usuarios</p>
         <p class="empty-description">
-          {{ searchTerm || selectedRole !== 'all' ? 'No se encontraron usuarios con esos filtros' : 'Comienza agregando el primer usuario' }}
+          {{ searchTerm || selectedRole !== 'all' ? 'No se encontraron usuarios con esos filtros' : 'Comienza agregando
+          el primer usuario' }}
         </p>
       </div>
 

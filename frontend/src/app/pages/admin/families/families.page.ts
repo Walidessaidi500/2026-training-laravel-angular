@@ -9,7 +9,7 @@ import {
 
 import { addIcons } from 'ionicons';
 import {
-  folderOutline, folder, addOutline, searchOutline,
+  folderOutline, folder, addOutline,
   createOutline, trashOutline, checkmarkCircle,
   closeCircle, alertCircle
 } from 'ionicons/icons';
@@ -63,7 +63,6 @@ export class FamiliesPage implements OnInit {
       'folder-outline': folderOutline,
       'folder': folder,
       'add-outline': addOutline,
-      'search-outline': searchOutline,
       'create-outline': createOutline,
       'trash-outline': trashOutline,
       'checkmark-circle': checkmarkCircle,

@@ -8,7 +8,8 @@
       <ion-skeleton-text animated style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text>
     </div>
     <div class="stats-grid three-cols">
-      <ion-skeleton-text animated style="height: 100px; border-radius: 16px;" *ngFor="let i of [1,2,3]"></ion-skeleton-text>
+      <ion-skeleton-text animated style="height: 100px; border-radius: 16px;"
+        *ngFor="let i of [1,2,3]"></ion-skeleton-text>
     </div>
     <div class="table-skeleton">
       <ion-skeleton-text animated style="height: 500px; border-radius: 16px;"></ion-skeleton-text>
@@ -17,7 +18,7 @@
 
   <!-- Content -->
   <div class="page-container" *ngIf="!isLoading && isAdmin">
-    
+
     <div class="page-header">
       <div class="header-content">
         <div class="icon-box primary">
@@ -44,7 +45,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="panel-card stat-card">
         <div class="stat-content">
           <div class="icon-box success-light"><ion-icon name="checkmark-circle" color="success"></ion-icon></div>
@@ -69,9 +70,8 @@
     <!-- Advanced Filters -->
     <div class="panel-card filter-panel advanced-filters">
       <div class="search-section">
-        <ion-icon name="search-outline" class="search-icon"></ion-icon>
-        <ion-searchbar placeholder="Buscar producto por nombre..." (ionInput)="onSearchChange($event)" [value]="searchTerm"
-          class="custom-searchbar"></ion-searchbar>
+        <ion-searchbar placeholder="Buscar producto por nombre..." (ionInput)="onSearchChange($event)"
+          [value]="searchTerm" class="custom-searchbar"></ion-searchbar>
       </div>
 
       <div class="selects-row">
@@ -107,8 +107,8 @@
 
         <!-- Filtro por Stock -->
         <div class="filter-select">
-          <ion-select label="Stock" labelPlacement="floating" [(ngModel)]="selectedStock"
-            (ionChange)="onFilterChange()" interface="popover">
+          <ion-select label="Stock" labelPlacement="floating" [(ngModel)]="selectedStock" (ionChange)="onFilterChange()"
+            interface="popover">
             <ion-select-option value="all">Cualquier cantidad</ion-select-option>
             <ion-select-option value="in_stock">Con Stock (> 0)</ion-select-option>
             <ion-select-option value="low_stock">Stock bajo (1-5)</ion-select-option>
@@ -147,8 +147,10 @@
             </div>
 
             <div class="product-meta">
-              <span class="meta-tag"><ion-icon name="folder-outline"></ion-icon> {{ product.family_name || 'Sin familia' }}</span>
-              <span class="meta-tag"><ion-icon name="receipt-outline"></ion-icon> {{ product.tax_name || 'Sin impuesto' }}</span>
+              <span class="meta-tag"><ion-icon name="folder-outline"></ion-icon> {{ product.family_name || 'Sin familia'
+                }}</span>
+              <span class="meta-tag"><ion-icon name="receipt-outline"></ion-icon> {{ product.tax_name || 'Sin impuesto'
+                }}</span>
 
               <span class="stock-badge"
                 [ngClass]="{'in-stock': product.stock > 5, 'low-stock': product.stock > 0 && product.stock <= 5, 'out-of-stock': product.stock <= 0}">
