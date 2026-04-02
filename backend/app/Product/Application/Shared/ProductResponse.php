@@ -11,13 +11,14 @@ class ProductResponse
         public readonly string $familyId,
         public readonly string $taxId,
         public readonly string $name,
-        public readonly int $price,
+        public readonly int $priceInCents,
         public readonly int $stock,
         public readonly bool $active,
         public readonly ?string $imageSrc,
         public readonly string $createdAt,
         public readonly string $updatedAt,
-    ) {}
+    ) {
+    }
 
     public static function create(Product $product): self
     {
@@ -26,7 +27,7 @@ class ProductResponse
             $product->familyId()->value(),
             $product->taxId()->value(),
             $product->name(),
-            $product->price(),
+            $product->price()->value(),
             $product->stock(),
             $product->isActive(),
             $product->imageSrc(),
@@ -45,7 +46,7 @@ class ProductResponse
             'family_id' => $this->familyId,
             'tax_id' => $this->taxId,
             'name' => $this->name,
-            'price' => $this->price,
+            'priceInCents' => $this->priceInCents,
             'stock' => $this->stock,
             'active' => $this->active,
             'image_src' => $this->imageSrc,

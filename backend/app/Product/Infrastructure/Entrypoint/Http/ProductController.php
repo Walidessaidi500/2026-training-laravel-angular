@@ -20,7 +20,8 @@ class ProductController
         private DeleteProduct $deleteProduct,
         private GetProduct $getProduct,
         private ToggleProductActive $toggleProductActive,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): JsonResponse
     {
@@ -58,7 +59,7 @@ class ProductController
             'family_id' => ['required', 'string'],
             'tax_id' => ['required', 'string'],
             'name' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'integer', 'min:0'],
+            'price_in_cents' => ['required', 'integer', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'image_src' => ['nullable', 'string', 'max:255'],
         ]);
@@ -67,8 +68,9 @@ class ProductController
             $validated['family_id'],
             $validated['tax_id'],
             $validated['name'],
-            $validated['price'],
+            $validated['price_in_cents'],
             $validated['stock'],
+            (int) $request->user()->restaurant_id,
             $validated['image_src'] ?? null,
         );
 
@@ -81,7 +83,7 @@ class ProductController
             'family_id' => ['required', 'string'],
             'tax_id' => ['required', 'string'],
             'name' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'integer', 'min:0'],
+            'price_in_cents' => ['required', 'integer', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'image_src' => ['nullable', 'string', 'max:255'],
         ]);
@@ -92,8 +94,9 @@ class ProductController
                 $validated['family_id'],
                 $validated['tax_id'],
                 $validated['name'],
-                $validated['price'],
+                $validated['price_in_cents'],
                 $validated['stock'],
+                (int) $request->user()->restaurant_id,
                 $validated['image_src'] ?? null,
             );
 

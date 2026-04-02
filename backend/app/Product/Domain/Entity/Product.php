@@ -6,6 +6,7 @@ use App\Product\Domain\ValueObject\Price;
 use App\Product\Domain\ValueObject\ProductName;
 use App\Product\Domain\ValueObject\Stock;
 use App\Shared\Domain\ValueObject\DomainDateTime;
+use App\Product\Domain\ValueObject\RestaurantId;
 use App\Shared\Domain\ValueObject\Uuid;
 
 class Product implements \JsonSerializable
@@ -17,11 +18,13 @@ class Product implements \JsonSerializable
         private ProductName $name,
         private Price $price,
         private Stock $stock,
+        private RestaurantId $restaurantId,
         private bool $active,
         private ?string $imageSrc,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
-    ) {}
+    ) {
+    }
 
     public static function dddCreate(
         Uuid $familyId,
@@ -29,6 +32,7 @@ class Product implements \JsonSerializable
         ProductName $name,
         Price $price,
         Stock $stock,
+        RestaurantId $restaurantId,
         ?string $imageSrc = null,
     ): self {
         $now = DomainDateTime::now();
@@ -40,6 +44,7 @@ class Product implements \JsonSerializable
             $name,
             $price,
             $stock,
+            $restaurantId,
             true,
             $imageSrc,
             $now,
@@ -54,6 +59,7 @@ class Product implements \JsonSerializable
         string $name,
         int $price,
         int $stock,
+        int $restaurantId,
         bool $active,
         ?string $imageSrc,
         \DateTimeImmutable $createdAt,
@@ -66,6 +72,7 @@ class Product implements \JsonSerializable
             ProductName::create($name),
             Price::create($price),
             Stock::create($stock),
+            RestaurantId::create($restaurantId),
             $active,
             $imageSrc,
             DomainDateTime::create($createdAt),
@@ -93,9 +100,9 @@ class Product implements \JsonSerializable
         return $this->name->value();
     }
 
-    public function price(): int
+    public function price(): Price
     {
-        return $this->price->value();
+        return $this->price;
     }
 
     public function stock(): int
@@ -111,6 +118,11 @@ class Product implements \JsonSerializable
     public function imageSrc(): ?string
     {
         return $this->imageSrc;
+    }
+
+    public function restaurantId(): RestaurantId
+    {
+        return $this->restaurantId;
     }
 
     public function update(
@@ -132,7 +144,7 @@ class Product implements \JsonSerializable
 
     public function toggleActive(): void
     {
-        $this->active = ! $this->active;
+        $this->active = !$this->active;
         $this->updatedAt = DomainDateTime::now();
     }
 
@@ -153,8 +165,9 @@ class Product implements \JsonSerializable
             'family_uuid' => $this->familyId->value(),
             'tax_uuid' => $this->taxId->value(),
             'name' => $this->name->value(),
-            'price' => $this->price->value(),
+            'priceInCents' => $this->price->value(),
             'stock' => $this->stock->value(),
+            'restaurant_id' => $this->restaurantId->value(),
             'active' => $this->active,
             'image_src' => $this->imageSrc,
             'created_at' => $this->createdAt->value()->format('Y-m-d\TH:i:s.u\Z'),

@@ -15,9 +15,9 @@ class Price
         $this->value = $value;
     }
 
-    public static function create(int $value): self
+    public static function create(int $cents): self
     {
-        return new self($value);
+        return new self($cents);
     }
 
     public function value(): int
