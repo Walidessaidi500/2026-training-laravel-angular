@@ -11,102 +11,84 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <form [formGroup]="userForm" (ngSubmit)="submit()" class="user-form">
-    <ion-item class="form-item">
-      <ion-label position="floating">Nombre</ion-label>
-      <ion-input
-        formControlName="name"
-        type="text"
-        placeholder="Ej: Juan Pérez"
-        [class.invalid]="isFieldInvalid('name')"
-      ></ion-input>
-    </ion-item>
-    <ion-text *ngIf="getFieldError('name')" class="error-text">
-      <p>{{ getFieldError('name') }}</p>
-    </ion-text>
+<ion-content class="ion-padding custom-form-content">
+  <form [formGroup]="userForm" (ngSubmit)="submit()" class="yurest-form">
 
-    <ion-item class="form-item">
-      <ion-label position="floating">Email</ion-label>
-      <ion-input
-        formControlName="email"
-        type="email"
-        placeholder="Ej: juan@example.com"
-        [class.invalid]="isFieldInvalid('email')"
-      ></ion-input>
-    </ion-item>
-    <ion-text *ngIf="getFieldError('email')" class="error-text">
-      <p>{{ getFieldError('email') }}</p>
-    </ion-text>
+    <div class="form-section">
+      <span class="section-title">Información Personal</span>
 
-    <ion-item class="form-item">
-      <ion-label position="floating">Contraseña {{ isEditMode ? '(Opcional)' : '' }}</ion-label>
-      <ion-input
-        formControlName="password"
-        type="password"
-        placeholder="Mínimo 8 caracteres"
-        [class.invalid]="isFieldInvalid('password')"
-      ></ion-input>
-    </ion-item>
-    <ion-text *ngIf="getFieldError('password')" class="error-text">
-      <p>{{ getFieldError('password') }}</p>
-    </ion-text>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="label">Nombre *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-input formControlName="name" type="text" placeholder="Ej: Juan Pérez"></ion-input>
+          </ion-item>
+          <small class="helper-text" *ngIf="getFieldError('name')">{{ getFieldError('name') }}</small>
+        </div>
 
-    <ion-item class="form-item">
-      <ion-label position="floating">Confirmar Contraseña {{ isEditMode ? '(Opcional)' : '' }}</ion-label>
-      <ion-input
-        formControlName="password_confirmation"
-        type="password"
-        placeholder="Repite tu contraseña"
-        [class.invalid]="isFieldInvalid('password_confirmation')"
-      ></ion-input>
-    </ion-item>
-    <ion-text *ngIf="getFieldError('password_confirmation')" class="error-text">
-      <p>{{ getFieldError('password_confirmation') }}</p>
-    </ion-text>
-
-    <ion-item class="form-item">
-      <ion-label position="floating">Rol</ion-label>
-      <ion-select formControlName="role" [class.invalid]="isFieldInvalid('role')">
-        <ion-select-option *ngFor="let role of roles" [value]="role.value">
-           {{ role.label }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-text *ngIf="getFieldError('role')" class="error-text">
-      <p>{{ getFieldError('role') }}</p>
-    </ion-text>
-
-    <ion-item class="form-item">
-      <ion-label position="floating">PIN (Opcional)</ion-label>
-      <ion-input
-        formControlName="pin"
-        type="text"
-        placeholder="Ej: 1234"
-        [class.invalid]="isFieldInvalid('pin')"
-      ></ion-input>
-    </ion-item>
-    <ion-text *ngIf="getFieldError('pin')" class="error-text">
-      <p>{{ getFieldError('pin') }}</p>
-    </ion-text>
-
-    <div class="form-actions ion-padding-top">
-      <ion-button
-        fill="outline"
-        type="button"
-        (click)="cancel()"
-        [disabled]="isLoading"
-      >
-        Cancelar
-      </ion-button>
-      
-      <ion-button
-        type="submit"
-        [disabled]="!userForm.valid || isLoading"
-      >
-        <ion-spinner *ngIf="isLoading" name="dots"></ion-spinner>
-        <span *ngIf="!isLoading">{{ isEditMode ? 'Actualizar' : 'Crear' }} Usuario</span>
-      </ion-button>
+        <div class="form-group">
+          <label class="label">Email *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-input formControlName="email" type="email" placeholder="Ej: juan@example.com"></ion-input>
+          </ion-item>
+          <small class="helper-text" *ngIf="getFieldError('email')">{{ getFieldError('email') }}</small>
+        </div>
+      </div>
     </div>
+
+    <div class="form-section">
+      <span class="section-title">Seguridad y Acceso</span>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="label">Rol en el sistema *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-select formControlName="role" interface="popover" placeholder="Selecciona un rol">
+              <ion-select-option *ngFor="let role of roles" [value]="role.value">
+                {{ role.label }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <small class="helper-text" *ngIf="getFieldError('role')">{{ getFieldError('role') }}</small>
+        </div>
+
+        <div class="form-group">
+          <label class="label">PIN de acceso (4 dígitos)</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-input formControlName="pin" type="text" placeholder="Ej: 1234"></ion-input>
+          </ion-item>
+          <small class="helper-text" *ngIf="getFieldError('pin')">{{ getFieldError('pin') }}</small>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="label">Contraseña {{ isEditMode ? '(Opcional)' : '*' }}</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-input formControlName="password" type="password" placeholder="••••••••"></ion-input>
+          </ion-item>
+          <small class="helper-text" *ngIf="getFieldError('password')">{{ getFieldError('password') }}</small>
+        </div>
+
+        <div class="form-group">
+          <label class="label">Confirmar Contraseña</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-input formControlName="password_confirmation" type="password" placeholder="••••••••"></ion-input>
+          </ion-item>
+          <small class="helper-text" *ngIf="getFieldError('password_confirmation')">{{ getFieldError('password_confirmation') }}</small>
+        </div>
+      </div>
+    </div>
+
   </form>
 </ion-content>
+
+<div class="form-footer">
+  <ion-button fill="clear" (click)="cancel()" class="btn-cancel" [disabled]="isLoading">
+    Cancelar
+  </ion-button>
+  <ion-button (click)="submit()" [disabled]="!userForm.valid || isLoading" class="btn-submit">
+    <ion-spinner *ngIf="isLoading" name="dots" color="light"></ion-spinner>
+    <span *ngIf="!isLoading">{{ isEditMode ? 'Guardar Cambios' : 'Crear Usuario' }}</span>
+  </ion-button>
+</div>

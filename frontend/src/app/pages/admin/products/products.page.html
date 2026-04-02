@@ -2,16 +2,22 @@
   <app-access-denied *ngIf="!isAdmin && !isLoading" [user]="currentUser"
     message="Esta página solo está disponible para administradores."></app-access-denied>
 
-  <div class="products-container" *ngIf="isLoading">
-    <div class="page-header"><ion-skeleton-text animated
-        style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text></div>
-    <div class="stats-grid"><ion-skeleton-text animated style="height: 100px; border-radius: 16px;"
-        *ngFor="let i of [1,2,3]"></ion-skeleton-text></div>
-    <div class="table-skeleton"><ion-skeleton-text animated
-        style="height: 500px; border-radius: 16px;"></ion-skeleton-text></div>
+  <!-- Skeleton Loading -->
+  <div class="page-container" *ngIf="isLoading">
+    <div class="page-header">
+      <ion-skeleton-text animated style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text>
+    </div>
+    <div class="stats-grid three-cols">
+      <ion-skeleton-text animated style="height: 100px; border-radius: 16px;" *ngFor="let i of [1,2,3]"></ion-skeleton-text>
+    </div>
+    <div class="table-skeleton">
+      <ion-skeleton-text animated style="height: 500px; border-radius: 16px;"></ion-skeleton-text>
+    </div>
   </div>
 
-  <div class="products-container" *ngIf="!isLoading && isAdmin">
+  <!-- Content -->
+  <div class="page-container" *ngIf="!isLoading && isAdmin">
+    
     <div class="page-header">
       <div class="header-content">
         <div class="icon-box primary">
@@ -19,7 +25,7 @@
         </div>
         <div>
           <h1>Catálogo de Productos</h1>
-          <p class="subtitle">Gestiona tu inventario y precios</p>
+          <p class="subtitle">Gestiona tu inventario y precios de forma centralizada</p>
         </div>
       </div>
       <button class="btn-primary" (click)="addNewProduct()">
@@ -27,6 +33,7 @@
       </button>
     </div>
 
+    <!-- Stats Section -->
     <div class="stats-grid three-cols">
       <div class="panel-card stat-card">
         <div class="stat-content">
@@ -37,6 +44,7 @@
           </div>
         </div>
       </div>
+      
       <div class="panel-card stat-card">
         <div class="stat-content">
           <div class="icon-box success-light"><ion-icon name="checkmark-circle" color="success"></ion-icon></div>
@@ -46,6 +54,7 @@
           </div>
         </div>
       </div>
+
       <div class="panel-card stat-card">
         <div class="stat-content">
           <div class="icon-box danger-light"><ion-icon name="warning-outline" color="danger"></ion-icon></div>
@@ -57,54 +66,59 @@
       </div>
     </div>
 
+    <!-- Advanced Filters -->
     <div class="panel-card filter-panel advanced-filters">
       <div class="search-section">
         <ion-icon name="search-outline" class="search-icon"></ion-icon>
-        <ion-searchbar placeholder="Buscar por nombre..." (ionChange)="onSearchChange($event)" [value]="searchTerm"
+        <ion-searchbar placeholder="Buscar producto por nombre..." (ionInput)="onSearchChange($event)" [value]="searchTerm"
           class="custom-searchbar"></ion-searchbar>
       </div>
 
       <div class="selects-row">
-        <ion-item lines="none" class="filter-select">
+        <!-- Filtro por Familia -->
+        <div class="filter-select">
           <ion-select label="Familia" labelPlacement="floating" [(ngModel)]="selectedFamily"
             (ionChange)="onFilterChange()" interface="popover">
             <ion-select-option value="all">Todas las familias</ion-select-option>
             <ion-select-option value="none">Sin familia asignada</ion-select-option>
             <ion-select-option *ngFor="let fam of families" [value]="fam.uuid">{{ fam.name }}</ion-select-option>
           </ion-select>
-        </ion-item>
+        </div>
 
-        <ion-item lines="none" class="filter-select">
+        <!-- Filtro por Impuesto -->
+        <div class="filter-select">
           <ion-select label="Impuesto" labelPlacement="floating" [(ngModel)]="selectedTax"
             (ionChange)="onFilterChange()" interface="popover">
             <ion-select-option value="all">Todos los impuestos</ion-select-option>
             <ion-select-option value="none">Sin impuesto asignado</ion-select-option>
-            <ion-select-option *ngFor="let tax of taxes" [value]="tax.uuid">{{ tax.name }} ({{ tax.percentage
-              }}%)</ion-select-option>
+            <ion-select-option *ngFor="let tax of taxes" [value]="tax.uuid">{{ tax.name }}</ion-select-option>
           </ion-select>
-        </ion-item>
+        </div>
 
-        <ion-item lines="none" class="filter-select">
+        <!-- Filtro por Estado -->
+        <div class="filter-select">
           <ion-select label="Estado" labelPlacement="floating" [(ngModel)]="selectedStatus"
             (ionChange)="onFilterChange()" interface="popover">
-            <ion-select-option value="all">Todos</ion-select-option>
-            <ion-select-option value="active">Activos</ion-select-option>
-            <ion-select-option value="inactive">Inactivos</ion-select-option>
+            <ion-select-option value="all">Todos los estados</ion-select-option>
+            <ion-select-option value="active">Solo Activos</ion-select-option>
+            <ion-select-option value="inactive">Solo Inactivos</ion-select-option>
           </ion-select>
-        </ion-item>
+        </div>
 
-        <ion-item lines="none" class="filter-select">
-          <ion-select label="Inventario" labelPlacement="floating" [(ngModel)]="selectedStock"
+        <!-- Filtro por Stock -->
+        <div class="filter-select">
+          <ion-select label="Stock" labelPlacement="floating" [(ngModel)]="selectedStock"
             (ionChange)="onFilterChange()" interface="popover">
-            <ion-select-option value="all">Todo el inventario</ion-select-option>
+            <ion-select-option value="all">Cualquier cantidad</ion-select-option>
             <ion-select-option value="in_stock">Con Stock (> 0)</ion-select-option>
             <ion-select-option value="low_stock">Stock bajo (1-5)</ion-select-option>
             <ion-select-option value="out_of_stock">Agotados (0)</ion-select-option>
           </ion-select>
-        </ion-item>
+        </div>
       </div>
     </div>
 
+    <!-- Main List Panel -->
     <div class="panel-card table-panel">
       <div class="card-header">
         <div>
@@ -113,14 +127,16 @@
         </div>
       </div>
 
+      <!-- Empty State -->
       <div class="empty-state" *ngIf="filteredProducts.length === 0">
         <div class="empty-icon"><ion-icon name="options-outline"></ion-icon></div>
         <p class="empty-title">Sin resultados</p>
-        <p class="empty-description">No hay productos que coincidan con los filtros seleccionados.</p>
+        <p class="empty-description">No hay productos que coincidan con los filtros aplicados.</p>
       </div>
 
+      <!-- List -->
       <ion-list class="products-list" *ngIf="filteredProducts.length > 0">
-        <ion-item lines="none" class="product-item" *ngFor="let product of filteredProducts">
+        <ion-item lines="none" class="product-item animated-fadeIn" *ngFor="let product of filteredProducts">
           <div class="product-icon">
             <ion-icon name="cube-outline"></ion-icon>
           </div>
@@ -131,12 +147,12 @@
             </div>
 
             <div class="product-meta">
-              <span class="meta-tag"><ion-icon name="folder-outline"></ion-icon> {{ product.family_name }}</span>
-              <span class="meta-tag"><ion-icon name="receipt-outline"></ion-icon> {{ product.tax_name }}</span>
+              <span class="meta-tag"><ion-icon name="folder-outline"></ion-icon> {{ product.family_name || 'Sin familia' }}</span>
+              <span class="meta-tag"><ion-icon name="receipt-outline"></ion-icon> {{ product.tax_name || 'Sin impuesto' }}</span>
 
               <span class="stock-badge"
                 [ngClass]="{'in-stock': product.stock > 5, 'low-stock': product.stock > 0 && product.stock <= 5, 'out-of-stock': product.stock <= 0}">
-                Stock: {{ product.stock }}
+                STOCK: {{ product.stock }}
               </span>
 
               <span class="status-badge" [ngClass]="product.active ? 'active' : 'inactive'">
@@ -147,10 +163,12 @@
           </ion-label>
 
           <div slot="end" class="actions">
-            <button class="action-btn edit-btn" (click)="editProduct(product)"><ion-icon
-                name="create-outline"></ion-icon></button>
-            <button class="action-btn delete-btn" (click)="deleteProduct(product)"><ion-icon
-                name="trash-outline"></ion-icon></button>
+            <button class="action-btn edit-btn" (click)="editProduct(product)">
+              <ion-icon name="create-outline"></ion-icon>
+            </button>
+            <button class="action-btn delete-btn" (click)="deleteProduct(product)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
           </div>
         </ion-item>
       </ion-list>

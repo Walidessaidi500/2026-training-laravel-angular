@@ -1,234 +1,9 @@
-// Reutilizar estilos base del dashboard
+/* Products Specific View Styles */
 .products-background {
   --background: var(--ion-color-light);
 }
 
-.products-container {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-// ==================== PAGE HEADER ====================
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-  gap: 16px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-content {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-
-    h1 {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--ion-color-secondary);
-      margin: 0;
-    }
-
-    .subtitle {
-      font-size: 13px;
-      color: var(--ion-color-medium);
-      margin: 4px 0 0;
-    }
-  }
-
-  .btn-primary {
-    background: var(--ion-color-primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-    font-weight: 700;
-    font-size: 13px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      background: var(--ion-color-primary-shade);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-
-    ion-icon {
-      font-size: 18px;
-    }
-  }
-}
-
-// ==================== STATS GRID ====================
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-
-  .stat-card {
-    margin-bottom: 0;
-
-    .stat-content {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-
-      .stat-value {
-        font-size: 32px;
-        font-weight: 800;
-        color: var(--ion-color-secondary);
-      }
-
-      .stat-label {
-        font-size: 11px;
-        font-weight: 700;
-        color: var(--ion-color-medium);
-        letter-spacing: 0.6px;
-        margin-top: 4px;
-        text-transform: uppercase;
-      }
-    }
-  }
-}
-
-// ==================== ICON BOXES ====================
-.icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-
-  &.primary {
-    background: var(--ion-color-primary);
-    color: white;
-  }
-
-  &.primary-light {
-    background: var(--ion-color-primary-light);
-    color: var(--ion-color-primary);
-  }
-
-  &.success-light {
-    background: var(--ion-color-success-light);
-    color: var(--ion-color-success);
-  }
-
-  &.danger-light {
-    background: var(--ion-color-danger-light);
-    color: var(--ion-color-danger);
-  }
-
-  &.warning-light {
-    background: var(--ion-color-warning-light);
-    color: var(--ion-color-warning);
-  }
-}
-
-// ==================== FILTER PANEL ====================
-.filter-panel {
-  margin-bottom: 24px;
-
-  .search-section {
-    position: relative;
-    margin-bottom: 20px;
-
-    .search-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--ion-color-medium);
-      font-size: 18px;
-      z-index: 10;
-      pointer-events: none;
-    }
-  }
-
-  .custom-searchbar {
-    --background: var(--ion-color-light);
-    --border-radius: 12px;
-    --padding-start: 40px;
-    --padding-end: 16px;
-    --placeholder-opacity: 0.7;
-
-    &::part(native-input) {
-      font-size: 14px;
-    }
-  }
-
-  .selects-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-
-    @media (max-width: 1024px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (max-width: 600px) {
-      grid-template-columns: 1fr;
-    }
-
-    .filter-select {
-      --background: var(--ion-color-light);
-      --border-radius: 12px;
-      --padding-start: 12px;
-      --min-height: 52px;
-      border: 1px solid rgba(0, 0, 0, 0.05);
-
-      ion-select {
-        width: 100%;
-        --padding-top: 10px;
-        --padding-bottom: 10px;
-      }
-    }
-  }
-}
-
-// ==================== TABLE / LIST ====================
 .table-panel {
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-
-    .label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      color: var(--ion-color-medium);
-      text-transform: uppercase;
-    }
-
-    h3 {
-      margin: 4px 0 0;
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--ion-color-secondary);
-    }
-  }
-
   .products-list {
     background: transparent;
 
@@ -279,16 +54,6 @@
             color: var(--ion-color-secondary);
             margin: 0;
           }
-
-          .price-tag {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--ion-color-primary);
-            background: white;
-            padding: 4px 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-          }
         }
 
         .product-meta {
@@ -296,59 +61,6 @@
           flex-wrap: wrap;
           gap: 12px;
           align-items: center;
-
-          .meta-tag {
-            font-size: 11px;
-            color: var(--ion-color-medium);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(0, 0, 0, 0.05);
-            padding: 4px 8px;
-            border-radius: 6px;
-          }
-
-          .stock-badge {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 6px;
-
-            &.in-stock {
-              background: var(--ion-color-success-light);
-              color: var(--ion-color-success);
-            }
-
-            &.low-stock {
-              background: var(--ion-color-warning-light);
-              color: var(--ion-color-warning);
-            }
-
-            &.out-of-stock {
-              background: var(--ion-color-danger-light);
-              color: var(--ion-color-danger);
-            }
-          }
-
-          .status-badge {
-            font-size: 10px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
-            border-radius: 6px;
-
-            &.active {
-              background: var(--ion-color-success-light);
-              color: var(--ion-color-success);
-            }
-
-            &.inactive {
-              background: var(--ion-color-danger-light);
-              color: var(--ion-color-danger);
-            }
-          }
         }
       }
 
@@ -361,78 +73,30 @@
   }
 }
 
-// ==================== ACTION BUTTONS ====================
-.action-btn {
-  background: transparent;
-  border: 1.5px solid;
-  border-radius: 8px;
-  min-width: 40px;
-  min-height: 40px;
-  width: 40px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
+.advanced-filters {
+  .custom-searchbar {
+    --background: var(--ion-color-light);
+    --border-radius: 12px;
+    --padding-start: 40px;
+    --padding-end: 16px;
+  }
 
-  &.edit-btn {
-    color: var(--ion-color-primary);
-    border-color: var(--ion-color-primary);
-    background: rgba(var(--ion-color-primary-rgb), 0.08);
+  .selects-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
 
-    &:hover {
-      background: var(--ion-color-primary-light);
-      transform: translateY(-2px);
-      box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.15);
+    @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 600px) { grid-template-columns: 1fr; }
+
+    .filter-select {
+      --background: var(--ion-color-light);
+      --border-radius: 12px;
+      --padding-start: 12px;
+      --min-height: 52px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+
+      ion-select { width: 100%; }
     }
-  }
-
-  &.delete-btn {
-    color: var(--ion-color-danger);
-    border-color: var(--ion-color-danger);
-    background: rgba(var(--ion-color-danger-rgb), 0.08);
-
-    &:hover {
-      background: var(--ion-color-danger-light);
-      transform: translateY(-2px);
-      box-shadow: 0 2px 8px rgba(var(--ion-color-danger-rgb), 0.15);
-    }
-  }
-
-  ion-icon {
-    font-size: 18px;
-  }
-}
-
-// ==================== EMPTY STATE ====================
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 24px;
-  text-align: center;
-
-  .empty-icon {
-    font-size: 56px;
-    color: var(--ion-color-medium);
-    opacity: 0.3;
-    margin-bottom: 16px;
-  }
-
-  .empty-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--ion-color-secondary);
-    margin: 0 0 8px;
-  }
-
-  .empty-description {
-    font-size: 13px;
-    color: var(--ion-color-medium);
-    margin: 0;
-    max-width: 350px;
   }
 }

@@ -4,24 +4,25 @@
     message="Esta página solo está disponible para administradores.">
   </app-access-denied>
 
-  <div class="taxes-container" *ngIf="isLoading">
+  <!-- Skeleton Loading -->
+  <div class="page-container" *ngIf="isLoading">
     <div class="page-header">
       <ion-skeleton-text animated style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text>
     </div>
-    <div class="stats-grid">
-      <ion-skeleton-text animated style="height: 100px; border-radius: 16px;"
-        *ngFor="let i of [1,2]"></ion-skeleton-text>
+    <div class="stats-grid two-cols">
+      <ion-skeleton-text animated style="height: 100px; border-radius: 16px;" *ngFor="let i of [1,2]"></ion-skeleton-text>
     </div>
     <div class="table-skeleton">
       <ion-skeleton-text animated style="height: 500px; border-radius: 16px;"></ion-skeleton-text>
     </div>
   </div>
 
-  <div class="taxes-container" *ngIf="!isLoading && isAdmin">
+  <!-- Content -->
+  <div class="page-container" *ngIf="!isLoading && isAdmin">
 
     <div class="page-header">
       <div class="header-content">
-        <div class="icon-box warning">
+        <div class="icon-box primary">
           <ion-icon name="receipt-outline"></ion-icon>
         </div>
         <div>
@@ -30,16 +31,16 @@
         </div>
       </div>
       <button class="btn-primary" (click)="addNewTax()">
-        <ion-icon name="add-outline"></ion-icon>
-        Nuevo Impuesto
+        <ion-icon name="add-outline"></ion-icon> Nuevo Impuesto
       </button>
     </div>
 
-    <div class="stats-grid">
+    <!-- Stats -->
+    <div class="stats-grid two-cols">
       <div class="panel-card stat-card">
         <div class="stat-content">
-          <div class="icon-box warning-light">
-            <ion-icon name="receipt" color="warning"></ion-icon>
+          <div class="icon-box primary-light">
+            <ion-icon name="receipt" color="primary"></ion-icon>
           </div>
           <div>
             <div class="stat-value">{{ taxStats.total }}</div>
@@ -49,6 +50,7 @@
       </div>
     </div>
 
+    <!-- Filters -->
     <div class="panel-card filter-panel">
       <div class="search-section">
         <ion-icon name="search-outline" class="search-icon"></ion-icon>
@@ -57,6 +59,7 @@
       </div>
     </div>
 
+    <!-- Table Panel -->
     <div class="panel-card table-panel">
       <div class="card-header">
         <div>
@@ -65,24 +68,24 @@
         </div>
       </div>
 
+      <!-- Empty State -->
       <div class="empty-state" *ngIf="filteredTaxes.length === 0">
         <div class="empty-icon">
           <ion-icon name="receipt-outline"></ion-icon>
         </div>
         <p class="empty-title">No hay impuestos</p>
         <p class="empty-description">
-          {{ searchTerm ? 'No se encontraron impuestos con la búsqueda aplicada' : 'Comienza agregando el primer
-          impuesto' }}
+          {{ searchTerm ? 'No se encontraron impuestos' : 'Comienza agregando el primer impuesto' }}
         </p>
       </div>
 
+      <!-- List -->
       <ion-list class="taxes-list" *ngIf="filteredTaxes.length > 0">
-        <ion-item lines="none" class="tax-item" *ngFor="let tax of filteredTaxes">
-
+        <ion-item lines="none" class="tax-item animated-fadeIn" *ngFor="let tax of filteredTaxes">
           <ion-label class="tax-info">
             <h2>{{ tax.name }}</h2>
             <div class="tax-meta">
-              <span class="badge-rate primary">
+              <span class="price-tag">
                 {{ tax.rate }}%
               </span>
             </div>

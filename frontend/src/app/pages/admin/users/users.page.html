@@ -1,14 +1,16 @@
 <ion-content class="users-background">
 
   <!-- Mensaje si no es admin -->
-  <app-access-denied *ngIf="!isAdmin && !isLoading" [user]="currentUser" message="Esta página solo está disponible para administradores.">
+  <app-access-denied *ngIf="!isAdmin && !isLoading" [user]="currentUser"
+    message="Esta página solo está disponible para administradores.">
   </app-access-denied>
-  <!-- Loading -->
-  <div class="users-container" *ngIf="isLoading">
+
+  <!-- Skeleton Loading -->
+  <div class="page-container" *ngIf="isLoading">
     <div class="page-header">
       <ion-skeleton-text animated style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text>
     </div>
-    <div class="stats-grid">
+    <div class="stats-grid two-cols">
       <ion-skeleton-text animated style="height: 100px; border-radius: 16px;"
         *ngFor="let i of [1,2,3,4]"></ion-skeleton-text>
     </div>
@@ -17,10 +19,9 @@
     </div>
   </div>
 
-  <!-- Users content - solo para admin -->
-  <div class="users-container" *ngIf="!isLoading && isAdmin">
+  <!-- Content -->
+  <div class="page-container" *ngIf="!isLoading && isAdmin">
 
-    <!-- Page Header -->
     <div class="page-header">
       <div class="header-content">
         <div class="icon-box primary">
@@ -28,17 +29,16 @@
         </div>
         <div>
           <h1>Gestión de Usuarios</h1>
-          <p class="subtitle">Administra todos los usuarios del sistema</p>
+          <p class="subtitle">Administra todos los usuarios y sus permisos</p>
         </div>
       </div>
       <button class="btn-primary" (click)="addNewUser()">
-        <ion-icon name="add-outline"></ion-icon>
-        Nuevo Usuario
+        <ion-icon name="add-outline"></ion-icon> Nuevo Usuario
       </button>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
+    <!-- Stats -->
+    <div class="stats-grid two-cols">
       <div class="panel-card stat-card">
         <div class="stat-content">
           <div class="icon-box primary-light">
@@ -50,7 +50,6 @@
           </div>
         </div>
       </div>
-
 
       <div class="panel-card stat-card">
         <div class="stat-content">
@@ -65,7 +64,7 @@
       </div>
     </div>
 
-    <!-- Filter and Search Panel -->
+    <!-- Filters -->
     <div class="panel-card filter-panel">
       <div class="search-section">
         <ion-icon name="search-outline" class="search-icon"></ion-icon>
@@ -92,48 +91,42 @@
       </div>
     </div>
 
-    <!-- Users Table Panel -->
+    <!-- Table Panel -->
     <div class="panel-card table-panel">
       <div class="card-header">
         <div>
           <span class="label">USUARIOS {{ selectedRole !== 'all' ? '- ' + selectedRole.toUpperCase() : '' }}</span>
           <h3>{{ filteredUsers.length }} usuario{{ filteredUsers.length !== 1 ? 's' : '' }}</h3>
         </div>
-        <span class="result-count">{{ filteredUsers.length }} de {{ users.length }}</span>
       </div>
 
       <!-- Empty State -->
       <div class="empty-state" *ngIf="filteredUsers.length === 0">
-        <div class="empty-icon">
-          <ion-icon name="people-outline"></ion-icon>
-        </div>
+        <div class="empty-icon"><ion-icon name="people-outline"></ion-icon></div>
         <p class="empty-title">No hay usuarios</p>
         <p class="empty-description">
-          {{ searchTerm || selectedRole !== 'all' ? 'No se encontraron usuarios con los filtros aplicados' : 'Comienza
-          agregando el primer usuario' }}
+          {{ searchTerm || selectedRole !== 'all' ? 'No se encontraron usuarios con esos filtros' : 'Comienza agregando el primer usuario' }}
         </p>
       </div>
 
-      <!-- Users List -->
+      <!-- List -->
       <ion-list class="users-list" *ngIf="filteredUsers.length > 0">
-        <ion-item lines="none" class="user-item" *ngFor="let user of filteredUsers">
-          <!-- Avatar -->
-          <div slot="start" class="avatar-circle" [style.background-color]="'var(--ion-color-primary)'">
+        <ion-item lines="none" class="user-item animated-fadeIn" *ngFor="let user of filteredUsers">
+          <div slot="start" class="avatar-circle">
             {{ getInitials(user.name) }}
           </div>
 
-          <!-- User Info -->
           <ion-label class="user-info">
             <h2>{{ user.name }}</h2>
             <p class="user-email">{{ user.email }}</p>
             <div class="user-meta">
-              <span class="badge-role" [ngClass]="getRoleBadgeClass(user.role)">
+              <span class="status-badge active" [ngClass]="getRoleBadgeClass(user.role)">
+                <ion-icon name="person-outline"></ion-icon>
                 {{ user.role | uppercase }}
               </span>
             </div>
           </ion-label>
 
-          <!-- Actions -->
           <div slot="end" class="actions">
             <button class="action-btn edit-btn" (click)="editUser(user)" title="Editar">
               <ion-icon name="create-outline"></ion-icon>

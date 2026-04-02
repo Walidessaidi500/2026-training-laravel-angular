@@ -12,79 +12,87 @@
 <ion-content class="ion-padding custom-form-content">
   <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="yurest-form">
 
-    <!-- Nombre -->
-    <div class="form-group">
-      <ion-label class="form-label">Nombre del Producto <span class="required">*</span></ion-label>
-      <ion-item lines="none" class="custom-input-item" [class.has-error]="f['name'].invalid && f['name'].touched">
-        <ion-input formControlName="name" type="text" placeholder="Ej: Hamburguesa Clásica" clearInput></ion-input>
-      </ion-item>
-      <ion-note color="danger" *ngIf="f['name'].invalid && f['name'].touched" class="error-msg">
-        El nombre es obligatorio (mínimo 2 caracteres).
-      </ion-note>
-    </div>
-
-    <!-- Precios y Stock (Dos columnas) -->
-    <div class="form-row">
-      <div class="form-group half">
-        <ion-label class="form-label">Precio Base (€) <span class="required">*</span></ion-label>
-        <ion-item lines="none" class="custom-input-item" [class.has-error]="f['price'].invalid && f['price'].touched">
-          <ion-input formControlName="price" type="number" inputmode="decimal" placeholder="0.00" [min]="0"></ion-input>
+    <div class="form-section">
+      <span class="section-title">Información Básica</span>
+      
+      <!-- Nombre -->
+      <div class="form-group">
+        <label class="label">Nombre del Producto *</label>
+        <ion-item lines="none" class="custom-input-item">
+          <ion-input formControlName="name" type="text" placeholder="Ej: Hamburguesa Clásica"></ion-input>
         </ion-item>
-        <ion-note color="danger" *ngIf="f['price'].invalid && f['price'].touched" class="error-msg">Precio
-          inválido.</ion-note>
+        <small class="helper-text" *ngIf="f['name'].invalid && f['name'].touched">
+          El nombre es obligatorio (mínimo 2 caracteres).
+        </small>
       </div>
 
-      <div class="form-group half">
-        <ion-label class="form-label">Stock Actual <span class="required">*</span></ion-label>
-        <ion-item lines="none" class="custom-input-item" [class.has-error]="f['stock'].invalid && f['stock'].touched">
-          <ion-input formControlName="stock" type="number" inputmode="numeric" placeholder="0" [min]="0"></ion-input>
-        </ion-item>
-        <ion-note color="danger" *ngIf="f['stock'].invalid && f['stock'].touched" class="error-msg">Stock
-          inválido.</ion-note>
-      </div>
-    </div>
+      <!-- Precios y Stock (Grid) -->
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="label">Precio Base (€) *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-input formControlName="price" type="number" inputmode="decimal" placeholder="0.00"></ion-input>
+          </ion-item>
+          <small class="helper-text" *ngIf="f['price'].invalid && f['price'].touched">Precio inválido.</small>
+        </div>
 
-    <!-- Selectores (Familia e Impuesto) -->
-    <div class="form-row">
-      <div class="form-group half">
-        <ion-label class="form-label">Familia <span class="required">*</span></ion-label>
-        <ion-item lines="none" class="custom-input-item"
-          [class.has-error]="f['family_id'].invalid && f['family_id'].touched">
-          <ion-select formControlName="family_id" interface="popover" placeholder="Selecciona...">
-            <ion-select-option *ngFor="let fam of families" [value]="fam.uuid">{{ fam.name }}</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </div>
-
-      <div class="form-group half">
-        <ion-label class="form-label">Impuesto <span class="required">*</span></ion-label>
-        <ion-item lines="none" class="custom-input-item" [class.has-error]="f['tax_id'].invalid && f['tax_id'].touched">
-          <ion-select formControlName="tax_id" interface="popover" placeholder="Selecciona...">
-            <ion-select-option *ngFor="let tax of taxes" [value]="tax.uuid">{{ tax.name }} ({{ tax.percentage
-              }}%)</ion-select-option>
-          </ion-select>
-        </ion-item>
+        <div class="form-group">
+          <label class="label">Stock Actual *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-input formControlName="stock" type="number" inputmode="numeric" placeholder="0"></ion-input>
+          </ion-item>
+          <small class="helper-text" *ngIf="f['stock'].invalid && f['stock'].touched">Stock inválido.</small>
+        </div>
       </div>
     </div>
 
-    <!-- Estado -->
-    <div class="form-group toggle-group">
-      <ion-item lines="none" class="custom-toggle-item">
-        <ion-label>
-          <h3>Estado del Producto</h3>
-          <p>{{ productForm.get('active')?.value ? 'Activo (Visible para venta)' : 'Inactivo (Oculto en TPV)' }}</p>
-        </ion-label>
-        <ion-toggle slot="end" formControlName="active" color="success"></ion-toggle>
-      </ion-item>
-    </div>
+    <div class="form-section">
+      <span class="section-title">Categorización y Configuración</span>
+      
+      <div class="form-grid">
+        <!-- Familia -->
+        <div class="form-group">
+          <label class="label">Familia *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-select formControlName="family_id" interface="popover" placeholder="Selecciona...">
+              <ion-select-option value="">Ninguna / Sin familia</ion-select-option>
+              <ion-select-option *ngFor="let fam of families" [value]="fam.uuid">{{ fam.name }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
 
+        <!-- Impuesto -->
+        <div class="form-group">
+          <label class="label">Impuesto *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-select formControlName="tax_id" interface="popover" placeholder="Selecciona...">
+              <ion-select-option value="">Ninguno / Sin impuesto</ion-select-option>
+              <ion-select-option *ngFor="let tax of taxes" [value]="tax.uuid">{{ tax.name }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+      </div>
+
+      <!-- Estado -->
+      <div class="form-group">
+        <div class="toggle-group">
+          <div class="toggle-label">
+            <span>¿Producto Activo?</span>
+            <small>{{ productForm.get('active')?.value ? 'Visible para la venta' : 'Oculto en TPV' }}</small>
+          </div>
+          <ion-toggle formControlName="active" color="success"></ion-toggle>
+        </div>
+      </div>
+    </div>
   </form>
 </ion-content>
 
-<div class="modal-footer">
-  <button type="button" class="btn-cancel" (click)="dismiss()">Cancelar</button>
-  <button type="submit" class="btn-primary" [disabled]="productForm.invalid" (click)="onSubmit()">
-    <ion-icon name="save-outline"></ion-icon>
+<div class="form-footer">
+  <ion-button fill="clear" (click)="dismiss()" class="btn-cancel">
+    Cancelar
+  </ion-button>
+  <ion-button (click)="onSubmit()" [disabled]="productForm.invalid" class="btn-submit">
+    <ion-icon name="save-outline" slot="start"></ion-icon>
     {{ isEditMode ? 'Guardar Cambios' : 'Crear Producto' }}
-  </button>
+  </ion-button>
 </div>
