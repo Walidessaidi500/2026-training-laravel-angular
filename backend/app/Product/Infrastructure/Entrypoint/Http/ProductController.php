@@ -30,6 +30,7 @@ class ProductController
         $restaurantId = $request->user()?->restaurant_id;
 
         $products = $this->productRepository->list($page, $perPage, $restaurantId);
+        $aggregates = $this->productRepository->getGlobalStats($restaurantId);
 
         return response()->json([
             'data' => $products->items(),
@@ -38,6 +39,7 @@ class ProductController
                 'per_page' => $products->perPage(),
                 'total' => $products->total(),
                 'last_page' => $products->lastPage(),
+                'aggregates' => $aggregates
             ],
         ]);
     }

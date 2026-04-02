@@ -153,7 +153,7 @@ export class ProductsPage implements OnInit {
 
         this.isInfiniteDisabled = this.currentPage >= this.lastPage;
         
-        this.calculateStats();
+        this.calculateStats(response.meta?.aggregates);
         this.applyFilters();
         this.isLoading = false;
       },
@@ -177,10 +177,16 @@ export class ProductsPage implements OnInit {
     }
   }
 
-  private calculateStats(): void {
-    this.productStats.total = this.products.length;
-    this.productStats.active = this.products.filter(p => p.active).length;
-    this.productStats.outOfStock = this.products.filter(p => p.stock <= 0).length;
+  private calculateStats(aggregates?: any): void {
+    if (aggregates) {
+      this.productStats.total = aggregates.total;
+      this.productStats.active = aggregates.active;
+      this.productStats.outOfStock = aggregates.out_of_stock;
+    } else {
+      this.productStats.total = this.products.length;
+      this.productStats.active = this.products.filter(p => p.active).length;
+      this.productStats.outOfStock = this.products.filter(p => p.stock <= 0).length;
+    }
   }
 
   // --- MÉTODOS DE FILTRADO ---

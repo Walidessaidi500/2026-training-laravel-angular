@@ -82,6 +82,21 @@ class EloquentProductRepository implements ProductRepositoryInterface
         $this->model->newQuery()->where('uuid', $id->value())->delete();
     }
 
+    public function getGlobalStats(?int $restaurantId = null): array
+    {
+        $query = $this->model->newQuery();
+
+        if ($restaurantId !== null) {
+            $query->where('restaurant_id', $restaurantId);
+        }
+
+        return [
+            'total' => (clone $query)->count(),
+            'active' => (clone $query)->where('active', true)->count(),
+            'out_of_stock' => (clone $query)->where('stock', '<=', 0)->count(),
+        ];
+    }
+
     private function toDomainEntity(EloquentProduct $model): Product
     {
         return Product::fromPersistence(
