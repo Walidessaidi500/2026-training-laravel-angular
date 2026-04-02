@@ -40,6 +40,14 @@
       <div class="nav-icon"><ion-icon name="folder-outline"></ion-icon></div>
     </ion-item>
 
+    <!-- Servicio -->
+    <div class="nav-divider"></div>
+
+    <ion-item button [class.active]="activeItem === 'products'" (click)="navigate('products')" title="Productos"
+      class="nav-item">
+      <div class="nav-icon"><ion-icon name="restaurant-outline"></ion-icon></div>
+    </ion-item>
+
 
     <!-- Catálogo -->
     <div class="nav-divider"></div>
@@ -57,12 +65,7 @@
       <div class="nav-icon"><ion-icon name="map-outline"></ion-icon></div>
     </ion-item>
 
-    <!-- Servicio -->
-    <div class="nav-divider"></div>
 
-    <ion-item button [class.active]="activeItem === 'mesas'" (click)="navigate('mesas')" title="Mesas" class="nav-item">
-      <div class="nav-icon"><ion-icon name="restaurant-outline"></ion-icon></div>
-    </ion-item>
 
 
   </ion-list>

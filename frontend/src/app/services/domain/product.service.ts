@@ -7,7 +7,7 @@ export interface Product {
   uuid: string;
   name: string;
   description: string;
-  price: number;
+  priceInCents: number;
   active: boolean;
   family_uuid: string;
   created_at: string;
@@ -38,12 +38,22 @@ export class ProductService {
     return this.http.get<Product>(`${this.apiUrl}/${uuid}`);
   }
 
-  create(data: Partial<Product>): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, data);
+  create(data: any): Observable<Product> {
+    const backendData = {
+      ...data,
+      price_in_cents: data.priceInCents
+    };
+    delete backendData.priceInCents;
+    return this.http.post<Product>(this.apiUrl, backendData);
   }
 
-  update(uuid: string, data: Partial<Product>): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/${uuid}`, data);
+  update(uuid: string, data: any): Observable<Product> {
+    const backendData = {
+      ...data,
+      price_in_cents: data.priceInCents
+    };
+    delete backendData.priceInCents;
+    return this.http.put<Product>(`${this.apiUrl}/${uuid}`, backendData);
   }
 
   delete(uuid: string): Observable<void> {
