@@ -69,6 +69,7 @@
           <ion-select label="Familia" labelPlacement="floating" [(ngModel)]="selectedFamily"
             (ionChange)="onFilterChange()" interface="popover">
             <ion-select-option value="all">Todas las familias</ion-select-option>
+            <ion-select-option value="none">Sin familia asignada</ion-select-option>
             <ion-select-option *ngFor="let fam of families" [value]="fam.uuid">{{ fam.name }}</ion-select-option>
           </ion-select>
         </ion-item>
@@ -77,6 +78,7 @@
           <ion-select label="Impuesto" labelPlacement="floating" [(ngModel)]="selectedTax"
             (ionChange)="onFilterChange()" interface="popover">
             <ion-select-option value="all">Todos los impuestos</ion-select-option>
+            <ion-select-option value="none">Sin impuesto asignado</ion-select-option>
             <ion-select-option *ngFor="let tax of taxes" [value]="tax.uuid">{{ tax.name }} ({{ tax.percentage
               }}%)</ion-select-option>
           </ion-select>

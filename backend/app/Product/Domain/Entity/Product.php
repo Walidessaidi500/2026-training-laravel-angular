@@ -13,8 +13,8 @@ class Product implements \JsonSerializable
 {
     private function __construct(
         private Uuid $id,
-        private Uuid $familyId,
-        private Uuid $taxId,
+        private ?Uuid $familyId,
+        private ?Uuid $taxId,
         private ProductName $name,
         private Price $price,
         private Stock $stock,
@@ -27,12 +27,13 @@ class Product implements \JsonSerializable
     }
 
     public static function dddCreate(
-        Uuid $familyId,
-        Uuid $taxId,
+        ?Uuid $familyId,
+        ?Uuid $taxId,
         ProductName $name,
         Price $price,
         Stock $stock,
         RestaurantId $restaurantId,
+        bool $active = true,
         ?string $imageSrc = null,
     ): self {
         $now = DomainDateTime::now();
@@ -45,7 +46,7 @@ class Product implements \JsonSerializable
             $price,
             $stock,
             $restaurantId,
-            true,
+            $active,
             $imageSrc,
             $now,
             $now,
@@ -54,8 +55,8 @@ class Product implements \JsonSerializable
 
     public static function fromPersistence(
         string $id,
-        string $familyId,
-        string $taxId,
+        ?string $familyId,
+        ?string $taxId,
         string $name,
         int $price,
         int $stock,
@@ -67,8 +68,8 @@ class Product implements \JsonSerializable
     ): self {
         return new self(
             Uuid::create($id),
-            Uuid::create($familyId),
-            Uuid::create($taxId),
+            $familyId ? Uuid::create($familyId) : null,
+            $taxId ? Uuid::create($taxId) : null,
             ProductName::create($name),
             Price::create($price),
             Stock::create($stock),
@@ -85,12 +86,12 @@ class Product implements \JsonSerializable
         return $this->id;
     }
 
-    public function familyId(): Uuid
+    public function familyId(): ?Uuid
     {
         return $this->familyId;
     }
 
-    public function taxId(): Uuid
+    public function taxId(): ?Uuid
     {
         return $this->taxId;
     }
@@ -126,8 +127,8 @@ class Product implements \JsonSerializable
     }
 
     public function update(
-        Uuid $familyId,
-        Uuid $taxId,
+        ?Uuid $familyId,
+        ?Uuid $taxId,
         ProductName $name,
         Price $price,
         Stock $stock,
@@ -164,8 +165,8 @@ class Product implements \JsonSerializable
     {
         return [
             'uuid' => $this->id->value(),
-            'family_id' => $this->familyId->value(),
-            'tax_id' => $this->taxId->value(),
+            'family_id' => $this->familyId?->value(),
+            'tax_id' => $this->taxId?->value(),
             'name' => $this->name->value(),
             'priceInCents' => $this->price->value(),
             'stock' => $this->stock->value(),

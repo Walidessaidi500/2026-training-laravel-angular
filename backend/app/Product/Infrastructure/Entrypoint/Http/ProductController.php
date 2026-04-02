@@ -58,21 +58,23 @@ class ProductController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'family_id' => ['required', 'string'],
-            'tax_id' => ['required', 'string'],
+            'family_id' => ['nullable', 'string'],
+            'tax_id' => ['nullable', 'string'],
             'name' => ['required', 'string', 'max:255'],
             'price_in_cents' => ['required', 'integer', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
+            'active' => ['required', 'boolean'],
             'image_src' => ['nullable', 'string', 'max:255'],
         ]);
 
         $response = ($this->createProduct)(
-            $validated['family_id'],
-            $validated['tax_id'],
+            $validated['family_id'] ?? null,
+            $validated['tax_id'] ?? null,
             $validated['name'],
             $validated['price_in_cents'],
             $validated['stock'],
             (int) $request->user()->restaurant_id,
+            (bool) $validated['active'],
             $validated['image_src'] ?? null,
         );
 
@@ -82,8 +84,8 @@ class ProductController
     public function update(Request $request, string $uuid): JsonResponse
     {
         $validated = $request->validate([
-            'family_id' => ['required', 'string'],
-            'tax_id' => ['required', 'string'],
+            'family_id' => ['nullable', 'string'],
+            'tax_id' => ['nullable', 'string'],
             'name' => ['required', 'string', 'max:255'],
             'price_in_cents' => ['required', 'integer', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
@@ -94,8 +96,8 @@ class ProductController
         try {
             $response = ($this->updateProduct)(
                 $uuid,
-                $validated['family_id'],
-                $validated['tax_id'],
+                $validated['family_id'] ?? null,
+                $validated['tax_id'] ?? null,
                 $validated['name'],
                 $validated['price_in_cents'],
                 $validated['stock'],

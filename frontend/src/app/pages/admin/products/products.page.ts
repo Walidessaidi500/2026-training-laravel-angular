@@ -64,7 +64,7 @@ export class ProductsPage implements OnInit {
   selectedFamily = 'all';
   selectedTax = 'all';
   selectedStatus = 'all';
-  selectedStock = 'all'; // all, in_stock, out_of_stock, low_stock
+  selectedStock = 'all';
 
   productStats = {
     total: 0,
@@ -114,11 +114,9 @@ export class ProductsPage implements OnInit {
     this.loadInitialData();
   }
 
-  // Cargamos productos, familias e impuestos para cruzar datos
   private loadInitialData(): void {
     this.isLoading = true;
 
-    // Llamadas simultáneas (puedes usar forkJoin si lo prefieres)
     this.familyService.list().subscribe((res: any) => {
       this.families = res.data || res || [];
       this.taxService.list().subscribe((taxRes: any) => {
@@ -128,10 +126,11 @@ export class ProductsPage implements OnInit {
     });
   }
 
-  private loadProducts(isAppend: boolean = false): void {
+  private loadProducts(isAppend: boolean = false, event?: any): void {
     if (!isAppend) {
       this.isLoading = true;
       this.currentPage = 1;
+      this.isInfiniteDisabled = false;
     }
 
     this.productService.list(this.currentPage, this.perPage).subscribe({
@@ -152,14 +151,21 @@ export class ProductsPage implements OnInit {
         }
 
         this.isInfiniteDisabled = this.currentPage >= this.lastPage;
-        
+
         this.calculateStats(response.meta?.aggregates);
         this.applyFilters();
         this.isLoading = false;
+
+        if (event) {
+          event.target.complete();
+        }
       },
       error: (error) => {
         console.error('Error loading products:', error);
         this.isLoading = false;
+        if (event) {
+          event.target.complete();
+        }
       }
     });
   }
@@ -167,10 +173,7 @@ export class ProductsPage implements OnInit {
   loadMore(event: any) {
     if (this.currentPage < this.lastPage) {
       this.currentPage++;
-      this.loadProducts(true);
-      setTimeout(() => {
-        event.target.complete();
-      }, 500);
+      this.loadProducts(true, event);
     } else {
       event.target.complete();
       this.isInfiniteDisabled = true;
@@ -189,7 +192,6 @@ export class ProductsPage implements OnInit {
     }
   }
 
-  // --- MÉTODOS DE FILTRADO ---
   onFilterChange(): void {
     this.applyFilters();
   }
@@ -209,12 +211,20 @@ export class ProductsPage implements OnInit {
 
     // 2. Filtro por Familia
     if (this.selectedFamily !== 'all') {
-      filtered = filtered.filter(p => p.family_id === this.selectedFamily);
+      if (this.selectedFamily === 'none') {
+        filtered = filtered.filter(p => !p.family_id);
+      } else {
+        filtered = filtered.filter(p => p.family_id === this.selectedFamily);
+      }
     }
 
     // 3. Filtro por Impuesto
     if (this.selectedTax !== 'all') {
-      filtered = filtered.filter(p => p.tax_id === this.selectedTax);
+      if (this.selectedTax === 'none') {
+        filtered = filtered.filter(p => !p.tax_id);
+      } else {
+        filtered = filtered.filter(p => p.tax_id === this.selectedTax);
+      }
     }
 
     // 4. Filtro por Estado (Activo/Inactivo)

@@ -21,8 +21,8 @@ class EloquentProductRepository implements ProductRepositoryInterface
         $this->model->newQuery()->updateOrCreate(
             ['uuid' => $product->id()->value()],
             [
-                'family_id' => $this->resolveFamilyId($product->familyId()),
-                'tax_id' => $this->resolveTaxId($product->taxId()),
+                'family_id' => $product->familyId() ? $this->resolveFamilyId($product->familyId()) : null,
+                'tax_id' => $product->taxId() ? $this->resolveTaxId($product->taxId()) : null,
                 'name' => $product->name(),
                 'price' => $product->price()->value(),
                 'stock' => $product->stock(),
@@ -101,8 +101,8 @@ class EloquentProductRepository implements ProductRepositoryInterface
     {
         return Product::fromPersistence(
             $model->uuid,
-            $model->family->uuid,
-            $model->tax->uuid,
+            $model->family?->uuid,
+            $model->tax?->uuid,
             $model->name,
             (int) $model->price,
             (int) $model->stock,
@@ -114,13 +114,21 @@ class EloquentProductRepository implements ProductRepositoryInterface
         );
     }
 
-    private function resolveFamilyId(Uuid $familyUuid): int
+    private function resolveFamilyId(?Uuid $familyUuid): ?int
     {
+        if ($familyUuid === null) {
+            return null;
+        }
+
         return EloquentFamily::where('uuid', $familyUuid->value())->firstOrFail()->id;
     }
 
-    private function resolveTaxId(Uuid $taxUuid): int
+    private function resolveTaxId(?Uuid $taxUuid): ?int
     {
+        if ($taxUuid === null) {
+            return null;
+        }
+
         return EloquentTax::where('uuid', $taxUuid->value())->firstOrFail()->id;
     }
 }

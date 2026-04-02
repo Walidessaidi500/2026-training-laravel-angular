@@ -18,8 +18,8 @@ class UpdateProduct
 
     public function __invoke(
         string $id,
-        string $familyId,
-        string $taxId,
+        ?string $familyId,
+        ?string $taxId,
         string $name,
         int $priceInCents,
         int $stock,
@@ -35,8 +35,8 @@ class UpdateProduct
         }
 
         $product->update(
-            Uuid::create($familyId),
-            Uuid::create($taxId),
+            $familyId ? Uuid::create($familyId) : null,
+            $taxId ? Uuid::create($taxId) : null,
             ProductName::create($name),
             Price::create($priceInCents),
             Stock::create($stock),

@@ -18,21 +18,23 @@ class CreateProduct
     ) {}
 
     public function __invoke(
-        string $familyId,
-        string $taxId,
+        ?string $familyId,
+        ?string $taxId,
         string $name,
         int $priceInCents,
         int $stock,
         int $restaurantId,
+        bool $active = true,
         ?string $imageSrc = null,
     ): ProductResponse {
         $product = Product::dddCreate(
-            Uuid::create($familyId),
-            Uuid::create($taxId),
+            $familyId ? Uuid::create($familyId) : null,
+            $taxId ? Uuid::create($taxId) : null,
             ProductName::create($name),
             Price::create($priceInCents),
             Stock::create($stock),
             RestaurantId::create($restaurantId),
+            $active,
             $imageSrc,
         );
 
