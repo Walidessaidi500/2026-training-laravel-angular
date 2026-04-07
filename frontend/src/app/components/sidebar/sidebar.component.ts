@@ -9,7 +9,11 @@ import {
   IonItem,
   IonIcon,
   IonFooter,
+  IonPopover,
+  IonLabel,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { personOutline, settingsOutline, logOutOutline, chevronDownOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-sidebar',
@@ -24,6 +28,8 @@ import {
     IonItem,
     IonIcon,
     IonFooter,
+    IonPopover,
+    IonLabel,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -37,7 +43,9 @@ export class SidebarComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService
-  ) {}
+  ) {
+    addIcons({ personOutline, settingsOutline, logOutOutline, chevronDownOutline });
+  }
 
   ngOnInit(): void {
     const user = this.authService.getUser();

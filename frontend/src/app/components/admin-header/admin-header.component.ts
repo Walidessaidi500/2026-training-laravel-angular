@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { addIcons } from 'ionicons';
 import { Router } from '@angular/router';
 import {
   IonHeader,
@@ -10,6 +11,7 @@ import {
   IonButtons,
 } from '@ionic/angular/standalone';
 import { AuthService } from '@services/auth/auth.service';
+import { searchOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-admin-header',
@@ -34,7 +36,9 @@ export class AdminHeaderComponent {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+    addIcons({ searchOutline });
+  }
 
   logout(): void {
     this.authService.logout();

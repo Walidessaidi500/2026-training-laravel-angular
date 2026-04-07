@@ -224,6 +224,88 @@
   }
 }
 
+.chart-card {
+  .chart-header-stats {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .amount-medium {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--ion-color-secondary);
+    }
+  }
+
+  .chart-placeholder {
+    height: 240px;
+    background: linear-gradient(to bottom, rgba(255, 83, 48, 0.03), transparent);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: 'Chart visualization';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ion-color-medium);
+      opacity: 0.5;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .fake-chart-area {
+      height: 100%;
+      width: 100%;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'%3E%3Cpath d='M0,250 Q100,220 200,240 T400,180 T600,210 T800,120 T1000,150' fill='none' stroke='rgba(255, 83, 48, 0.2)' stroke-width='4'/%3E%3C/svg%3E") no-repeat center;
+      background-size: cover;
+    }
+  }
+}
+
+.time-filters {
+  display: flex;
+  background: var(--ion-color-light);
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+
+  .filter-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ion-color-medium);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.3px;
+
+    &:hover {
+      color: var(--ion-color-primary);
+      background: rgba(255, 83, 48, 0.08);
+    }
+
+    &.active {
+      background: var(--ion-color-primary);
+      color: white;
+      box-shadow: 0 4px 15px rgba(255, 83, 48, 0.25);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
 
 .transaction-list {
   background: transparent;

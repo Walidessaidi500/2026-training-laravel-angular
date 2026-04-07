@@ -73,11 +73,35 @@
 </ion-content>
 
 <ion-footer class="ion-no-border sidebar-footer">
-  <ion-list lines="none">
-    <ion-item button class="logout-item" (click)="logout()" title="Logout">
-      <div class="avatar-circle">
-        <span>JD</span>
-      </div>
-    </ion-item>
-  </ion-list>
+
+  <ion-item button class="user-menu-item" id="user-menu-trigger" detail="false" lines="none">
+    <div class="avatar-circle">
+      <ion-icon name="person-outline"></ion-icon>
+    </div>
+    <!-- Indicador visual de desplegable -->
+    <ion-icon name="chevron-down-outline" class="dropdown-icon"></ion-icon>
+  </ion-item>
+
+  <!-- Menú desplegable -->
+  <ion-popover trigger="user-menu-trigger" triggerAction="click" [dismissOnSelect]="true" class="user-popover">
+    <ng-template>
+      <ion-content class="ion-padding-vertical">
+        <ion-list lines="none" class="popover-list">
+
+          <!-- Opción: Configuración -->
+          <ion-item button (click)="navigate('settings')" detail="false">
+            <ion-icon name="settings-outline" slot="start"></ion-icon>
+            <ion-label>Configuración</ion-label>
+          </ion-item>
+
+          <!-- Opción: Logout -->
+          <ion-item button (click)="logout()" detail="false" class="logout-option">
+            <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+            <ion-label color="danger">Cerrar sesión</ion-label>
+          </ion-item>
+
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
 </ion-footer>
