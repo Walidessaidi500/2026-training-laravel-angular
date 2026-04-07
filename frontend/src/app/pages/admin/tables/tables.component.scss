@@ -1,0 +1,259 @@
+ion-content {
+    --background: var(--ion-background-color);
+}
+
+/* Tables View Specific Styles */
+.tables-background {
+    --background: var(--ion-color-light);
+}
+
+/* Filtros por Zona (Pills) */
+.zone-filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    overflow-x: auto;
+    padding: 4px 0 12px;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    .pill-btn {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 10px 20px;
+        border-radius: 24px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ion-color-medium);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+
+        .badge {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        &.active {
+            background: var(--ion-color-primary-light);
+            color: var(--ion-color-primary);
+            border-color: transparent;
+
+            .badge {
+                background: white;
+                color: var(--ion-color-primary);
+            }
+        }
+    }
+}
+
+/* Cabecera de Zona */
+.active-zone-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .zone-title-block {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .vertical-line {
+            width: 4px;
+            height: 32px;
+            background: var(--ion-color-primary);
+            border-radius: 4px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--ion-color-secondary);
+        }
+
+        .zone-meta {
+            font-size: 12px;
+            color: var(--ion-color-medium);
+            font-weight: 500;
+        }
+    }
+
+    .action-btn-text {
+        background: rgba(var(--ion-color-primary-rgb), 0.05);
+        border: none;
+        color: var(--ion-color-primary);
+        font-weight: 700;
+        font-size: 13px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            background: var(--ion-color-primary-light);
+        }
+    }
+}
+
+/* Grid de Mesas */
+.tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+
+    .table-card {
+        padding: 20px;
+        border: 2px solid transparent;
+        transition: all 0.2s;
+        margin-bottom: 0;
+
+        &.available {
+            border-color: rgba(var(--ion-color-success-rgb), 0.1);
+            &:hover {
+                border-color: rgba(var(--ion-color-success-rgb), 0.3);
+                transform: translateY(-4px);
+                box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            }
+        }
+
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+
+            .table-identifier {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                font-weight: 800;
+                margin-right: 12px;
+
+                &.available {
+                    background: var(--ion-color-success-light);
+                    color: var(--ion-color-success);
+                }
+            }
+
+            .table-info {
+                flex: 1;
+                cursor: pointer;
+
+                h3 {
+                    margin: 0 0 4px;
+                    font-size: 16px;
+                    font-weight: 800;
+                    color: var(--ion-color-secondary);
+                }
+
+                .meta {
+                    font-size: 11px;
+                    color: var(--ion-color-medium);
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+            }
+
+            .card-actions {
+                display: flex;
+                gap: 8px;
+
+                .icon-btn {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    font-size: 18px;
+
+                    &.edit {
+                        background: var(--ion-color-primary-light);
+                        color: var(--ion-color-primary);
+                        &:hover { transform: scale(1.1); background: var(--ion-color-primary); color: white; }
+                    }
+
+                    &.delete {
+                        background: var(--ion-color-danger-light);
+                        color: var(--ion-color-danger);
+                        &:hover { transform: scale(1.1); background: var(--ion-color-danger); color: white; }
+                    }
+                }
+            }
+        }
+
+        .status-bar {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+
+            &.available {
+                background: var(--ion-color-success-light);
+                color: var(--ion-color-success);
+            }
+        }
+    }
+}
+
+.zone-section {
+    margin-bottom: 48px;
+    
+    &:last-child {
+        margin-bottom: 24px;
+    }
+}
+
+.empty-state-container {
+    grid-column: 1 / -1;
+    padding: 60px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.table-info {
+    .meta {
+        font-size: 11px;
+        color: var(--ion-color-medium);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+.empty-zone-msg {
+    grid-column: 1 / -1;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px dashed rgba(0, 0, 0, 0.05);
+    padding: 32px;
+    border-radius: 12px;
+    color: var(--ion-color-medium);
+    font-size: 13px;
+    font-weight: 500;
+}

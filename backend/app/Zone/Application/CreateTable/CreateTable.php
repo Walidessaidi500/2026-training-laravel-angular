@@ -12,9 +12,9 @@ class CreateTable
 {
     public function __construct(private TableRepositoryInterface $tableRepository) {}
 
-    public function __invoke(string $zoneId, string $name): TableResponse
+    public function __invoke(string $zoneId, string $name, int $restaurantId): TableResponse
     {
-        $table = Table::dddCreate(Uuid::create($zoneId), TableName::create($name));
+        $table = Table::dddCreate(Uuid::create($zoneId), TableName::create($name), $restaurantId);
         $this->tableRepository->save($table);
 
         return TableResponse::create($table);

@@ -7,7 +7,7 @@ use App\Zone\Domain\Entity\Table;
 use App\Zone\Domain\Interfaces\TableRepositoryInterface;
 use App\Zone\Infrastructure\Persistence\Models\EloquentTable;
 use App\Zone\Infrastructure\Persistence\Models\EloquentZone;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EloquentTableRepository implements TableRepositoryInterface
 {
@@ -18,6 +18,7 @@ class EloquentTableRepository implements TableRepositoryInterface
         $this->model->newQuery()->updateOrCreate(
             ['uuid' => $table->id()->value()],
             [
+                'restaurant_id' => $table->restaurantId(),
                 'zone_id' => $this->resolveZoneId($table->zoneId()),
                 'name' => $table->name(),
                 'created_at' => $table->createdAt()->value(),
@@ -47,7 +48,7 @@ class EloquentTableRepository implements TableRepositoryInterface
             ->all();
     }
 
-    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): Paginator
+    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator
     {
         $query = $this->model->newQuery()
             ->with('zone')
@@ -57,9 +58,9 @@ class EloquentTableRepository implements TableRepositoryInterface
             $query->where('restaurant_id', $restaurantId);
         }
 
-        $items = $query->paginate($perPage, ['*'], 'page', $page);
-
-        return $items->map(fn (EloquentTable $m) => $this->toDomainEntity($m));
+        return $query
+            ->paginate($perPage, ['*'], 'page', $page)
+            ->through(fn (EloquentTable $m) => $this->toDomainEntity($m));
     }
 
     public function delete(Uuid $id): void
@@ -71,6 +72,7 @@ class EloquentTableRepository implements TableRepositoryInterface
     {
         return Table::fromPersistence(
             $model->uuid,
+            (int) $model->restaurant_id,
             $model->zone->uuid,
             $model->name,
             $model->created_at->toDateTimeImmutable(),

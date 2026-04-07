@@ -27,8 +27,8 @@ export class TableService {
 
   constructor(private http: HttpClient) {}
 
-  list(): Observable<TableListResponse> {
-    return this.http.get<TableListResponse>(this.apiUrl);
+  list(page: number = 1, perPage: number = 1000): Observable<TableListResponse> {
+    return this.http.get<TableListResponse>(`${this.apiUrl}?page=${page}&per_page=${perPage}`);
   }
 
   get(uuid: string): Observable<Table> {

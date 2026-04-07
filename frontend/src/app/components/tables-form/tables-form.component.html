@@ -1,0 +1,66 @@
+<ion-header class="ion-no-border form-header">
+  <ion-toolbar>
+    <ion-title>
+      {{ isEditMode ? 'Editar Mesa' : 'Nueva Mesa' }}
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()" [disabled]="isLoading">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding custom-form-content">
+  <form [formGroup]="tableForm" (ngSubmit)="submit()" class="yurest-form">
+    <div class="form-section">
+      <span class="section-title">Datos de la Mesa</span>
+
+      <div class="form-grid">
+        <!-- Nombre -->
+        <div class="form-group">
+          <label class="label">Nombre o Número *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-input
+              formControlName="name"
+              placeholder="Ej: Mesa 12, Terraza 4..."
+              type="text"
+            ></ion-input>
+          </ion-item>
+          <small class="helper-text" *ngIf="getFieldError('name')">
+            {{ getFieldError('name') }}
+          </small>
+        </div>
+
+        <!-- Zona -->
+        <div class="form-group">
+          <label class="label">Zona / Área *</label>
+          <ion-item lines="none" class="custom-input-item">
+            <ion-select
+              formControlName="zone_id"
+              placeholder="Selecciona zona"
+              interface="popover"
+            >
+              <ion-select-option *ngFor="let zone of zones" [value]="zone.uuid">
+                {{ zone.name }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <small class="helper-text" *ngIf="getFieldError('zone_id')">
+            {{ getFieldError('zone_id') }}
+          </small>
+        </div>
+      </div>
+    </div>
+  </form>
+</ion-content>
+
+<div class="form-footer">
+  <ion-button fill="clear" (click)="dismiss()" class="btn-cancel" [disabled]="isLoading">
+    Cancelar
+  </ion-button>
+  <ion-button (click)="submit()" [disabled]="tableForm.invalid || isLoading" class="btn-submit">
+    <ion-spinner *ngIf="isLoading" name="dots" color="light"></ion-spinner>
+    <span *ngIf="!isLoading">{{ isEditMode ? 'Guardar Cambios' : 'Crear Mesa' }}</span>
+  </ion-button>
+</div>

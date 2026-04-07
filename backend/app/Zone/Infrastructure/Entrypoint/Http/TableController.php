@@ -22,8 +22,8 @@ class TableController
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->query('per_page', 15);
-        $page = $request->query('page', 1);
+        $perPage = (int) $request->query('per_page', 1000);
+        $page = (int) $request->query('page', 1);
         $restaurantId = $request->user()?->restaurant_id;
 
         $tables = $this->tableRepository->list($page, $perPage, $restaurantId);
@@ -55,7 +55,9 @@ class TableController
             'name' => ['required', 'string', 'max:255'],
         ]);
 
-        return new JsonResponse(($this->createTable)($validated['zone_id'], $validated['name'])->toArray(), 201);
+        $restaurantId = (int) $request->user()->restaurant_id;
+
+        return new JsonResponse(($this->createTable)($validated['zone_id'], $validated['name'], $restaurantId)->toArray(), 201);
     }
 
     public function update(Request $request, string $uuid): JsonResponse

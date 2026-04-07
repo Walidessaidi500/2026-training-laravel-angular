@@ -34,6 +34,10 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'zones',
         loadComponent: () => import('./zones/zones.component').then((m) => m.ZoneListComponent),
+      },
+      {
+        path: 'tables',
+        loadComponent: () => import('./tables/tables.component').then((m) => m.TablesComponent),
       }
     ],
   },
