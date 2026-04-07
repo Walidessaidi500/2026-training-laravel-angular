@@ -43,7 +43,7 @@
           </div>
         </div>
       </div>
- 
+
       <div class="stat-card panel-card">
         <div class="stat-content">
           <div class="icon-box success-light lg">
@@ -55,7 +55,7 @@
           </div>
         </div>
       </div>
- 
+
       <div class="stat-card panel-card">
         <div class="stat-content">
           <div class="icon-box primary-light lg">
@@ -63,7 +63,7 @@
           </div>
           <div>
             <div class="stat-value">{{ zones.length }}</div>
-            <div class="stat-label">Zonas Activas</div>
+            <div class="stat-label">Zonas</div>
           </div>
         </div>
       </div>
@@ -103,13 +103,14 @@
           <ion-icon name="add-outline"></ion-icon> Añadir a {{ group.zone.name }}
         </button>
       </div>
- 
+
       <!-- Grid de Mesas -->
       <div class="tables-grid">
         <div class="table-card panel-card available" *ngFor="let table of group.tables">
           <div class="card-top">
             <div class="table-identifier available">
-              {{ (table.name.split(' ').length > 1) ? table.name.split(' ')[table.name.split(' ').length - 1] : table.name }}
+              {{ (table.name.split(' ').length > 1) ? table.name.split(' ')[table.name.split(' ').length - 1] :
+              table.name }}
             </div>
             <div class="table-info" (click)="onEditTable(table)">
               <h3>{{ table.name }}</h3>
