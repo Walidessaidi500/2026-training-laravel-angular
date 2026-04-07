@@ -67,6 +67,12 @@ class EloquentTableRepository implements TableRepositoryInterface
     {
         $this->model->newQuery()->where('uuid', $id->value())->delete();
     }
+    
+    public function deleteByZoneUuid(Uuid $zoneUuid): void
+    {
+        $zoneId = $this->resolveZoneId($zoneUuid);
+        $this->model->newQuery()->where('zone_id', $zoneId)->delete();
+    }
 
     private function toDomainEntity(EloquentTable $model): Table
     {
