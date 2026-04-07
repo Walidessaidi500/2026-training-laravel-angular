@@ -30,7 +30,8 @@ import {
   person,
   cash,
   folder,
-  receipt
+  receipt,
+  restaurant
 } from 'ionicons/icons';
 import { AuthService } from '@services/auth/auth.service';
 import { ProductService } from '@services/domain/product.service';
@@ -40,11 +41,13 @@ import { ZoneService } from '@services/domain/zone.service';
 import { OrderService } from '@services/domain/order.service';
 import { UserService } from '@services/domain/user.service';
 import { SaleService } from '@services/domain/sale.service';
+import { TableService } from '@services/domain/table.service';
 import { AccessDeniedComponent } from '@app/components/access-denied/access-denied.component';
 import { ProductFormComponent } from '@app/components/product-form/product-form.component';
 import { FamilyFormComponent } from '@app/components/families-form/families-form.component';
 import { TaxFormComponent } from '@app/components/tax-form/tax-form.component';
 import { UserFormComponent } from '@app/components/user-form/user-form.component';
+import { TablesFormComponent } from '@app/components/tables-form/tables-form.component';
 
 interface User {
   uuid: string;
@@ -71,7 +74,8 @@ interface User {
     ProductFormComponent,
     FamilyFormComponent,
     TaxFormComponent,
-    UserFormComponent
+    UserFormComponent,
+    TablesFormComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -141,7 +145,8 @@ export class DashboardPage implements OnInit {
     private userService: UserService,
     private saleService: SaleService,
     private modalController: ModalController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private tableService: TableService
   ) {
     addIcons({
       'cash-outline': cashOutline,
@@ -162,7 +167,8 @@ export class DashboardPage implements OnInit {
       'person': person,
       'cash': cash,
       'folder': folder,
-      'receipt': receipt
+      'receipt': receipt,
+      'restaurant': restaurant,
     });
   }
 
@@ -389,7 +395,7 @@ export class DashboardPage implements OnInit {
     await modal.present();
 
     const { data } = await modal.onWillDismiss();
-    
+
     if (data) {
       this.isLoading = true;
       // Guardar producto
@@ -402,7 +408,7 @@ export class DashboardPage implements OnInit {
             position: 'bottom'
           });
           await toast.present();
-          
+
           // Añadir alerta y actividad
           this.dashboardData.alerts.unshift({
             type: 'success',
@@ -410,7 +416,7 @@ export class DashboardPage implements OnInit {
             description: `Se ha añadido el producto "${data.name}" al catálogo.`,
             timeAgo: 'Justo ahora'
           });
-          
+
           this.dashboardData.activities.unshift({
             type: 'info',
             icon: 'cube',
@@ -444,7 +450,7 @@ export class DashboardPage implements OnInit {
     await modal.present();
 
     const { data } = await modal.onWillDismiss();
-    
+
     if (data) {
       this.isLoading = true;
       this.familyService.create(data).subscribe({
@@ -455,14 +461,14 @@ export class DashboardPage implements OnInit {
             color: 'success'
           });
           await toast.present();
-          
+
           this.dashboardData.alerts.unshift({
             type: 'success',
             title: 'Categoría añadida',
             description: `Nueva familia: "${data.name}"`,
             timeAgo: 'Justo ahora'
           });
-          
+
           this.dashboardData.activities.unshift({
             type: 'info',
             icon: 'folder',
@@ -487,7 +493,7 @@ export class DashboardPage implements OnInit {
     await modal.present();
 
     const { data } = await modal.onWillDismiss();
-    
+
     if (data) {
       this.isLoading = true;
       this.taxService.create(data).subscribe({
@@ -498,14 +504,14 @@ export class DashboardPage implements OnInit {
             color: 'success'
           });
           await toast.present();
-          
+
           this.dashboardData.alerts.unshift({
             type: 'success',
             title: 'Impuesto configurado',
             description: `Añadido: ${data.name} (${data.rate}%)`,
             timeAgo: 'Justo ahora'
           });
-          
+
           this.dashboardData.activities.unshift({
             type: 'info',
             icon: 'receipt',
@@ -530,7 +536,7 @@ export class DashboardPage implements OnInit {
     await modal.present();
 
     const { data } = await modal.onWillDismiss();
-    
+
     if (data) {
       this.isLoading = true;
       this.userService.create(data).subscribe({
@@ -541,19 +547,62 @@ export class DashboardPage implements OnInit {
             color: 'success'
           });
           await toast.present();
-          
+
           this.dashboardData.alerts.unshift({
             type: 'success',
             title: 'Nuevo acceso',
             description: `Usuario creado: ${data.name}`,
             timeAgo: 'Justo ahora'
           });
-          
+
           this.dashboardData.activities.unshift({
             type: 'info',
             icon: 'people',
             title: 'Nuevo compañero',
             description: `${this.currentUser?.name} registró a ${data.name}`,
+            timeAgo: 'Justo ahora'
+          });
+
+          this.loadStatistics();
+        },
+        error: () => this.isLoading = false
+      });
+    }
+  }
+
+  async agregarMesa(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: TablesFormComponent,
+      cssClass: 'fullscreen-modal'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (data) {
+      this.isLoading = true;
+      this.tableService.create(data).subscribe({
+        next: async () => {
+          const toast = await this.toastController.create({
+            message: 'Mesa creada con éxito',
+            duration: 2000,
+            color: 'success'
+          });
+          await toast.present();
+
+          this.dashboardData.alerts.unshift({
+            type: 'success',
+            title: 'Nueva mesa',
+            description: `Mesa creada: ${data.name}`,
+            timeAgo: 'Justo ahora'
+          });
+
+          this.dashboardData.activities.unshift({
+            type: 'info',
+            icon: 'restaurant',
+            title: 'Nueva mesa',
+            description: `${this.currentUser?.name} creó "${data.name}"`,
             timeAgo: 'Justo ahora'
           });
 
