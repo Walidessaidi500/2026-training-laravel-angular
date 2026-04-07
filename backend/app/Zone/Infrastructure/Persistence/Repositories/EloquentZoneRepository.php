@@ -17,6 +17,7 @@ class EloquentZoneRepository implements ZoneRepositoryInterface
         $this->model->newQuery()->updateOrCreate(
             ['uuid' => $zone->id()->value()],
             [
+                'restaurant_id' => $zone->restaurantId(),
                 'name' => $zone->name(),
                 'created_at' => $zone->createdAt()->value(),
                 'updated_at' => $zone->updatedAt()->value(),
@@ -26,7 +27,10 @@ class EloquentZoneRepository implements ZoneRepositoryInterface
 
     public function findById(Uuid $id): ?Zone
     {
-        $model = $this->model->newQuery()->where('uuid', $id->value())->first();
+        $model = $this->model->newQuery()
+            ->withCount('tables')
+            ->where('uuid', $id->value())
+            ->first();
 
         return $model ? $this->toDomainEntity($model) : null;
     }
@@ -35,6 +39,7 @@ class EloquentZoneRepository implements ZoneRepositoryInterface
     public function findAll(): array
     {
         return $this->model->newQuery()
+            ->withCount('tables')
             ->orderBy('name')
             ->get()
             ->map(fn (EloquentZone $m) => $this->toDomainEntity($m))
@@ -44,6 +49,7 @@ class EloquentZoneRepository implements ZoneRepositoryInterface
     public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator
     {
         $query = $this->model->newQuery()
+            ->withCount('tables')
             ->orderBy('name');
 
         if ($restaurantId !== null) {
@@ -64,9 +70,11 @@ class EloquentZoneRepository implements ZoneRepositoryInterface
     {
         return Zone::fromPersistence(
             $model->uuid,
+            (int) $model->restaurant_id,
             $model->name,
             $model->created_at->toDateTimeImmutable(),
             $model->updated_at->toDateTimeImmutable(),
+            $model->tables_count ?? null,
         );
     }
 }

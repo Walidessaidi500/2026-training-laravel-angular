@@ -11,6 +11,7 @@ class ZoneResponse
         public readonly string $name,
         public readonly string $createdAt,
         public readonly string $updatedAt,
+        public readonly ?int $tableCount = null,
     ) {}
 
     public static function create(Zone $zone): self
@@ -20,6 +21,7 @@ class ZoneResponse
             $zone->name(),
             $zone->createdAt()->format('Y-m-d\TH:i:s'),
             $zone->updatedAt()->format('Y-m-d\TH:i:s'),
+            $zone->tableCount(),
         );
     }
 
@@ -31,6 +33,7 @@ class ZoneResponse
         return [
             'uuid' => $this->uuid,
             'name' => $this->name,
+            'tableCount' => $this->tableCount,
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
         ];

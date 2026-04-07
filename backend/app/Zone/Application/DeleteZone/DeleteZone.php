@@ -7,14 +7,16 @@ use App\Zone\Domain\Interfaces\ZoneRepositoryInterface;
 
 class DeleteZone
 {
-    public function __construct(private ZoneRepositoryInterface $zoneRepository) {}
+    public function __construct(private ZoneRepositoryInterface $zoneRepository)
+    {
+    }
 
-    public function __invoke(string $id): void
+    public function __invoke(string $id, int $restaurantId): void
     {
         $uuid = Uuid::create($id);
         $zone = $this->zoneRepository->findById($uuid);
 
-        if ($zone === null) {
+        if ($zone === null || $zone->restaurantId() !== $restaurantId) {
             throw new \InvalidArgumentException('Zona no encontrada');
         }
 

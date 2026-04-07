@@ -1,0 +1,53 @@
+/* Zones View Specific Styles */
+.zones-background {
+  --background: var(--ion-color-light);
+}
+
+.table-panel {
+  .zones-list {
+    background: transparent;
+
+    .zone-item {
+      --padding-start: 0;
+      --padding-end: 0;
+      --inner-padding-end: 0;
+      --background: transparent;
+      margin-bottom: 12px;
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--ion-color-light);
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--ion-color-primary-light);
+      }
+
+      .zone-info {
+        flex: 1;
+
+        h2 {
+          font-weight: 700;
+          font-size: 16px;
+          color: var(--ion-color-secondary);
+          margin-bottom: 8px;
+        }
+
+        .zone-meta {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+    }
+  }
+}
+
+.cell-secondary {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}

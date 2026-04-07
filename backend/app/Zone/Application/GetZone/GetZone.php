@@ -10,12 +10,12 @@ class GetZone
 {
     public function __construct(private ZoneRepositoryInterface $zoneRepository) {}
 
-    public function __invoke(string $id): ZoneResponse
+    public function __invoke(string $id, int $restaurantId): ZoneResponse
     {
         $uuid = Uuid::create($id);
         $zone = $this->zoneRepository->findById($uuid);
 
-        if ($zone === null) {
+        if ($zone === null || $zone->restaurantId() !== $restaurantId) {
             throw new \InvalidArgumentException('Zona no encontrada');
         }
 

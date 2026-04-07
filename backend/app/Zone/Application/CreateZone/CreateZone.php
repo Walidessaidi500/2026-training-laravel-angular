@@ -11,9 +11,9 @@ class CreateZone
 {
     public function __construct(private ZoneRepositoryInterface $zoneRepository) {}
 
-    public function __invoke(string $name): ZoneResponse
+    public function __invoke(string $name, int $restaurantId): ZoneResponse
     {
-        $zone = Zone::dddCreate(ZoneName::create($name));
+        $zone = Zone::dddCreate(ZoneName::create($name), $restaurantId);
         $this->zoneRepository->save($zone);
 
         return ZoneResponse::create($zone);

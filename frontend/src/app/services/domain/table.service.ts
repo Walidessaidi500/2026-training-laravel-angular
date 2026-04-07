@@ -3,16 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 
-export interface Zone {
+export interface Table {
   uuid: string;
+  zone_id: string;
   name: string;
-  description: string;
-  active: boolean;
   created_at: string;
 }
 
-export interface ZoneListResponse {
-  data: Zone[];
+export interface TableListResponse {
+  data: Table[];
   meta: {
     total: number;
     per_page: number;
@@ -23,25 +22,25 @@ export interface ZoneListResponse {
 @Injectable({
   providedIn: 'root',
 })
-export class ZoneService {
-  private readonly apiUrl = `${environment.apiUrl}/zones`;
+export class TableService {
+  private readonly apiUrl = `${environment.apiUrl}/tables`;
 
   constructor(private http: HttpClient) {}
 
-  list(): Observable<ZoneListResponse> {
-    return this.http.get<ZoneListResponse>(this.apiUrl);
+  list(): Observable<TableListResponse> {
+    return this.http.get<TableListResponse>(this.apiUrl);
   }
 
-  get(uuid: string): Observable<Zone> {
-    return this.http.get<Zone>(`${this.apiUrl}/${uuid}`);
+  get(uuid: string): Observable<Table> {
+    return this.http.get<Table>(`${this.apiUrl}/${uuid}`);
   }
 
-  create(data: Partial<Zone>): Observable<Zone> {
-    return this.http.post<Zone>(this.apiUrl, data);
+  create(data: Partial<Table>): Observable<Table> {
+    return this.http.post<Table>(this.apiUrl, data);
   }
 
-  update(uuid: string, data: Partial<Zone>): Observable<Zone> {
-    return this.http.put<Zone>(`${this.apiUrl}/${uuid}`, data);
+  update(uuid: string, data: Partial<Table>): Observable<Table> {
+    return this.http.put<Table>(`${this.apiUrl}/${uuid}`, data);
   }
 
   delete(uuid: string): Observable<void> {

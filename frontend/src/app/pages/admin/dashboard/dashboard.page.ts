@@ -36,7 +36,7 @@ import { AuthService } from '@services/auth/auth.service';
 import { ProductService } from '@services/domain/product.service';
 import { FamilyService } from '@services/domain/family.service';
 import { TaxService } from '@services/domain/tax.service';
-import { ZoneService } from '@services/domain/table.service';
+import { ZoneService } from '@services/domain/zone.service';
 import { OrderService } from '@services/domain/order.service';
 import { UserService } from '@services/domain/user.service';
 import { SaleService } from '@services/domain/sale.service';

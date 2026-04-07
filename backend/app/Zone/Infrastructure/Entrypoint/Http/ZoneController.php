@@ -39,10 +39,12 @@ class ZoneController
         ]);
     }
 
-    public function show(string $uuid): JsonResponse
+    public function show(Request $request, string $uuid): JsonResponse
     {
+        $restaurantId = $request->user()?->restaurant_id;
+
         try {
-            return new JsonResponse(($this->getZone)($uuid)->toArray(), 200);
+            return new JsonResponse(($this->getZone)($uuid, (int) $restaurantId)->toArray(), 200);
         } catch (\InvalidArgumentException $e) {
             return new JsonResponse(['message' => $e->getMessage()], 404);
         }
@@ -51,25 +53,29 @@ class ZoneController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate(['name' => ['required', 'string', 'max:255']]);
+        $restaurantId = $request->user()->restaurant_id;
 
-        return new JsonResponse(($this->createZone)($validated['name'])->toArray(), 201);
+        return new JsonResponse(($this->createZone)($validated['name'], (int) $restaurantId)->toArray(), 201);
     }
 
     public function update(Request $request, string $uuid): JsonResponse
     {
         $validated = $request->validate(['name' => ['required', 'string', 'max:255']]);
+        $restaurantId = $request->user()?->restaurant_id;
 
         try {
-            return new JsonResponse(($this->updateZone)($uuid, $validated['name'])->toArray(), 200);
+            return new JsonResponse(($this->updateZone)($uuid, $validated['name'], (int) $restaurantId)->toArray(), 200);
         } catch (\InvalidArgumentException $e) {
             return new JsonResponse(['message' => $e->getMessage()], 404);
         }
     }
 
-    public function destroy(string $uuid): JsonResponse
+    public function destroy(Request $request, string $uuid): JsonResponse
     {
+        $restaurantId = $request->user()?->restaurant_id;
+
         try {
-            ($this->deleteZone)($uuid);
+            ($this->deleteZone)($uuid, (int) $restaurantId);
 
             return new JsonResponse(null, 204);
         } catch (\InvalidArgumentException $e) {
