@@ -1,0 +1,134 @@
+<ion-content class="settings-background">
+  <div class="page-container">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="icon-box primary">
+          <ion-icon name="settings-outline"></ion-icon>
+        </div>
+        <div>
+          <h1>Configuración</h1>
+          <p class="subtitle">Gestiona tu perfil y preferencias</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pestañas (Segment) -->
+    <div class="panel-card" style="margin-bottom: 24px; padding: 0;">
+      <ion-segment [(ngModel)]="selectedTab" mode="md" class="custom-segment">
+        <ion-segment-button value="account">
+          <ion-label>Cuenta</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="accessibility">
+          <ion-label>Accesibilidad</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <!-- Pestaña: Cuenta -->
+    <div class="panel-card" *ngIf="selectedTab === 'account'">
+      <div class="card-header">
+        <div>
+          <span class="label">PERFIL</span>
+          <h3>Ajustes de Cuenta</h3>
+        </div>
+      </div>
+
+      <div class="avatar-container">
+        <div class="avatar-wrapper">
+          <img [src]="userProfile.avatarUrl" alt="Avatar del usuario" />
+          <button class="avatar-edit-btn" (click)="fileInput.click()">
+            <ion-icon name="create-outline"></ion-icon>
+          </button>
+        </div>
+        <input type="file" #fileInput accept="image/*" (change)="onAvatarSelected($event)" hidden />
+      </div>
+
+      <form [formGroup]="accountForm" (ngSubmit)="updateAccountSettings()" class="settings-form">
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" class="custom-input" formControlName="email" placeholder="tu@correo.com">
+          <span class="error-message" *ngIf="accountForm.get('email')?.invalid && accountForm.get('email')?.touched">
+            Introduce un correo electrónico válido.
+          </span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-group">
+          <label>Contraseña Actual</label>
+          <input type="password" class="custom-input" formControlName="currentPassword" placeholder="Introduce tu contraseña actual">
+        </div>
+
+        <div class="form-group">
+          <label>Nueva Contraseña</label>
+          <input type="password" class="custom-input" formControlName="newPassword" placeholder="Mínimo 8 caracteres">
+          <span class="error-message" *ngIf="accountForm.get('newPassword')?.invalid && accountForm.get('newPassword')?.touched">
+            La contraseña debe tener al menos 8 caracteres.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label>Confirmar Nueva Contraseña</label>
+          <input type="password" class="custom-input" formControlName="confirmPassword" placeholder="Repite la nueva contraseña">
+          <span class="error-message" *ngIf="accountForm.get('confirmPassword')?.hasError('passwordMismatch') && accountForm.get('confirmPassword')?.touched">
+            Las contraseñas no coinciden.
+          </span>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-primary" type="submit" [disabled]="accountForm.invalid || accountForm.pristine">
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Pestaña: Accesibilidad -->
+    <div class="panel-card" *ngIf="selectedTab === 'accessibility'">
+      <div class="card-header">
+        <div>
+          <span class="label">PREFERENCIAS</span>
+          <h3>Ajustes de Accesibilidad</h3>
+        </div>
+      </div>
+
+      <ion-list lines="none" class="custom-list">
+        <ion-item class="setting-item">
+          <div slot="start" class="icon-box primary-light">
+            <ion-icon name="contrast-outline" color="primary"></ion-icon>
+          </div>
+          <ion-label>
+            <h2>Modo Oscuro</h2>
+            <p>Aplica un tema oscuro a toda la aplicación</p>
+          </ion-label>
+          <ion-toggle [(ngModel)]="accessibilitySettings.darkMode" (ionChange)="toggleAccessibility()" slot="end"></ion-toggle>
+        </ion-item>
+
+        <ion-item class="setting-item">
+          <div slot="start" class="icon-box warning-light">
+            <ion-icon name="text-outline" color="warning"></ion-icon>
+          </div>
+          <ion-label>
+            <h2>Texto Grande</h2>
+            <p>Aumenta el tamaño de la fuente para mejor legibilidad</p>
+          </ion-label>
+          <ion-toggle [(ngModel)]="accessibilitySettings.largeText" (ionChange)="toggleAccessibility()" slot="end"></ion-toggle>
+        </ion-item>
+
+        <ion-item class="setting-item">
+          <div slot="start" class="icon-box success-light">
+            <ion-icon name="volume-high-outline" color="success"></ion-icon>
+          </div>
+          <ion-label>
+            <h2>Lector de Pantalla</h2>
+            <p>Optimiza la app para lectores de pantalla</p>
+          </ion-label>
+          <ion-toggle [(ngModel)]="accessibilitySettings.screenReader" (ionChange)="toggleAccessibility()" slot="end"></ion-toggle>
+        </ion-item>
+      </ion-list>
+    </div>
+
+  </div>
+</ion-content>

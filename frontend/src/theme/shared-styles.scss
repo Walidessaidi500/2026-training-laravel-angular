@@ -39,35 +39,44 @@
       margin: 4px 0 0;
     }
   }
+}
 
-  /* Reuse the primary button style */
-  .btn-primary {
-    background: var(--ion-color-primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-    font-weight: 700;
-    font-size: 13px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
+/* Common Buttons */
+.btn-primary {
+  background: var(--ion-color-primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 24px;
+  font-weight: 700;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.2);
 
-    &:hover {
-      background: var(--ion-color-primary-shade);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
-    }
+  &:hover:not(:disabled) {
+    background: var(--ion-color-primary-shade);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(var(--ion-color-primary-rgb), 0.3);
+  }
 
-    &:active {
-      transform: translateY(0);
-    }
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
 
-    ion-icon {
-      font-size: 18px;
-    }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--ion-color-medium);
+    box-shadow: none;
+  }
+
+  ion-icon {
+    font-size: 18px;
   }
 }
 

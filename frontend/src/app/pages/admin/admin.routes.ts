@@ -38,6 +38,10 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'tables',
         loadComponent: () => import('./tables/tables.component').then((m) => m.TablesComponent),
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./settings/settings.component').then((m) => m.SettingsComponent),
       }
     ],
   },
