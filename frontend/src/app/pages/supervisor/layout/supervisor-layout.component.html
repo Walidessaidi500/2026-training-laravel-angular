@@ -1,0 +1,18 @@
+<ion-split-pane contentId="main-content" class="admin-split-pane">
+
+  <ion-menu contentId="main-content" type="overlay">
+    <app-sidebar [activeItem]="selectedMenu" (onNavigate)="navigateTo($event)" (onLogout)="logout()">
+    </app-sidebar>
+  </ion-menu>
+
+  <div class="ion-page" id="main-content">
+
+    <app-admin-header [restaurantName]="restaurantName" [isLive]="true">
+    </app-admin-header>
+
+    <ion-content class="bg-light">
+      <router-outlet></router-outlet>
+    </ion-content>
+
+  </div>
+</ion-split-pane>
