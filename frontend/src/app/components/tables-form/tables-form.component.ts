@@ -17,6 +17,8 @@ import {
   IonSpinner,
   ModalController,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { saveOutline, closeOutline } from 'ionicons/icons';
 import { Zone } from '@services/domain/zone.service';
 import { Table } from '@services/domain/table.service';
 
@@ -55,7 +57,9 @@ export class TablesFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController
-  ) {}
+  ) {
+    addIcons({ saveOutline, closeOutline });
+  }
 
   ngOnInit(): void {
     this.isEditMode = !!this.table;
