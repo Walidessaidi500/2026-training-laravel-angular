@@ -7,8 +7,12 @@ export const guestGuard: CanActivateFn = (route, state) => {
     const router = inject(Router);
 
 if (authService.isAuthenticated()) {
-    
-    router.navigate(['/admin/dashboard']);
+    const user = authService.getUser();
+    if (user?.role === 'supervisor') {
+        router.navigate(['/supervisor/dashboard']);
+    } else {
+        router.navigate(['/admin/dashboard']);
+    }
     return false;
 }
 

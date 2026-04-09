@@ -26,12 +26,14 @@
     </ng-container>
 
     <!-- Impuestos -->
-    <div class="nav-divider"></div>
+    <ng-container *ngIf="isAdmin">
+      <div class="nav-divider"></div>
 
-    <ion-item button [class.active]="activeItem === 'taxes'" (click)="navigate('taxes')" title="Impuestos"
-      class="nav-item">
-      <div class="nav-icon"><ion-icon name="calculator-outline"></ion-icon></div>
-    </ion-item>
+      <ion-item button [class.active]="activeItem === 'taxes'" (click)="navigate('taxes')" title="Impuestos"
+        class="nav-item">
+        <div class="nav-icon"><ion-icon name="calculator-outline"></ion-icon></div>
+      </ion-item>
+    </ng-container>
 
     <!-- Familias -->
     <div class="nav-divider"></div>

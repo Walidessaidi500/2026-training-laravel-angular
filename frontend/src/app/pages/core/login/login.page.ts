@@ -56,7 +56,12 @@ export class LoginPage implements OnInit {
     this.authService.login(credentials).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigate(['/admin']);
+        const user = this.authService.getUser();
+        if (user?.role === 'supervisor') {
+          this.router.navigate(['/supervisor/dashboard']);
+        } else {
+          this.router.navigate(['/admin']);
+        }
       },
       error: (error) => {
         this.isLoading = false;

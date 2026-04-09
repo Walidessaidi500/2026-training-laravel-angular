@@ -39,6 +39,7 @@ export class SidebarComponent implements OnInit {
   @Output() onLogout = new EventEmitter<void>();
 
   isAdmin: boolean = false;
+  isSupervisor: boolean = false;
 
   constructor(
     private router: Router,
@@ -50,6 +51,7 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {
     const user = this.authService.getUser();
     this.isAdmin = user?.role === 'admin';
+    this.isSupervisor = user?.role === 'supervisor';
   }
 
   navigate(item: string): void {
