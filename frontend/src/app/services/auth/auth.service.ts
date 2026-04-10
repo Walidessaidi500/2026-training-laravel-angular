@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap, switchMap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap, switchMap, catchError, map } from 'rxjs/operators';
 import { environment } from '@environments/environment';
 
 export interface LoginRequest {
@@ -32,7 +32,26 @@ export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(this.getStoredUser());
   public user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    if (this.hasToken()) {
+      this.refreshUser().subscribe();
+    }
+  }
+
+  refreshUser(): Observable<User | null> {
+    return this.http.get<User>(`${this.apiUrl}/me`).pipe(
+      tap((user) => this.setUser(user)),
+      catchError(() => {
+        this.logout();
+        return of(null);
+      })
+    );
+  }
+
+  hasRole(role: string): boolean {
+    const user = this.getUser();
+    return user?.role === role;
+  }
 
   login(credentials: LoginRequest): Observable<User> {
     return this.http

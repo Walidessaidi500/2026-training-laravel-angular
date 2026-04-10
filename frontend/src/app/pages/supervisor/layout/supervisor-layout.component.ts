@@ -41,12 +41,13 @@ export class SupervisorLayoutComponent implements OnInit {
   }
 
   private loadAuthenticatedUser(): void {
-    const user = this.authService.getUser();
-    if (!user) {
-      this.restaurantName = 'Restaurante';
-      return;
-    }
-    this.restaurantName = user.name || 'Restaurante';
+    this.authService.user$.subscribe(user => {
+      if (!user) {
+        this.restaurantName = 'Restaurante';
+        return;
+      }
+      this.restaurantName = user.name || 'Restaurante';
+    });
   }
 
   navigateTo(path: string | Event): void {

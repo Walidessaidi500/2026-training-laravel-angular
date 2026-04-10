@@ -49,9 +49,10 @@ export class SidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const user = this.authService.getUser();
-    this.isAdmin = user?.role === 'admin';
-    this.isSupervisor = user?.role === 'supervisor';
+    this.authService.user$.subscribe(user => {
+      this.isAdmin = user?.role === 'admin';
+      this.isSupervisor = user?.role === 'supervisor';
+    });
   }
 
   navigate(item: string): void {

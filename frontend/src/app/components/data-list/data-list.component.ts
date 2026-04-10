@@ -16,7 +16,6 @@ export class DataListComponent {
   @Input() emptyTitle: string = 'No hay elementos';
   @Input() emptyDescription: string = 'No se encontraron resultados.';
   @Input() emptyIcon: string = 'list-outline';
-  
-  // Accepts a custom template for rendering each row
+
   @Input() itemTemplate!: TemplateRef<any>;
 }

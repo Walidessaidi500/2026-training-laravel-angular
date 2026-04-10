@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@providers/auth.guard';
 import { guestGuard } from './providers/guest.guard';
+import { roleGuard } from './providers/role.guard';
 
 export const routes: Routes = [
   {
@@ -15,12 +16,12 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard(['admin'])],
     loadChildren: () => import('./pages/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
   },
   {
     path: 'supervisor',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard(['supervisor'])],
     loadChildren: () => import('./pages/supervisor/supervisor.routes').then((m) => m.SUPERVISOR_ROUTES),
   },
   {

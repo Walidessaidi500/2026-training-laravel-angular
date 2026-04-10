@@ -41,15 +41,14 @@ export class AdminLayoutComponent implements OnInit {
   }
 
   private loadAuthenticatedUser(): void {
-    const user = this.authService.getUser();
-    
-    if (!user) {
-      this.restaurantName = 'Restaurante';
-      return;
-    }
-
-    // Mostrar el nombre del usuario como título del header
-    this.restaurantName = user.name || 'Restaurante';
+    this.authService.user$.subscribe(user => {
+      if (!user) {
+        this.restaurantName = 'Restaurante';
+        return;
+      }
+      // Mostrar el nombre del usuario como título del header
+      this.restaurantName = user.name || 'Restaurante';
+    });
   }
 
   navigateTo(path: string | Event): void {
