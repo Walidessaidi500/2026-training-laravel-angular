@@ -31,6 +31,8 @@ import { AuthService } from '@services/auth/auth.service';
 import { UserService } from '@services/domain/user.service';
 import { UserFormComponent, UserFormData } from '@components/user-form/user-form.component';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
+import { PageHeaderComponent } from '@components/page-header/page-header.component';
+import { DataListComponent } from '@components/data-list/data-list.component';
 
 interface User {
   uuid: string;
@@ -61,6 +63,8 @@ interface User {
     IonSegment,
     IonSegmentButton,
     AccessDeniedComponent,
+    PageHeaderComponent,
+    DataListComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

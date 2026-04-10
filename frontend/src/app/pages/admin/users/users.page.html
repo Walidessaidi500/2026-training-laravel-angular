@@ -22,20 +22,14 @@
   <!-- Content -->
   <div class="page-container" *ngIf="!isLoading && isAdmin">
 
-    <div class="page-header">
-      <div class="header-content">
-        <div class="icon-box primary">
-          <ion-icon name="people-outline"></ion-icon>
-        </div>
-        <div>
-          <h1>Gestión de Usuarios</h1>
-          <p class="subtitle">Administra todos los usuarios y sus permisos</p>
-        </div>
-      </div>
-      <button class="btn-primary" (click)="addNewUser()">
-        <ion-icon name="add-outline"></ion-icon> Nuevo Usuario
-      </button>
-    </div>
+    <app-page-header
+      title="Gestión de Usuarios"
+      subtitle="Administra todos los usuarios y sus permisos"
+      buttonText="Nuevo Usuario"
+      buttonIcon="add-outline"
+      [showButton]="true"
+      (actionClick)="addNewUser()">
+    </app-page-header>
 
     <!-- Stats -->
     <div class="stats-grid two-cols">
@@ -91,52 +85,42 @@
     </div>
 
     <!-- Table Panel -->
-    <div class="panel-card table-panel">
-      <div class="card-header">
-        <div>
-          <span class="label">USUARIOS {{ selectedRole !== 'all' ? '- ' + selectedRole.toUpperCase() : '' }}</span>
-          <h3>{{ filteredUsers.length }} usuario{{ filteredUsers.length !== 1 ? 's' : '' }}</h3>
+    <app-data-list
+      [label]="'USUARIOS ' + (selectedRole !== 'all' ? '- ' + selectedRole.toUpperCase() : '')"
+      [title]="filteredUsers.length + ' usuario(s)'"
+      emptyIcon="people-outline"
+      emptyTitle="No hay usuarios"
+      [emptyDescription]="(searchTerm || selectedRole !== 'all') ? 'No se encontraron usuarios con esos filtros' : 'Comienza agregando el primer usuario'"
+      [items]="filteredUsers"
+      [itemTemplate]="userItemRef">
+    </app-data-list>
+
+    <ng-template #userItemRef let-user>
+      <ion-item lines="none" class="user-item animated-fadeIn">
+        <div slot="start" class="avatar-circle">
+          {{ getInitials(user.name) }}
         </div>
-      </div>
 
-      <!-- Empty State -->
-      <div class="empty-state" *ngIf="filteredUsers.length === 0">
-        <div class="empty-icon"><ion-icon name="people-outline"></ion-icon></div>
-        <p class="empty-title">No hay usuarios</p>
-        <p class="empty-description">
-          {{ searchTerm || selectedRole !== 'all' ? 'No se encontraron usuarios con esos filtros' : 'Comienza agregando
-          el primer usuario' }}
-        </p>
-      </div>
-
-      <!-- List -->
-      <ion-list class="users-list" *ngIf="filteredUsers.length > 0">
-        <ion-item lines="none" class="user-item animated-fadeIn" *ngFor="let user of filteredUsers">
-          <div slot="start" class="avatar-circle">
-            {{ getInitials(user.name) }}
+        <ion-label class="user-info">
+          <h2>{{ user.name }}</h2>
+          <p class="user-email">{{ user.email }}</p>
+          <div class="user-meta">
+            <span class="status-badge active" [ngClass]="getRoleBadgeClass(user.role)">
+              <ion-icon name="person-outline"></ion-icon>
+              {{ user.role | uppercase }}
+            </span>
           </div>
+        </ion-label>
 
-          <ion-label class="user-info">
-            <h2>{{ user.name }}</h2>
-            <p class="user-email">{{ user.email }}</p>
-            <div class="user-meta">
-              <span class="status-badge active" [ngClass]="getRoleBadgeClass(user.role)">
-                <ion-icon name="person-outline"></ion-icon>
-                {{ user.role | uppercase }}
-              </span>
-            </div>
-          </ion-label>
-
-          <div slot="end" class="actions">
-            <button class="action-btn edit-btn" (click)="editUser(user)" title="Editar">
-              <ion-icon name="create-outline"></ion-icon>
-            </button>
-            <button class="action-btn delete-btn" (click)="deleteUser(user)" title="Eliminar">
-              <ion-icon name="trash-outline"></ion-icon>
-            </button>
-          </div>
-        </ion-item>
-      </ion-list>
-    </div>
+        <div slot="end" class="actions">
+          <button class="action-btn edit-btn" (click)="editUser(user)" title="Editar">
+            <ion-icon name="create-outline"></ion-icon>
+          </button>
+          <button class="action-btn delete-btn" (click)="deleteUser(user)" title="Eliminar">
+            <ion-icon name="trash-outline"></ion-icon>
+          </button>
+        </div>
+      </ion-item>
+    </ng-template>
   </div>
 </ion-content>

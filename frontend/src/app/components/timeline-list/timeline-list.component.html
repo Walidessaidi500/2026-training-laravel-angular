@@ -1,0 +1,24 @@
+<div class="panel-card timeline-card">
+  <div class="card-header">
+    <span class="label">{{ label }}</span>
+    <div class="badge-count outline" *ngIf="items.length">{{ items.length }} events</div>
+  </div>
+  <h3>{{ title }}</h3>
+
+  <div class="timeline" *ngIf="items.length > 0; else emptyState">
+    <div class="timeline-item" *ngFor="let activity of items">
+      <div class="timeline-icon" [ngClass]="activity.type">
+        <ion-icon [name]="activity.icon"></ion-icon>
+      </div>
+      <div class="timeline-content">
+        <h4>{{ activity.title }}</h4>
+        <p>{{ activity.description }}</p>
+      </div>
+      <div class="timeline-time">{{ activity.timeAgo }}</div>
+    </div>
+  </div>
+  
+  <ng-template #emptyState>
+    <p class="empty-text">No hay actividades recientes.</p>
+  </ng-template>
+</div>

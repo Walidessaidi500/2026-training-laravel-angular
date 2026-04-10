@@ -44,7 +44,10 @@ import { AccessDeniedComponent } from '@app/components/access-denied/access-deni
 import { ProductFormComponent } from '@app/components/product-form/product-form.component';
 import { FamilyFormComponent } from '@app/components/families-form/families-form.component';
 import { TablesFormComponent } from '@app/components/tables-form/tables-form.component';
-
+import { MicroStatCardComponent } from '@app/components/micro-stat-card/micro-stat-card.component';
+import { ShortcutListComponent, ShortcutItem } from '@app/components/shortcut-list/shortcut-list.component';
+import { AlertListComponent } from '@app/components/alert-list/alert-list.component';
+import { TimelineListComponent } from '@app/components/timeline-list/timeline-list.component';
 interface User {
   uuid: string;
   name: string;
@@ -69,7 +72,11 @@ interface User {
     IonSkeletonText,
     ProductFormComponent,
     FamilyFormComponent,
-    TablesFormComponent
+    TablesFormComponent,
+    MicroStatCardComponent,
+    ShortcutListComponent,
+    AlertListComponent,
+    TimelineListComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -116,6 +123,13 @@ export class DashboardPage implements OnInit {
     alerts: [] as any[],
     activities: [] as any[],
   };
+
+  dashboardShortcuts: ShortcutItem[] = [
+    { id: 'order', icon: 'cart', iconColor: 'primary', title: 'Nuevo Pedido', description: 'Crear una transacción' },
+    { id: 'product', icon: 'cube', iconColor: 'primary', title: 'Añadir producto', description: 'Listar nuevo item' },
+    { id: 'family', icon: 'folder', iconColor: 'success', title: 'Nueva Familia', description: 'Categorizar productos' },
+    { id: 'table', icon: 'restaurant', iconColor: 'primary', title: 'Nueva Mesa', description: 'Crear nueva mesa' }
+  ];
 
   constructor(
     private authService: AuthService,
@@ -275,6 +289,15 @@ export class DashboardPage implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  handleShortcutClick(id: string): void {
+    switch(id) {
+      case 'order': this.crearOrden(); break;
+      case 'product': this.agregarProducto(); break;
+      case 'family': this.agregarFamilia(); break;
+      case 'table': this.agregarMesa(); break;
+    }
   }
 
   crearOrden(): void {

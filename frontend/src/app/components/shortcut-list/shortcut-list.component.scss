@@ -1,0 +1,63 @@
+.panel-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: var(--ion-color-medium, #92949c);
+  }
+}
+
+.action-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --background: transparent;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  transition: background 0.2s;
+
+  &:hover {
+    --background: rgba(0, 0, 0, 0.01);
+  }
+
+  .icon-box {
+    margin-right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+
+    &.primary-light { background: rgba(255, 83, 48, 0.1); color: var(--ion-color-primary, #ff5330); }
+    &.success-light { background: rgba(45, 211, 111, 0.1); color: var(--ion-color-success, #2dd36f); }
+    &.warning-light { background: rgba(255, 196, 9, 0.1); color: var(--ion-color-warning, #ffc409); }
+    &.danger-light { background: rgba(235, 68, 90, 0.1); color: var(--ion-color-danger, #eb445a); }
+  }
+
+  h2 {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ion-color-secondary, #222428);
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: 12px;
+    color: var(--ion-color-medium, #92949c);
+    margin: 0;
+  }
+}

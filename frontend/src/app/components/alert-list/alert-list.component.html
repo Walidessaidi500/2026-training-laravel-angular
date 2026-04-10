@@ -1,0 +1,23 @@
+<div class="panel-card list-card">
+  <div class="card-header">
+    <span class="label">{{ label }}</span>
+    <div class="badge-count" *ngIf="alerts.length">{{ alerts.length }}</div>
+  </div>
+
+  <ng-container *ngIf="alerts.length > 0; else noAlerts">
+    <div class="alert-item" [ngClass]="alert.type" *ngFor="let alert of alerts">
+      <div class="alert-icon-wrapper">
+        <ion-icon [name]="alert.type === 'success' ? 'checkmark-circle' : (alert.type === 'danger' ? 'alert-circle' : 'warning')"></ion-icon>
+      </div>
+      <div class="alert-content">
+        <h4>{{ alert.title }}</h4>
+        <p>{{ alert.description }}</p>
+        <span class="time-ago">{{ alert.timeAgo }}</span>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #noAlerts>
+    <p class="empty-text">No hay alertas activas.</p>
+  </ng-template>
+</div>

@@ -64,41 +64,41 @@
       </div>
 
       <div class="micro-stats-grid">
-        <div class="panel-card micro-card">
-          <div class="micro-header">
-            <div class="icon-box primary-light"><ion-icon name="people" color="primary"></ion-icon></div>
-            <span class="trend-badge success small">+12.5%</span>
-          </div>
-          <div class="value">{{ dashboardData.metrics.activeUsers | number }}</div>
-          <div class="label">USUARIOS ACTIVOS</div>
-        </div>
+        <app-micro-stat-card
+          icon="people"
+          iconColor="primary"
+          trendPercentage="+12.5"
+          trendType="success"
+          [value]="dashboardData.metrics.activeUsers | number"
+          label="USUARIOS ACTIVOS">
+        </app-micro-stat-card>
 
-        <div class="panel-card micro-card">
-          <div class="micro-header">
-            <div class="icon-box primary-light"><ion-icon name="cart" color="primary"></ion-icon></div>
-            <span class="trend-badge success small">+8.2%</span>
-          </div>
-          <div class="value">{{ dashboardData.metrics.ordersToday | number }}</div>
-          <div class="label">PEDIDOS HOY</div>
-        </div>
+        <app-micro-stat-card
+          icon="cart"
+          iconColor="primary"
+          trendPercentage="+8.2"
+          trendType="success"
+          [value]="dashboardData.metrics.ordersToday | number"
+          label="PEDIDOS HOY">
+        </app-micro-stat-card>
 
-        <div class="panel-card micro-card">
-          <div class="micro-header">
-            <div class="icon-box primary-light"><ion-icon name="pie-chart" color="primary"></ion-icon></div>
-            <span class="trend-badge danger small">-0.8%</span>
-          </div>
-          <div class="value">{{ dashboardData.metrics.conversionRate }}%</div>
-          <div class="label">CONVERSION</div>
-        </div>
+        <app-micro-stat-card
+          icon="pie-chart"
+          iconColor="primary"
+          trendPercentage="-0.8"
+          trendType="danger"
+          [value]="dashboardData.metrics.conversionRate + '%'"
+          label="CONVERSIÓN">
+        </app-micro-stat-card>
 
-        <div class="panel-card micro-card">
-          <div class="micro-header">
-            <div class="icon-box primary-light"><ion-icon name="cube" color="primary"></ion-icon></div>
-            <span class="trend-badge success small">+3</span>
-          </div>
-          <div class="value">{{ dashboardData.metrics.totalProducts | number }}</div>
-          <div class="label">PRODUCTOS</div>
-        </div>
+        <app-micro-stat-card
+          icon="cube"
+          iconColor="primary"
+          trendPercentage="+3"
+          trendType="success"
+          [value]="dashboardData.metrics.totalProducts | number"
+          label="PRODUCTOS">
+        </app-micro-stat-card>
       </div>
 
       <div class="panel-card chart-card">
@@ -156,108 +156,18 @@
 
     <div class="side-column">
 
-      <div class="panel-card list-card">
-        <div class="card-header">
-          <span class="label">SHORTCUTS</span>
-          <ion-icon name="flash-outline" color="medium"></ion-icon>
-        </div>
-        <ion-list>
-          <ion-item lines="none" button class="action-item" detail="true" (click)="crearOrden()">
-            <div slot="start" class="icon-box primary-light">
-              <ion-icon name="cart" color="primary"></ion-icon>
-            </div>
-            <ion-label>
-              <h2>Nuevo Pedido</h2>
-              <p>Crear una transacción</p>
-            </ion-label>
-          </ion-item>
-          <ion-item lines="none" button class="action-item" detail="true" (click)="agregarProducto()">
-            <div slot="start" class="icon-box primary-light">
-              <ion-icon name="cube" color="primary"></ion-icon>
-            </div>
-            <ion-label>
-              <h2>Añadir producto</h2>
-              <p>Listar nuevo item</p>
-            </ion-label>
-          </ion-item>
-          <ion-item lines="none" button class="action-item" detail="true" (click)="agregarUsuario()">
-            <div slot="start" class="icon-box warning-light">
-              <ion-icon name="people" color="warning"></ion-icon>
-            </div>
-            <ion-label>
-              <h2>Nuevo Usuario</h2>
-              <p>Dar acceso al sistema</p>
-            </ion-label>
-          </ion-item>
-          <ion-item lines="none" button class="action-item" detail="true" (click)="agregarFamilia()">
-            <div slot="start" class="icon-box success-light">
-              <ion-icon name="folder" color="success"></ion-icon>
-            </div>
-            <ion-label>
-              <h2>Nueva Familia</h2>
-              <p>Categorizar productos</p>
-            </ion-label>
-          </ion-item>
-          <ion-item lines="none" button class="action-item" detail="true" (click)="agregarImpuesto()">
-            <div slot="start" class="icon-box primary-light">
-              <ion-icon name="receipt" color="primary"></ion-icon>
-            </div>
-            <ion-label>
-              <h2>Nuevo Impuesto</h2>
-              <p>Configurar IVA/Tasas</p>
-            </ion-label>
-          </ion-item>
-          <ion-item lines="none" button class="action-item" detail="true" (click)="agregarMesa()">
-            <div slot="start" class="icon-box primary-light">
-              <ion-icon name="restaurant" color="primary"></ion-icon>
-            </div>
-            <ion-label>
-              <h2>Nueva Mesa</h2>
-              <p>Crear nueva mesa</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </div>
+      <app-shortcut-list
+        [shortcuts]="dashboardShortcuts"
+        (shortcutClick)="handleShortcutClick($event)">
+      </app-shortcut-list>
 
-      <div class="panel-card list-card">
-        <div class="card-header">
-          <span class="label">ALERTAS</span>
-          <div class="badge-count">{{ dashboardData.alerts.length }}</div>
-        </div>
+      <app-alert-list
+        [alerts]="dashboardData.alerts">
+      </app-alert-list>
 
-        <div class="alert-item" [ngClass]="alert.type" *ngFor="let alert of dashboardData.alerts">
-          <div class="alert-icon-wrapper">
-            <ion-icon
-              [name]="alert.type === 'success' ? 'checkmark-circle' : (alert.type === 'danger' ? 'alert-circle' : 'warning')"></ion-icon>
-          </div>
-          <div class="alert-content">
-            <h4>{{ alert.title }}</h4>
-            <p>{{ alert.description }}</p>
-            <span class="time-ago">{{ alert.timeAgo }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel-card timeline-card">
-        <div class="card-header">
-          <span class="label">CENTRO DE ACTIVIDAD</span>
-          <div class="badge-count outline">{{ dashboardData.activities.length }} events</div>
-        </div>
-        <h3>ACTUALIZACIONES EN DIRECTO</h3>
-
-        <div class="timeline">
-          <div class="timeline-item" *ngFor="let activity of dashboardData.activities">
-            <div class="timeline-icon" [ngClass]="activity.type">
-              <ion-icon [name]="activity.icon"></ion-icon>
-            </div>
-            <div class="timeline-content">
-              <h4>{{ activity.title }}</h4>
-              <p>{{ activity.description }}</p>
-            </div>
-            <div class="timeline-time">{{ activity.timeAgo }}</div>
-          </div>
-        </div>
-      </div>
+      <app-timeline-list
+        [items]="dashboardData.activities">
+      </app-timeline-list>
 
     </div>
   </div>

@@ -1,0 +1,18 @@
+<div class="panel-card list-card">
+  <div class="card-header">
+    <span class="label">{{ label }}</span>
+    <ion-icon name="flash-outline" color="medium"></ion-icon>
+  </div>
+  
+  <ion-list>
+    <ion-item *ngFor="let shortcut of shortcuts" lines="none" button class="action-item" detail="true" (click)="onShortcutClick(shortcut.id)">
+      <div slot="start" class="icon-box" [ngClass]="shortcut.iconColor + '-light'">
+        <ion-icon [name]="shortcut.icon" [color]="shortcut.iconColor"></ion-icon>
+      </div>
+      <ion-label>
+        <h2>{{ shortcut.title }}</h2>
+        <p>{{ shortcut.description }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</div>

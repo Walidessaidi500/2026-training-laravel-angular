@@ -48,6 +48,10 @@ import { FamilyFormComponent } from '@app/components/families-form/families-form
 import { TaxFormComponent } from '@app/components/tax-form/tax-form.component';
 import { UserFormComponent } from '@app/components/user-form/user-form.component';
 import { TablesFormComponent } from '@app/components/tables-form/tables-form.component';
+import { MicroStatCardComponent } from '@app/components/micro-stat-card/micro-stat-card.component';
+import { ShortcutListComponent, ShortcutItem } from '@app/components/shortcut-list/shortcut-list.component';
+import { AlertListComponent } from '@app/components/alert-list/alert-list.component';
+import { TimelineListComponent } from '@app/components/timeline-list/timeline-list.component';
 
 interface User {
   uuid: string;
@@ -75,7 +79,11 @@ interface User {
     FamilyFormComponent,
     TaxFormComponent,
     UserFormComponent,
-    TablesFormComponent
+    TablesFormComponent,
+    MicroStatCardComponent,
+    ShortcutListComponent,
+    AlertListComponent,
+    TimelineListComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -134,6 +142,15 @@ export class DashboardPage implements OnInit {
     alerts: [] as any[],
     activities: [] as any[],
   };
+
+  dashboardShortcuts: ShortcutItem[] = [
+    { id: 'order', icon: 'cart', iconColor: 'primary', title: 'Nuevo Pedido', description: 'Crear una transacción' },
+    { id: 'product', icon: 'cube', iconColor: 'primary', title: 'Añadir producto', description: 'Listar nuevo item' },
+    { id: 'user', icon: 'people', iconColor: 'warning', title: 'Nuevo Usuario', description: 'Dar acceso al sistema' },
+    { id: 'family', icon: 'folder', iconColor: 'success', title: 'Nueva Familia', description: 'Categorizar productos' },
+    { id: 'tax', icon: 'receipt', iconColor: 'primary', title: 'Nuevo Impuesto', description: 'Configurar IVA/Tasas' },
+    { id: 'table', icon: 'restaurant', iconColor: 'primary', title: 'Nueva Mesa', description: 'Crear nueva mesa' }
+  ];
 
   constructor(
     private authService: AuthService,
@@ -375,6 +392,17 @@ export class DashboardPage implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  handleShortcutClick(id: string): void {
+    switch(id) {
+      case 'order': this.crearOrden(); break;
+      case 'product': this.agregarProducto(); break;
+      case 'user': this.agregarUsuario(); break;
+      case 'family': this.agregarFamilia(); break;
+      case 'tax': this.agregarImpuesto(); break;
+      case 'table': this.agregarMesa(); break;
+    }
   }
 
   crearOrden(): void {

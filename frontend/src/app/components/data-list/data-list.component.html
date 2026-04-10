@@ -1,0 +1,22 @@
+<div class="panel-card table-panel">
+  <div class="card-header">
+    <div>
+      <span class="label">{{ label }}</span>
+      <h3>{{ title || items.length + ' elementos' }}</h3>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="items.length === 0">
+    <div class="empty-icon"><ion-icon [name]="emptyIcon"></ion-icon></div>
+    <p class="empty-title">{{ emptyTitle }}</p>
+    <p class="empty-description">{{ emptyDescription }}</p>
+  </div>
+
+  <!-- List -->
+  <ion-list class="data-list-container" *ngIf="items.length > 0">
+    <ng-container *ngFor="let item of items">
+      <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item }"></ng-container>
+    </ng-container>
+  </ion-list>
+</div>

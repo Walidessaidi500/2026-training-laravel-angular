@@ -1,0 +1,12 @@
+<div class="panel-card micro-card">
+  <div class="micro-header">
+    <div class="icon-box" [ngClass]="iconColor + '-light'">
+      <ion-icon [name]="icon" [color]="iconColor"></ion-icon>
+    </div>
+    <span *ngIf="trendPercentage || trendPercentage === 0" class="trend-badge small" [ngClass]="trendType">
+      {{ trendPercentage }}
+    </span>
+  </div>
+  <div class="value">{{ value }}</div>
+  <div class="label">{{ label }}</div>
+</div>
