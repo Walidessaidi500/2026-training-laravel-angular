@@ -94,8 +94,8 @@ export class UserFormComponent implements OnInit {
 
   private initializeForm(): void {
     const passwordValidators = this.isEditMode 
-      ? [Validators.minLength(8)]  // Opcional en edición
-      : [Validators.required, Validators.minLength(8)];  // Requerido en creación
+      ? [Validators.minLength(8)]
+      : [Validators.required, Validators.minLength(8)];
 
     this.userForm = this.formBuilder.group(
       {
@@ -106,7 +106,7 @@ export class UserFormComponent implements OnInit {
         password: ['', passwordValidators],
         password_confirmation: ['', passwordValidators],
       },
-      { validators: this.passwordMatchValidator() }  // Validador de grupo personalizado
+      { validators: this.passwordMatchValidator() }
     );
   }
 
@@ -115,24 +115,24 @@ export class UserFormComponent implements OnInit {
       const password = control.get('password');
       const passwordConfirmation = control.get('password_confirmation');
 
-      // Si ambos campos son vacíos y no están requeridos, es válido
+
       if (!password?.value && !passwordConfirmation?.value) {
         return null;
       }
 
-      // Si uno es vacío pero el otro no, mostrar error
+
       if (password?.value && !passwordConfirmation?.value) {
         passwordConfirmation?.setErrors({ required: true });
         return { passwordMismatch: true };
       }
 
-      // Si son diferentes, mostrar error
+
       if (password?.value !== passwordConfirmation?.value) {
         passwordConfirmation?.setErrors({ mismatch: true });
         return { passwordMismatch: true };
       }
 
-      // Si coinciden, limpiar errores
+
       passwordConfirmation?.setErrors(null);
       return null;
     };
@@ -151,7 +151,7 @@ export class UserFormComponent implements OnInit {
     if (this.userForm.valid) {
       const formData: UserFormData = this.userForm.value;
       
-      // En modo edición, no enviar campos de password si están vacíos
+
       if (this.isEditMode) {
         if (!formData.password) {
           delete formData.password;
@@ -170,7 +170,7 @@ export class UserFormComponent implements OnInit {
 
   cancel(): void {
     this.onCancel.emit();
-    // Usar dismiss() sin datos para indicar cancelación
+
     this.modalController.dismiss(null);
   }
 

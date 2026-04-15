@@ -39,9 +39,7 @@ class EloquentFamilyRepository implements FamilyRepositoryInterface
         return $this->toDomainEntity($model);
     }
 
-    /**
-     * @return Family[]
-     */
+    
     public function findAll(): array
     {
         return $this->model->newQuery()

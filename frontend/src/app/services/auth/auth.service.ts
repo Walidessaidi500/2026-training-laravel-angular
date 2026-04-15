@@ -41,8 +41,11 @@ export class AuthService {
   refreshUser(): Observable<User | null> {
     return this.http.get<User>(`${this.apiUrl}/me`).pipe(
       tap((user) => this.setUser(user)),
-      catchError(() => {
-        this.logout();
+      catchError((error) => {
+
+        if (error.status === 401 || error.status === 403) {
+          this.logout();
+        }
         return of(null);
       })
     );

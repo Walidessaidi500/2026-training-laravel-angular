@@ -15,9 +15,7 @@ class LoginUserResponse
         return new self($token, $userName, $userEmail);
     }
 
-    /**
-     * @return array<string, string>
-     */
+    
     public function toArray(): array
     {
         return [

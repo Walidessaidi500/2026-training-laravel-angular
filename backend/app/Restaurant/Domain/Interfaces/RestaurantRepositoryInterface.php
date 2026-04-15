@@ -13,6 +13,6 @@ interface RestaurantRepositoryInterface
 
     public function delete(Uuid $id): void;
 
-    /** @return Restaurant[] */
+    
     public function all(): array;
 }

@@ -46,7 +46,7 @@ export class AdminLayoutComponent implements OnInit {
         this.restaurantName = 'Restaurante';
         return;
       }
-      // Mostrar el nombre del usuario como título del header
+      
       this.restaurantName = user.name || 'Restaurante';
     });
   }

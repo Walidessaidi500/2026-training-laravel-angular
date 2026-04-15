@@ -53,13 +53,13 @@ import { contrastOutline, textOutline, volumeHighOutline, settingsOutline, creat
 })
 export class SettingsComponent implements OnInit {
 
-  // Controla la pestaña activa del ion-segment
+  
   selectedTab: string = 'account';
 
-  // Formulario reactivo
+  
   accountForm!: FormGroup;
 
-  // Estado de la UI
+  
   userProfile = {
     avatarUrl: 'assets/images/default-avatar.png',
     email: ''
@@ -92,7 +92,7 @@ export class SettingsComponent implements OnInit {
     this.initForm();
     this.loadCurrentUserData();
     
-    // Cargar preferencias de accesibilidad
+    
     const prefs = localStorage.getItem('accessibilityPrefs');
     if (prefs) {
       try {
@@ -134,7 +134,7 @@ export class SettingsComponent implements OnInit {
     }
   }
 
-  // --- LÓGICA DE CUENTA ---
+  
 
   public updateAccountSettings() {
     if (this.accountForm.invalid || !this.currentUser) return;
@@ -184,20 +184,20 @@ export class SettingsComponent implements OnInit {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
 
-      // Mostrar preview local rápido
+      
       const reader = new FileReader();
       reader.onload = () => {
         this.userProfile.avatarUrl = reader.result as string;
       };
       reader.readAsDataURL(file);
 
-      // Aquí deberías subir a través del UserService o un Endpoint de Upload
-      // Como no hay updateAvatar de momento, lo mostramos
+      
+      
       this.presentToast('Imagen de perfil actualizada localmente (necesita API).');
     }
   }
 
-  // --- LÓGICA DE ACCESIBILIDAD ---
+  
 
   public toggleAccessibility() {
     if (this.accessibilitySettings.darkMode) {
@@ -206,11 +206,11 @@ export class SettingsComponent implements OnInit {
       document.body.classList.remove('dark');
     }
 
-    // Guardar preferencias en LocalStorage
+    
     localStorage.setItem('accessibilityPrefs', JSON.stringify(this.accessibilitySettings));
   }
 
-  // --- UTILIDADES ---
+  
 
   private async presentToast(message: string, color: 'success' | 'danger' | 'warning' = 'success') {
     const toast = await this.toastController.create({

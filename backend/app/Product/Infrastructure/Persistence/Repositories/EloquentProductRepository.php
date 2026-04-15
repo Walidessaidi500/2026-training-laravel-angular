@@ -49,9 +49,7 @@ class EloquentProductRepository implements ProductRepositoryInterface
         return $this->toDomainEntity($model);
     }
 
-    /**
-     * @return Product[]
-     */
+    
     public function findAll(): array
     {
         return $this->model->newQuery()

@@ -1,6 +1,6 @@
 <ion-content class="products-background">
-  <app-access-denied *ngIf="!isAdmin && !isLoading" [user]="currentUser"
-    message="Esta página solo está disponible para administradores."></app-access-denied>
+  <app-access-denied *ngIf="!isAdmin && !isSupervisor && !isLoading" [user]="currentUser"
+    message="Esta página solo está disponible para administradores y supervisores."></app-access-denied>
 
   <!-- Skeleton Loading -->
   <div class="page-container" *ngIf="isLoading">
@@ -17,7 +17,7 @@
   </div>
 
   <!-- Content -->
-  <div class="page-container" *ngIf="!isLoading && isAdmin">
+  <div class="page-container" *ngIf="!isLoading && (isAdmin || isSupervisor)">
 
     <div class="page-header">
       <div class="header-content">
@@ -29,7 +29,7 @@
           <p class="subtitle">Gestiona tu inventario y precios de forma centralizada</p>
         </div>
       </div>
-      <button class="btn-primary" (click)="addNewProduct()">
+      <button *ngIf="isAdmin" class="btn-primary" (click)="addNewProduct()">
         <ion-icon name="add-outline"></ion-icon> Nuevo Producto
       </button>
     </div>
@@ -168,7 +168,7 @@
             <button class="action-btn edit-btn" (click)="editProduct(product)">
               <ion-icon name="create-outline"></ion-icon>
             </button>
-            <button class="action-btn delete-btn" (click)="deleteProduct(product)">
+            <button *ngIf="isAdmin" class="action-btn delete-btn" (click)="deleteProduct(product)">
               <ion-icon name="trash-outline"></ion-icon>
             </button>
           </div>

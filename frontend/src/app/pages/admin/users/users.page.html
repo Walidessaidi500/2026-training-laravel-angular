@@ -1,8 +1,8 @@
 <ion-content class="users-background">
 
-  <!-- Mensaje si no es admin -->
-  <app-access-denied *ngIf="!isAdmin && !isLoading" [user]="currentUser"
-    message="Esta página solo está disponible para administradores.">
+  <!-- Mensaje si no es admin o supervisor -->
+  <app-access-denied *ngIf="!isAdmin && !isSupervisor && !isLoading" [user]="currentUser"
+    message="Esta página solo está disponible para administradores y supervisores.">
   </app-access-denied>
 
   <!-- Skeleton Loading -->
@@ -20,19 +20,14 @@
   </div>
 
   <!-- Content -->
-  <div class="page-container" *ngIf="!isLoading && isAdmin">
+  <div class="page-container" *ngIf="!isLoading && (isAdmin || isSupervisor)">
 
-    <app-page-header
-      title="Gestión de Usuarios"
-      subtitle="Administra todos los usuarios y sus permisos"
-      buttonText="Nuevo Usuario"
-      buttonIcon="add-outline"
-      [showButton]="true"
-      (actionClick)="addNewUser()">
+    <app-page-header title="Gestión de Usuarios" subtitle="Consulta los usuarios y sus permisos"
+      buttonText="Nuevo Usuario" buttonIcon="add-outline" [showButton]="isAdmin" (actionClick)="addNewUser()">
     </app-page-header>
 
     <!-- Stats -->
-    <div class="stats-grid two-cols">
+    <div class="stats-grid" [class.two-cols]="isAdmin">
       <div class="panel-card stat-card">
         <div class="stat-content">
           <div class="icon-box primary-light">
@@ -45,7 +40,7 @@
         </div>
       </div>
 
-      <div class="panel-card stat-card">
+      <div class="panel-card stat-card" *ngIf="isAdmin">
         <div class="stat-content">
           <div class="icon-box warning-light">
             <ion-icon name="shield" color="warning"></ion-icon>
@@ -71,7 +66,7 @@
           <ion-segment-button value="all">
             <ion-label>Todos</ion-label>
           </ion-segment-button>
-          <ion-segment-button value="admin">
+          <ion-segment-button value="admin" *ngIf="isAdmin">
             <ion-label>Admin</ion-label>
           </ion-segment-button>
           <ion-segment-button value="supervisor">
@@ -85,14 +80,10 @@
     </div>
 
     <!-- Table Panel -->
-    <app-data-list
-      [label]="'USUARIOS ' + (selectedRole !== 'all' ? '- ' + selectedRole.toUpperCase() : '')"
-      [title]="filteredUsers.length + ' usuario(s)'"
-      emptyIcon="people-outline"
-      emptyTitle="No hay usuarios"
+    <app-data-list [label]="'USUARIOS ' + (selectedRole !== 'all' ? '- ' + selectedRole.toUpperCase() : '')"
+      [title]="filteredUsers.length + ' usuario(s)'" emptyIcon="people-outline" emptyTitle="No hay usuarios"
       [emptyDescription]="(searchTerm || selectedRole !== 'all') ? 'No se encontraron usuarios con esos filtros' : 'Comienza agregando el primer usuario'"
-      [items]="filteredUsers"
-      [itemTemplate]="userItemRef">
+      [items]="filteredUsers" [itemTemplate]="userItemRef">
     </app-data-list>
 
     <ng-template #userItemRef let-user>
@@ -112,7 +103,7 @@
           </div>
         </ion-label>
 
-        <div slot="end" class="actions">
+        <div *ngIf="isAdmin" slot="end" class="actions">
           <button class="action-btn edit-btn" (click)="editUser(user)" title="Editar">
             <ion-icon name="create-outline"></ion-icon>
           </button>

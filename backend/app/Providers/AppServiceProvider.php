@@ -24,9 +24,7 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
+    
     public function register(): void
     {
         // User
@@ -54,9 +52,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\App\Restaurant\Domain\Interfaces\PasswordHasherInterface::class, \App\Restaurant\Infrastructure\Services\LaravelPasswordHasher::class);
     }
 
-    /**
-     * Bootstrap any application services.
-     */
+    
     public function boot(): void
     {
         //

@@ -1,0 +1,146 @@
+
+.tpv-background {
+  --background: #f4f5f8;
+
+}
+
+.tpv-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.tpv-header {
+  background-color: #222428;
+  color: white;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+
+  .header-title h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .header-title p {
+    margin: 5px 0 0;
+    color: #92949c;
+    font-size: 16px;
+  }
+}
+
+.tpv-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+
+.zones-sidebar {
+  width: 250px;
+  background: white;
+  border-right: 2px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  gap: 15px;
+  overflow-y: auto;
+
+  .zone-btn {
+    width: 100%;
+    min-height: 80px;
+
+    border: 2px solid #d7d8da;
+    background: #ffffff;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.1s ease;
+
+
+    &.active {
+      background: #3880ff;
+      color: white;
+      border-color: #3880ff;
+      transform: scale(1.02);
+      box-shadow: 0 4px 10px rgba(56, 128, 255, 0.4);
+    }
+
+    &:active {
+      transform: scale(0.98);
+
+    }
+  }
+}
+
+
+.tables-grid-container {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #f4f5f8;
+}
+
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  align-content: start;
+}
+
+.table-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 140px;
+
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+
+
+  &:active {
+    opacity: 0.8;
+    transform: translateY(2px);
+  }
+
+  .table-name {
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 10px;
+  }
+
+  .table-status-text {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+
+  &.free {
+    background-color: #2dd36f;
+
+    border: 4px solid #1ba352;
+  }
+
+  &.occupied {
+    background-color: #eb445a;
+
+    border: 4px solid #b32a3d;
+  }
+}

@@ -30,8 +30,8 @@ export interface Product {
   active: boolean;
   family_id: string;
   tax_id: string;
-  family_name?: string; // Para mostrar en la vista
-  tax_name?: string;    // Para mostrar en la vista
+  family_name?: string; 
+  tax_name?: string;    
 }
 
 @Component({
@@ -49,6 +49,7 @@ export interface Product {
 export class ProductsPage implements OnInit {
   currentUser: any = null;
   isAdmin = false;
+  isSupervisor = false;
   isLoading = true;
 
   // Datos base
@@ -56,7 +57,7 @@ export class ProductsPage implements OnInit {
   families: any[] = [];
   taxes: any[] = [];
 
-  // Array renderizado
+  
   filteredProducts: Product[] = [];
 
   // Filtros
@@ -72,7 +73,7 @@ export class ProductsPage implements OnInit {
     outOfStock: 0
   };
 
-  // Pagination state
+  
   currentPage = 1;
   lastPage = 1;
   perPage = 20;
@@ -104,12 +105,17 @@ export class ProductsPage implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    const role = this.currentUser?.role;
+
+    if (!this.currentUser || (role !== 'admin' && role !== 'supervisor')) {
       this.isAdmin = false;
+      this.isSupervisor = false;
       this.isLoading = false;
       return;
     }
-    this.isAdmin = true;
+
+    this.isAdmin = role === 'admin';
+    this.isSupervisor = role === 'supervisor';
     this.loadInitialData();
   }
 
@@ -203,12 +209,12 @@ export class ProductsPage implements OnInit {
   private applyFilters(): void {
     let filtered = [...this.products];
 
-    // 1. Búsqueda por texto (Nombre)
+    
     if (this.searchTerm) {
       filtered = filtered.filter(p => p.name.toLowerCase().includes(this.searchTerm));
     }
 
-    // 2. Filtro por Familia
+    
     if (this.selectedFamily !== 'all') {
       if (this.selectedFamily === 'none') {
         filtered = filtered.filter(p => !p.family_id);
@@ -217,7 +223,7 @@ export class ProductsPage implements OnInit {
       }
     }
 
-    // 3. Filtro por Impuesto
+    
     if (this.selectedTax !== 'all') {
       if (this.selectedTax === 'none') {
         filtered = filtered.filter(p => !p.tax_id);
@@ -226,7 +232,7 @@ export class ProductsPage implements OnInit {
       }
     }
 
-    // 4. Filtro por Estado (Activo/Inactivo)
+    
     if (this.selectedStatus !== 'all') {
       const isActive = this.selectedStatus === 'active';
       filtered = filtered.filter(p => p.active === isActive);
@@ -326,7 +332,7 @@ export class ProductsPage implements OnInit {
   async deleteProduct(product: Product): Promise<void> {
     const alert = await this.alertController.create({
       header: 'Eliminar Producto',
-      message: '¿Estás seguro de que deseas eliminar <strong>' + product.name + '</strong>? Esta acción no se puede deshacer.',
+      message: '¿Estás seguro de que deseas eliminar ' + product.name + '? Esta acción no se puede deshacer.',
       backdropDismiss: false,
       buttons: [
         {

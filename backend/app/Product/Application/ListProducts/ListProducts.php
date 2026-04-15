@@ -11,9 +11,7 @@ class ListProducts
         private ProductRepositoryInterface $productRepository,
     ) {}
 
-    /**
-     * @return array<int, array<string, mixed>>
-     */
+    
     public function __invoke(): array
     {
         $products = $this->productRepository->findAll();

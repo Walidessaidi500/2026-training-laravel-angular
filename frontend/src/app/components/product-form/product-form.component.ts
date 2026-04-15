@@ -9,6 +9,7 @@ import {
 
 import { addIcons } from 'ionicons';
 import { closeOutline, saveOutline } from 'ionicons/icons';
+import { AuthService } from '@services/auth/auth.service';
 
 export interface ProductFormData {
   name: string;
@@ -35,13 +36,20 @@ export class ProductFormComponent implements OnInit {
   @Input() families: any[] = [];
   @Input() taxes: any[] = [];
 
+  isAdmin = false;
+  isSupervisor = false;
   productForm: FormGroup;
   isEditMode = false;
 
   constructor(
     private fb: FormBuilder,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private authService: AuthService
   ) {
+    const user = this.authService.getUser();
+    this.isAdmin = user?.role === 'admin';
+    this.isSupervisor = user?.role === 'supervisor';
+
     addIcons({
       'close-outline': closeOutline,
       'save-outline': saveOutline
@@ -68,6 +76,13 @@ export class ProductFormComponent implements OnInit {
         tax_id: this.product.tax_id,
         active: this.product.active ?? true
       });
+
+      
+      if (this.isSupervisor) {
+        this.productForm.get('price')?.disable();
+        this.productForm.get('family_id')?.disable();
+        this.productForm.get('tax_id')?.disable();
+      }
     }
   }
 
@@ -77,12 +92,13 @@ export class ProductFormComponent implements OnInit {
 
   onSubmit() {
     if (this.productForm.valid) {
+      const rawValues = this.productForm.getRawValue();
       const formData: ProductFormData = {
-        name: this.productForm.value.name.trim(),
-        priceInCents: Math.round(Number(this.productForm.value.price) * 100),
-        stock: Number(this.productForm.value.stock),
-        family_id: this.productForm.value.family_id,
-        tax_id: this.productForm.value.tax_id,
+        name: rawValues.name.trim(),
+        priceInCents: Math.round(Number(rawValues.price) * 100),
+        stock: Number(rawValues.stock),
+        family_id: rawValues.family_id,
+        tax_id: rawValues.tax_id,
         active: Boolean(this.productForm.get('active')?.value)
       };
 

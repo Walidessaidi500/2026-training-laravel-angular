@@ -53,6 +53,7 @@ export class TablesComponent implements OnInit {
 
   public currentUser: any = null;
   public isAdmin: boolean = false;
+  public isSupervisor: boolean = false;
   public isLoading: boolean = true;
 
   public zones: Zone[] = [];
@@ -88,7 +89,7 @@ export class TablesComponent implements OnInit {
   public async onAddTable(zoneId?: string): Promise<void> {
     const selectedZone = this.zones.find(z => z.uuid === zoneId);
     
-    // Si no tenemos zona (caso del botón global), permitimos elegir una
+    
     if (!zoneId && this.zones.length > 0) {
       const alert = await this.alertCtrl.create({
         header: 'Nueva Mesa',
@@ -114,7 +115,7 @@ export class TablesComponent implements OnInit {
       });
       await alert.present();
     } else if (zoneId) {
-      // Caso directo: Añadir a zona específica
+      
       this.promptTableName(zoneId, selectedZone?.name);
     } else {
       this.showToast('Primero debes crear al menos una zona', 'danger');
@@ -220,19 +221,24 @@ export class TablesComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    const role = this.currentUser?.role;
+
+    if (!this.currentUser || (role !== 'admin' && role !== 'supervisor')) {
       this.isAdmin = false;
+      this.isSupervisor = false;
       this.isLoading = false;
       return;
     }
-    this.isAdmin = true;
+    
+    this.isAdmin = role === 'admin';
+    this.isSupervisor = role === 'supervisor';
     this.loadData();
   }
 
   private loadData(): void {
     this.isLoading = true;
     
-    // Cargamos zonas y mesas
+    
     this.zoneService.list(1, 100).subscribe({
       next: (zoneResponse) => {
         this.zones = zoneResponse.data;
@@ -260,13 +266,13 @@ export class TablesComponent implements OnInit {
     this.activeZoneId = zoneId;
     
     if (zoneId === 'all') {
-      // Agrupar todas las mesas por zona
+      
       this.groupedTables = this.zones.map(zone => ({
         zone,
         tables: this.allTables.filter(t => t.zone_id === zone.uuid)
       }));
     } else {
-      // Solo mostrar la zona seleccionada
+      
       const selectedZone = this.zones.find(z => z.uuid === zoneId);
       if (selectedZone) {
         this.groupedTables = [{

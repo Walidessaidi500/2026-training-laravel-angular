@@ -1,0 +1,25 @@
+<ion-content [fullscreen]="true" class="tpv-background">
+  <div class="tpv-layout">
+
+    <header class="tpv-header">
+      <div class="header-title">
+        <h1>Terminal de Venta</h1>
+        <p>Selección de Mesa</p>
+      </div>
+    </header>
+
+    <main class="tables-grid-container">
+      <div class="tables-grid">
+        <ng-container *ngIf="tables$ | async as tables">
+          <button
+            *ngFor="let table of tables"
+            class="table-btn free"
+            (click)="onTableClick(table)">
+            <span class="table-name">{{ table.name }}</span>
+          </button>
+        </ng-container>
+      </div>
+    </main>
+
+  </div>
+</ion-content>

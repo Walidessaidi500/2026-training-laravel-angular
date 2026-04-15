@@ -43,6 +43,7 @@ export interface Family {
 export class FamiliesPage implements OnInit {
   currentUser: any = null;
   isAdmin = false;
+  isSupervisor = false;
   isLoading = true;
 
   families: Family[] = [];
@@ -76,12 +77,17 @@ export class FamiliesPage implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    const role = this.currentUser?.role;
+
+    if (!this.currentUser || role !== 'admin') {
       this.isAdmin = false;
+      this.isSupervisor = false;
       this.isLoading = false;
       return;
     }
+
     this.isAdmin = true;
+    this.isSupervisor = false;
     this.loadFamilies();
   }
 
@@ -119,14 +125,12 @@ export class FamiliesPage implements OnInit {
   private applyFilters(): void {
     let filtered = this.families;
 
-    // Filtro por búsqueda
     if (this.searchTerm) {
       filtered = filtered.filter((f) =>
         f.name.toLowerCase().includes(this.searchTerm)
       );
     }
 
-    // Filtro por estado
     if (this.selectedStatus !== 'all') {
       const wantActive = this.selectedStatus === 'active';
       filtered = filtered.filter((f) => f.active === wantActive);
@@ -209,7 +213,6 @@ export class FamiliesPage implements OnInit {
   toggleFamilyStatus(family: Family): void {
     this.familyService.toggle(family.uuid).subscribe({
       next: (updatedFamily: any) => {
-        // Actualizamos localmente para feedback inmediato
         family.active = !family.active;
         this.calculateStats();
         this.showToast(

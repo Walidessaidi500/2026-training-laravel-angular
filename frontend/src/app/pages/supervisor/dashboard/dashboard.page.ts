@@ -169,7 +169,7 @@ export class DashboardPage implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
 
-    // Permitir rol supervisor (o admin por flexibilidad en desarrollo)
+    
     if (!this.currentUser || (this.currentUser.role !== 'supervisor' && this.currentUser.role !== 'admin')) {
       this.isSupervisor = false;
       this.dashboardData.alerts.push({

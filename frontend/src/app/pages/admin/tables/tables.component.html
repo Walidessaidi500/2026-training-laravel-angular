@@ -1,6 +1,6 @@
 <ion-content class="tables-background">
-  <app-access-denied *ngIf="!isAdmin && !isLoading" [user]="currentUser"
-    message="Esta página solo está disponible para administradores."></app-access-denied>
+  <app-access-denied *ngIf="!isAdmin && !isSupervisor && !isLoading" [user]="currentUser"
+    message="Esta página solo está disponible para administradores y supervisores."></app-access-denied>
 
   <!-- Skeleton Loading -->
   <div class="page-container" *ngIf="isLoading">
@@ -13,7 +13,7 @@
   </div>
 
   <!-- Content -->
-  <div class="page-container" *ngIf="!isLoading && isAdmin">
+  <div class="page-container" *ngIf="!isLoading && (isAdmin || isSupervisor)">
 
     <div class="page-header">
       <div class="header-content">

@@ -122,9 +122,9 @@ export class ZoneListComponent implements OnInit {
     );
   }
 
-  // ==========================================================================
+  
   // Acciones
-  // ==========================================================================
+  
 
   public async onCreateZone(): Promise<void> {
     const alert = await this.alertCtrl.create({

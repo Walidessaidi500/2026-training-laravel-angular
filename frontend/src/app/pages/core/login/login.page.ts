@@ -59,8 +59,10 @@ export class LoginPage implements OnInit {
         const user = this.authService.getUser();
         if (user?.role === 'supervisor') {
           this.router.navigate(['/supervisor/dashboard']);
-        } else {
+        } else if (user?.role === 'admin') {
           this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/employee/tpv']);
         }
       },
       error: (error) => {

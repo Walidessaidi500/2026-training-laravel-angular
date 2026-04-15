@@ -22,7 +22,7 @@ class PostController
             'pin' => ['nullable', 'string', 'max:10'],
         ]);
 
-        // Obtener restaurant_id del usuario autenticado
+        
         $authenticatedUser = $request->user();
 
         if (! $authenticatedUser || ! $authenticatedUser->restaurant_id) {

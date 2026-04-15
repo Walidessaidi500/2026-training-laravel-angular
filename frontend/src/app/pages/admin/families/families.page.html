@@ -1,6 +1,6 @@
 <ion-content class="families-background">
-  <app-access-denied *ngIf="!isAdmin && !isLoading" [user]="currentUser"
-    message="Esta página solo está disponible para administradores."></app-access-denied>
+  <app-access-denied *ngIf="!isAdmin && !isSupervisor && !isLoading" [user]="currentUser"
+    message="Esta página solo está disponible para administradores y supervisores."></app-access-denied>
 
   <!-- Skeleton Loading -->
   <div class="page-container" *ngIf="isLoading">
@@ -17,14 +17,14 @@
   </div>
 
   <!-- Content -->
-  <div class="page-container" *ngIf="!isLoading && isAdmin">
+  <div class="page-container" *ngIf="!isLoading && (isAdmin || isSupervisor)">
 
     <app-page-header
       title="Familias de Productos"
       subtitle="Organiza tu catálogo en categorías lógicas"
       buttonText="Nueva Familia"
       buttonIcon="add-outline"
-      [showButton]="true"
+      [showButton]="isAdmin"
       (actionClick)="addNewFamily()">
     </app-page-header>
 
@@ -95,13 +95,13 @@
           <h2>{{ family.name }}</h2>
           <div class="family-meta">
             <span class="status-badge" [ngClass]="family.active ? 'active' : 'inactive'"
-              (click)="toggleFamilyStatus(family)" style="cursor: pointer;">
+              (click)="isAdmin ? toggleFamilyStatus(family) : null" [style.cursor]="isAdmin ? 'pointer' : 'default'">
               <ion-icon [name]="family.active ? 'checkmark-circle' : 'close-circle'"></ion-icon>
               {{ family.active ? 'ACTIVA' : 'INACTIVA' }}
             </span>
           </div>
         </ion-label>
-        <div slot="end" class="actions">
+        <div *ngIf="isAdmin" slot="end" class="actions">
           <button class="action-btn edit-btn" (click)="editFamily(family)" title="Editar">
             <ion-icon name="create-outline"></ion-icon>
           </button>

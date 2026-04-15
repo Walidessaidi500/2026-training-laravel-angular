@@ -9,7 +9,7 @@ class ListZones
 {
     public function __construct(private ZoneRepositoryInterface $zoneRepository) {}
 
-    /** @return array<int, array<string, mixed>> */
+    
     public function __invoke(): array
     {
         return array_map(

@@ -107,7 +107,7 @@ export class TaxesPage implements OnInit {
     this.isLoading = true;
     this.taxService.list().subscribe({
       next: (response: any) => {
-        // Mapeamos 'percentage' del backend a 'rate' para el frontend
+        
         const rawData = response.data || response || [];
         this.taxes = rawData.map((t: any) => ({
           ...t,
@@ -170,7 +170,7 @@ export class TaxesPage implements OnInit {
       componentProps: {
         tax: {
           ...tax,
-          rate: tax.rate // Aseguramos que pasamos 'rate' al componente
+          rate: tax.rate 
         },
       },
       cssClass: 'fullscreen-modal',
@@ -188,7 +188,7 @@ export class TaxesPage implements OnInit {
 
   private handleCreateTax(formData: TaxFormData): void {
     this.isLoading = true;
-    // Mapeamos 'rate' a 'percentage' para el backend
+    
     const apiData = {
       name: formData.name,
       percentage: formData.rate
@@ -209,7 +209,7 @@ export class TaxesPage implements OnInit {
 
   private handleUpdateTax(uuid: string, formData: TaxFormData): void {
     this.isLoading = true;
-    // Mapeamos 'rate' a 'percentage' para el backend
+    
     const apiData = {
       name: formData.name,
       percentage: formData.rate

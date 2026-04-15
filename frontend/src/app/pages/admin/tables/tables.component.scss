@@ -2,12 +2,12 @@ ion-content {
     --background: var(--ion-background-color);
 }
 
-/* Tables View Specific Styles */
+
 .tables-background {
     --background: var(--ion-color-light);
 }
 
-/* Filtros por Zona (Pills) */
+
 .zone-filters {
     display: flex;
     gap: 12px;
@@ -55,7 +55,7 @@ ion-content {
     }
 }
 
-/* Cabecera de Zona */
+
 .active-zone-header {
     display: flex;
     justify-content: space-between;
@@ -108,7 +108,7 @@ ion-content {
     }
 }
 
-/* Grid de Mesas */
+
 .tables-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

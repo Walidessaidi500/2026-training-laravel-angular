@@ -39,9 +39,7 @@ class EloquentTaxRepository implements TaxRepositoryInterface
         return $this->toDomainEntity($model);
     }
 
-    /**
-     * @return Tax[]
-     */
+    
     public function findAll(): array
     {
         return $this->model->newQuery()

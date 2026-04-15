@@ -25,6 +25,11 @@ export const routes: Routes = [
     loadChildren: () => import('./pages/supervisor/supervisor.routes').then((m) => m.SUPERVISOR_ROUTES),
   },
   {
+    path: 'employee',
+    canActivate: [authGuard, roleGuard(['operator'])],
+    loadChildren: () => import('./pages/employee/employee.routes').then((m) => m.EMPLOYEE_ROUTES),
+  },
+  {
     path: '**',
     redirectTo: 'home',
     pathMatch: 'full',

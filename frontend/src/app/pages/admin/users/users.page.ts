@@ -71,6 +71,7 @@ interface User {
 export class UsersPage implements OnInit {
   currentUser: User | null = null;
   isAdmin = false;
+  isSupervisor = false;
   isLoading = true;
 
   users: User[] = [];
@@ -89,6 +90,8 @@ export class UsersPage implements OnInit {
     admin: 'danger',
     customer: 'success',
     staff: 'warning',
+    operator: 'warning',
+    supervisor: 'tertiary',
   };
 
   constructor(
@@ -113,21 +116,31 @@ export class UsersPage implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
+    const role = this.currentUser?.role?.toLowerCase();
 
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    if (!this.currentUser || (role !== 'admin' && role !== 'supervisor')) {
       this.isAdmin = false;
+      this.isSupervisor = false;
       this.isLoading = false;
       return;
     }
 
-    this.isAdmin = true;
+    this.isAdmin = role === 'admin';
+    this.isSupervisor = role === 'supervisor';
     this.loadUsers();
   }
 
   private loadUsers(): void {
     this.userService.list().subscribe({
       next: (response: any) => {
-        this.users = response.data || response || [];
+        let allUsers = response.data || response || [];
+        
+        
+        if (this.isSupervisor) {
+          allUsers = allUsers.filter((u: User) => u.role.toLowerCase() !== 'admin');
+        }
+
+        this.users = allUsers;
         this.calculateStats();
         this.applyFilters();
         this.isLoading = false;
@@ -141,7 +154,7 @@ export class UsersPage implements OnInit {
 
   private calculateStats(): void {
     this.userStats.total = this.users.length;
-    this.userStats.admins = this.users.filter((u) => u.role === 'admin').length;
+    this.userStats.admins = this.users.filter((u) => u.role.toLowerCase() === 'admin').length;
   }
 
   onSearchChange(event: any): void {
@@ -157,12 +170,12 @@ export class UsersPage implements OnInit {
   private applyFilters(): void {
     let filtered = this.users;
 
-    // Filter by role
+    
     if (this.selectedRole !== 'all') {
-      filtered = filtered.filter((u) => u.role === this.selectedRole);
+      filtered = filtered.filter((u) => u.role.toLowerCase() === this.selectedRole.toLowerCase());
     }
 
-    // Filter by search term
+    
     if (this.searchTerm) {
       filtered = filtered.filter(
         (u) =>

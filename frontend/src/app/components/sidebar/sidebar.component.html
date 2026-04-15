@@ -16,7 +16,7 @@
     </ion-item>
 
     <!-- Usuarios -->
-    <ng-container *ngIf="isAdmin">
+    <ng-container *ngIf="isAdmin || isSupervisor">
       <div class="nav-divider"></div>
 
       <ion-item button [class.active]="activeItem === 'users'" (click)="navigate('users')" title="Usuarios"
@@ -36,11 +36,13 @@
     </ng-container>
 
     <!-- Familias -->
-    <div class="nav-divider"></div>
-    <ion-item button [class.active]="activeItem === 'families'" (click)="navigate('families')" title="Familias"
-      class="nav-item">
-      <div class="nav-icon"><ion-icon name="folder-outline"></ion-icon></div>
-    </ion-item>
+    <ng-container *ngIf="isAdmin">
+      <div class="nav-divider"></div>
+      <ion-item button [class.active]="activeItem === 'families'" (click)="navigate('families')" title="Familias"
+        class="nav-item">
+        <div class="nav-icon"><ion-icon name="folder-outline"></ion-icon></div>
+      </ion-item>
+    </ng-container>
 
     <!-- Servicio -->
     <div class="nav-divider"></div>
@@ -51,11 +53,13 @@
     </ion-item>
 
     <!-- Zonas -->
-    <div class="nav-divider"></div>
+    <ng-container *ngIf="isAdmin">
+      <div class="nav-divider"></div>
 
-    <ion-item button [class.active]="activeItem === 'zones'" (click)="navigate('zones')" title="Zonas" class="nav-item">
-      <div class="nav-icon"><ion-icon name="map-outline"></ion-icon></div>
-    </ion-item>
+      <ion-item button [class.active]="activeItem === 'zones'" (click)="navigate('zones')" title="Zonas" class="nav-item">
+        <div class="nav-icon"><ion-icon name="map-outline"></ion-icon></div>
+      </ion-item>
+    </ng-container>
 
 
     <!-- Mesas -->

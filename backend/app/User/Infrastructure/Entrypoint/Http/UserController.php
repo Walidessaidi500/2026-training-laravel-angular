@@ -56,8 +56,8 @@ class UserController
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        // Toggle active status logic if implemented
-        // For now, just return the user
+        
+        
         return response()->json($user);
     }
 }

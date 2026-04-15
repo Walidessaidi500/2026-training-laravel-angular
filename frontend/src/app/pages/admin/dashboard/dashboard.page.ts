@@ -88,12 +88,12 @@ interface User {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class DashboardPage implements OnInit {
-  // Usuario autenticado
+  
   currentUser: User | null = null;
   isAdmin = false;
   restaurantId: number | undefined;
 
-  // Datos para formularios
+  
   families: any[] = [];
   taxes: any[] = [];
 
@@ -190,10 +190,10 @@ export class DashboardPage implements OnInit {
   }
 
   ngOnInit(): void {
-    // Obtener usuario actual
+    
     this.currentUser = this.authService.getUser();
 
-    // Verificar si el usuario es admin
+    
     if (!this.currentUser || this.currentUser.role !== 'admin') {
       this.isAdmin = false;
       this.dashboardData.alerts.push({
@@ -212,7 +212,7 @@ export class DashboardPage implements OnInit {
   }
 
   private loadStatistics(): void {
-    // Agregar alerta de bienvenida con información del restaurante
+    
     const now = new Date();
     this.dashboardData.alerts.push({
       type: 'success',
@@ -221,7 +221,7 @@ export class DashboardPage implements OnInit {
       timeAgo: 'Hace unos momentos',
     });
 
-    // Agregar actividad inicial
+    
     this.dashboardData.activities.push({
       type: 'login',
       icon: 'person',
@@ -230,10 +230,10 @@ export class DashboardPage implements OnInit {
       timeAgo: 'Hace unos segundos',
     });
 
-    // Cargar productos del restaurante
+    
     this.productService.list().subscribe({
       next: (response) => {
-        // El backend filtra automáticamente por restaurant_id del usuario autenticado
+        
         this.totalProducts = response.meta.total;
         this.activeProducts = response.data.filter((p) => p.active).length;
         this.dashboardData.metrics.totalProducts = this.totalProducts;
@@ -257,7 +257,7 @@ export class DashboardPage implements OnInit {
       },
     });
 
-    // Cargar familias del restaurante
+    
     this.familyService.list().subscribe({
       next: (response) => {
         this.families = response.data || [];
@@ -267,7 +267,7 @@ export class DashboardPage implements OnInit {
       error: (error) => console.error('Error cargando las familias:', error),
     });
 
-    // Cargar impuestos del restaurante
+    
     this.taxService.list().subscribe({
       next: (response) => {
         this.taxes = response.data || [];
@@ -276,19 +276,19 @@ export class DashboardPage implements OnInit {
       error: (error) => console.error('Error cargando los impuestos:', error),
     });
 
-    // Cargar zonas del restaurante
+    
     this.zoneService.list().subscribe({
       next: (response) => {
-        // El backend filtra automáticamente por restaurant_id del usuario autenticado
+        
         this.totalZones = response.meta.total;
       },
       error: (error) => console.error('Error cargando las zonas:', error),
     });
 
-    // Cargar órdenes del restaurante del usuario actual
+    
     this.orderService.list().subscribe({
       next: (response) => {
-        // El backend filtra automáticamente por restaurant_id del usuario autenticado
+        
         const userOrders = response.data || [];
 
         this.totalOrders = userOrders.length;
@@ -296,7 +296,7 @@ export class DashboardPage implements OnInit {
 
         this.dashboardData.metrics.ordersToday = this.openOrders;
 
-        // Mapear órdenes a formato esperado
+        
         this.dashboardData.recentOrders = userOrders.slice(0, 5).map((order: any) => ({
           id: order.uuid || order.id,
           customerName: `Mesa ${order.table_id || 'N/A'}`,
@@ -327,10 +327,10 @@ export class DashboardPage implements OnInit {
       },
     });
 
-    // Cargar usuarios del restaurante
+    
     this.userService.list().subscribe({
       next: (response) => {
-        // El backend filtra automáticamente por restaurant_id del usuario autenticado
+        
         const restaurantUsers = response.data || [];
 
         this.totalUsers = restaurantUsers.length;
@@ -355,10 +355,10 @@ export class DashboardPage implements OnInit {
       },
     });
 
-    // Cargar ventas del restaurante
+    
     this.saleService.list().subscribe({
       next: (response) => {
-        // El backend filtra automáticamente por restaurant_id del usuario autenticado
+        
         const restaurantSales = response.data || [];
 
         this.totalSales = restaurantSales.length;
@@ -367,7 +367,7 @@ export class DashboardPage implements OnInit {
         this.dashboardData.revenue.total = this.totalRevenue;
         this.dashboardData.revenue.thisWeek = this.totalRevenue * 0.4; // Aproximado
         this.dashboardData.revenue.avgOrder = this.totalRevenue / Math.max(this.totalSales, 1);
-        this.dashboardData.revenue.mrr = this.totalRevenue * 30; // Proyección mensual básica
+        this.dashboardData.revenue.mrr = this.totalRevenue * 30; 
         this.dashboardData.revenue.trendPercentage = 12.5;
         this.dashboardData.metrics.conversionRate = 3.5;
 
@@ -388,7 +388,7 @@ export class DashboardPage implements OnInit {
           title: 'Error al cargar ventas',
           description: error?.message || 'No se pudieron cargar los datos de ventas de tu restaurante',
           timeAgo: 'Hace unos momentos',
-        });
+          });
         this.isLoading = false;
       },
     });
@@ -407,7 +407,6 @@ export class DashboardPage implements OnInit {
 
   crearOrden(): void {
     console.log('Crear una nueva orden');
-    // TODO: Implementar navegación a crear orden
   }
 
   async agregarProducto(): Promise<void> {
@@ -426,7 +425,6 @@ export class DashboardPage implements OnInit {
 
     if (data) {
       this.isLoading = true;
-      // Guardar producto
       this.productService.create(data).subscribe({
         next: async () => {
           const toast = await this.toastController.create({
@@ -437,7 +435,6 @@ export class DashboardPage implements OnInit {
           });
           await toast.present();
 
-          // Añadir alerta y actividad
           this.dashboardData.alerts.unshift({
             type: 'success',
             title: 'Inventario actualizado',
@@ -453,7 +450,7 @@ export class DashboardPage implements OnInit {
             timeAgo: 'Justo ahora'
           });
 
-          this.loadStatistics(); // Recargar estadísticas
+          this.loadStatistics();
         },
         error: async (error) => {
           const toast = await this.toastController.create({

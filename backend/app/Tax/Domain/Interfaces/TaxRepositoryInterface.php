@@ -12,9 +12,7 @@ interface TaxRepositoryInterface
 
     public function findById(Uuid $id): ?Tax;
 
-    /**
-     * @return Tax[]
-     */
+    
     public function findAll(): array;
 
     public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator;

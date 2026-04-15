@@ -22,7 +22,7 @@
 
 h3 {
   margin: 4px 0 0;
-  font-size: 14px; /* Slightly adjusted to fit */
+  font-size: 14px; 
   font-weight: 700;
   color: var(--ion-color-secondary, #222428);
 }
@@ -54,7 +54,7 @@ h3 {
     align-items: flex-start;
     position: relative;
 
-    /* Línea conectora */
+    
     &:not(:last-child)::after {
       content: '';
       position: absolute;

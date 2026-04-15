@@ -37,7 +37,7 @@ class EloquentTableRepository implements TableRepositoryInterface
         return $model ? $this->toDomainEntity($model) : null;
     }
 
-    /** @return Table[] */
+    
     public function findAll(): array
     {
         return $this->model->newQuery()

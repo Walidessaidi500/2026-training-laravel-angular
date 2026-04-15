@@ -12,9 +12,7 @@ interface TableRepositoryInterface
 
     public function findById(Uuid $id): ?Table;
 
-    /**
-     * @return Table[]
-     */
+    
     public function findAll(): array;
 
     public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator;

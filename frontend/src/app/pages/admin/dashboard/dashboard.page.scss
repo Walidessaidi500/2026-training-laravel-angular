@@ -24,7 +24,6 @@
   border: 1px solid rgba(0, 0, 0, 0.03);
   margin-bottom: 24px;
 
-  /* Eliminar margen en la última tarjeta */
   &:last-child {
     margin-bottom: 0;
   }
@@ -67,7 +66,6 @@
 
 .btn-soft {
   background: rgba(255, 83, 48, 0.08);
-  /* Uso leve del color primario */
   color: var(--ion-color-primary);
   border: none;
   border-radius: 8px;
@@ -262,7 +260,7 @@
     .fake-chart-area {
       height: 100%;
       width: 100%;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'%3E%3Cpath d='M0,250 Q100,220 200,240 T400,180 T600,210 T800,120 T1000,150' fill='none' stroke='rgba(255, 83, 48, 0.2)' stroke-width='4'/%3E%3C/svg%3E") no-repeat center;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http:
       background-size: cover;
     }
   }
@@ -460,7 +458,7 @@
     align-items: flex-start;
     position: relative;
 
-    /* Línea conectora */
+    
     &:not(:last-child)::after {
       content: '';
       position: absolute;
