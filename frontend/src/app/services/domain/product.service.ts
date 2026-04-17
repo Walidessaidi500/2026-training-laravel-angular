@@ -6,11 +6,13 @@ import { environment } from '@environments/environment';
 export interface Product {
   uuid: string;
   name: string;
-  description: string;
   priceInCents: number;
+  stock: number;
   active: boolean;
-  family_uuid: string;
+  family_id: string;
+  tax_id: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface ProductListResponse {

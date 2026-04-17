@@ -1,25 +1,157 @@
 <ion-content [fullscreen]="true" class="tpv-background">
   <div class="tpv-layout">
 
+    <!-- Header -->
     <header class="tpv-header">
-      <div class="header-title">
-        <h1>Terminal de Venta</h1>
-        <p>Selección de Mesa</p>
+      <div class="header-content">
+        <div class="header-left">
+          <button *ngIf="viewState === 'order'" class="back-btn" (click)="backToTables()">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+          </button>
+          <div class="header-title">
+            <h1>Terminal de Venta</h1>
+            <p>{{ viewState === 'tables' ? 'Selección de Mesa' : ('Mesa: ' + selectedTable?.name) }}</p>
+          </div>
+        </div>
+        <div class="header-right" *ngIf="currentUser">
+        <div class="user-chip" id="user-menu-trigger" style="cursor: pointer;">
+          <ion-icon name="person-circle-outline"></ion-icon>
+          <span>{{ currentUser.name }}</span>
+          <ion-icon name="chevron-down-outline" style="margin-left: 5px;"></ion-icon>
+        </div>
+
+        <ion-popover trigger="user-menu-trigger" triggerAction="click" dismissOnSelect="true">
+          <ng-template>
+            <ion-content>
+              <ion-list lines="none">
+                <ion-item button (click)="logout()" detail="false">
+                  <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+                  <ion-label color="danger">Cerrar Sesión</ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-content>
+          </ng-template>
+        </ion-popover>
+        </div>
       </div>
     </header>
 
-    <main class="tables-grid-container">
-      <div class="tables-grid">
-        <ng-container *ngIf="tables$ | async as tables">
-          <button
-            *ngFor="let table of tables"
-            class="table-btn free"
-            (click)="onTableClick(table)">
-            <span class="table-name">{{ table.name }}</span>
-          </button>
-        </ng-container>
-      </div>
-    </main>
+    <div class="tpv-body">
 
+      <!-- View 1: Table Selection -->
+      <ng-container *ngIf="viewState === 'tables'">
+        <!-- Sidebar for Zones -->
+        <aside class="zones-sidebar">
+          <button
+            *ngFor="let zone of zones"
+            class="zone-btn"
+            [class.active]="selectedZoneUuid === zone.uuid"
+            (click)="selectZone(zone.uuid)">
+            <ion-icon name="grid-outline"></ion-icon>
+            <span>{{ zone.name }}</span>
+          </button>
+        </aside>
+
+        <!-- Main Grid for Tables -->
+        <main class="tables-grid-container">
+          <div class="tables-grid">
+            <button
+              *ngFor="let table of filteredTables"
+              class="table-btn"
+              [class.free]="true"
+              (click)="onTableClick(table)">
+              <span class="table-name">{{ table.name }}</span>
+              <span class="table-status-text">Libre</span>
+            </button>
+          </div>
+        </main>
+      </ng-container>
+
+      <!-- View 2: Order Management -->
+      <ng-container *ngIf="viewState === 'order'">
+        <!-- Sidebar for Categories (Families) -->
+        <aside class="families-sidebar">
+          <button
+            *ngFor="let family of families"
+            class="family-btn"
+            [class.active]="selectedFamilyUuid === family.uuid"
+            (click)="selectFamily(family.uuid)">
+            <ion-icon name="layers-outline"></ion-icon>
+            <span>{{ family.name }}</span>
+          </button>
+        </aside>
+
+        <!-- Main Area: Products and Cart -->
+        <main class="order-container">
+          <!-- Product Grid -->
+          <div class="products-section">
+            <div class="products-grid">
+              <button
+                *ngFor="let product of filteredProducts"
+                class="product-card"
+                (click)="addToCart(product)">
+                <div class="product-icon-box">
+                  <ion-icon name="fast-food-outline"></ion-icon>
+                </div>
+                <div class="product-info">
+                  <span class="product-name">{{ product.name }}</span>
+                  <span class="product-price">{{ (getPriceWithTax(product) / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Shopping Cart / Ticket -->
+          <aside class="cart-section">
+            <div class="cart-header">
+              <div class="header-icon">
+                <ion-icon name="receipt-outline"></ion-icon>
+              </div>
+              <h2>Detalle Pedido</h2>
+              <button class="clear-btn" (click)="clearCart()" *ngIf="cart.length > 0">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
+            </div>
+
+            <div class="cart-items">
+              <div *ngIf="cart.length === 0" class="empty-cart">
+                <ion-icon name="cart-outline"></ion-icon>
+                <p>El pedido está vacío</p>
+              </div>
+
+              <div *ngFor="let item of cart; let i = index" class="cart-item">
+                <div class="item-info">
+                  <span class="item-name">{{ item.product.name }}</span>
+                  <span class="item-price">{{ (getPriceWithTax(item.product) * item.quantity / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+                </div>
+                <div class="item-controls">
+                  <button (click)="removeFromCart(i)"><ion-icon name="remove-outline"></ion-icon></button>
+                  <span class="quantity">{{ item.quantity }}</span>
+                  <button (click)="addToCart(item.product)"><ion-icon name="add-outline"></ion-icon></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="cart-footer">
+              <div class="total-row">
+                <span class="total-label">Total a pagar</span>
+                <span class="total-value">{{ (total / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+              </div>
+              <div class="action-buttons">
+                <button class="btn-send" (click)="sendOrder()" [disabled]="cart.length === 0">
+                  <ion-icon name="cloud-upload-outline"></ion-icon>
+                  Enviar
+                </button>
+                <button class="btn-pay" (click)="closeTicket()" [disabled]="cart.length === 0">
+                  <ion-icon name="wallet-outline"></ion-icon>
+                  Cobrar
+                </button>
+              </div>
+            </div>
+          </aside>
+        </main>
+      </ng-container>
+
+    </div>
   </div>
 </ion-content>
