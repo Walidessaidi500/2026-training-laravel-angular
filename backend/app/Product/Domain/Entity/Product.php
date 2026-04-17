@@ -11,6 +11,8 @@ use App\Shared\Domain\ValueObject\Uuid;
 
 class Product implements \JsonSerializable
 {
+    //constructor privado garantiza que solo pueda nacer a traves de metodos controlados
+    //usa VOs para asegurar que el producto siempre este en estado valido
     private function __construct(
         private Uuid $id,
         private ?Uuid $familyId,
@@ -160,7 +162,7 @@ class Product implements \JsonSerializable
     {
         return $this->updatedAt;
     }
-
+// Serializa la informacion hacia fuera en JSON
     public function jsonSerialize(): array
     {
         return [

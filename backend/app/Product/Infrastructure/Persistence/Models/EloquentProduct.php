@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+//define los nombres de tabla, campos rellenables y relaciones
 class EloquentProduct extends Model
 {
     use HasFactory;

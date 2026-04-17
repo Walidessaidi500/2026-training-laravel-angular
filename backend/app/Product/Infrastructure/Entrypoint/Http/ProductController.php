@@ -55,6 +55,7 @@ class ProductController
         }
     }
 
+    //Recibe los datos y los valida despues los delega al caso de uso CreateProduct
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([

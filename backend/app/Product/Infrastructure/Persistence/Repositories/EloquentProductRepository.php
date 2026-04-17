@@ -15,7 +15,7 @@ class EloquentProductRepository implements ProductRepositoryInterface
     public function __construct(
         private EloquentProduct $model,
     ) {}
-
+// convierte las entidades de dominio en modelo de base de datos
     public function save(Product $product): void
     {
         $this->model->newQuery()->updateOrCreate(

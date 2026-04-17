@@ -17,6 +17,7 @@ class CreateProduct
         private ProductRepositoryInterface $productRepository,
     ) {}
 
+    // Recibe tipos primitivos y los convierte en VOs
     public function __invoke(
         ?string $familyId,
         ?string $taxId,

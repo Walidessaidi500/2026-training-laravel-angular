@@ -26,7 +26,7 @@ export interface Product {
   uuid: string;
   name: string;
   priceInCents: number;
-  stock: number; // Cantidad
+  stock: number;
   active: boolean;
   family_id: string;
   tax_id: string;
@@ -319,15 +319,7 @@ export class ProductsPage implements OnInit {
     });
   }
 
-  private performDelete(uuid: string): void {
-    this.productService.delete(uuid).subscribe({
-      next: () => {
-        this.showToast('Producto eliminado exitosamente', 'success', 'checkmark-circle');
-        this.loadProducts();
-      },
-      error: () => this.showToast('Error al eliminar el producto', 'danger', 'alert-circle'),
-    });
-  }
+ 
 
   async deleteProduct(product: Product): Promise<void> {
     const alert = await this.alertController.create({
