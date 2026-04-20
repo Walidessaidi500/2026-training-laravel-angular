@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, AlertController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { Router } from '@angular/router';
 import {
@@ -23,7 +23,9 @@ import {
   chevronDownOutline,
   peopleOutline,
   printOutline,
-  backspaceOutline
+  backspaceOutline,
+  checkmarkCircle,
+  alertCircle
 } from 'ionicons/icons';
 
 import { TableService, Table } from '@services/domain/table.service';
@@ -61,6 +63,8 @@ export class TpvPage implements OnInit {
   private readonly userService = inject(UserService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly alertController = inject(AlertController);
+  private readonly toastController = inject(ToastController);
 
   // Estados de vista
   public viewState: 'tables' | 'order' = 'tables';
@@ -112,7 +116,9 @@ export class TpvPage implements OnInit {
       chevronDownOutline,
       peopleOutline,
       printOutline,
-      backspaceOutline
+      backspaceOutline,
+      checkmarkCircle,
+      alertCircle
     });
   }
 
@@ -245,6 +251,11 @@ export class TpvPage implements OnInit {
   }
 
   public onDinersConfirm() {
+    let dinersCount = parseInt(this.tempDiners);
+    if (isNaN(dinersCount) || dinersCount < 1) {
+      dinersCount = 1;
+    }
+
     this.showDinersSelection = false;
     if (this.currentOrder) {
       // Estamos editando comensales de un pedido abierto
@@ -254,11 +265,12 @@ export class TpvPage implements OnInit {
       // Es una apertura nueva
       this.viewState = 'order';
       this.cart = [];
+      this.tempDiners = dinersCount.toString();
     }
   }
 
   public addDinerDigit(digit: string) {
-    if (this.tempDiners === '0') {
+    if (this.tempDiners === '0' || this.tempDiners === '1') {
       this.tempDiners = digit;
     } else {
       this.tempDiners += digit;
@@ -269,7 +281,7 @@ export class TpvPage implements OnInit {
     if (this.tempDiners.length > 1) {
       this.tempDiners = this.tempDiners.slice(0, -1);
     } else {
-      this.tempDiners = '0';
+      this.tempDiners = '1';
     }
   }
 
@@ -353,17 +365,17 @@ export class TpvPage implements OnInit {
         if (!this.currentOrder) {
           this.currentOrder = res;
         }
-        alert('Pedido sincronizado correctamente');
+        this.showToast('Pedido mandado a cocina correctamente', 'success', 'checkmark-circle');
       },
       error: (err) => {
-        console.error('Error al sincronizar el pedido', err);
-        alert('Error al enviar a cocina');
+        console.error('Error al mandar el pedido', err);
+        this.showToast('Error al enviar a cocina', 'danger', 'alert-circle');
       }
     });
   }
 
   public printProvisional() {
-    alert('Imprimiendo ticket provisional...');
+    this.showToast('Imprimiendo ticket provisional...', 'success', 'checkmark-circle');
     // Aquí se llamaría a un servicio de impresión o endpoint de backend si existiera
   }
 
@@ -393,12 +405,12 @@ export class TpvPage implements OnInit {
 
     this.saleService.process(saleData).subscribe({
       next: () => {
-        alert('Ticket cerrado y cobrado correctamente');
+        this.showToast('Ticket cerrado y cobrado correctamente', 'success', 'checkmark-circle');
         this.backToTables();
       },
       error: (err) => {
         console.error('Error al procesar la venta', err);
-        alert('Hubo un error al procesar la venta');
+        this.showToast('Hubo un error al procesar la venta', 'danger', 'alert-circle');
       }
     });
   }
@@ -406,5 +418,16 @@ export class TpvPage implements OnInit {
   public logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  private async showToast(message: string, color: 'success' | 'danger', icon: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2500,
+      position: 'top',
+      color,
+      icon
+    });
+    await toast.present();
   }
 }
