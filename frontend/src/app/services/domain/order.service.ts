@@ -14,6 +14,7 @@ export interface Order {
   diners: number;
   opened_at: string;
   closed_at?: string;
+  order_lines?: any[];
   created_at: string;
   updated_at: string;
 }
@@ -46,8 +47,16 @@ export class OrderService {
     return this.http.get<Order>(`${this.apiUrl}/${uuid}`);
   }
 
+  getActiveOrderByTable(tableUuid: string): Observable<Order | null> {
+    return this.http.get<Order | null>(`${this.apiUrl}/table/${tableUuid}`);
+  }
+
   create(data: Partial<Order>): Observable<Order> {
     return this.http.post<Order>(this.apiUrl, data);
+  }
+
+  sync(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/sync`, data);
   }
 
   update(uuid: string, data: Partial<Order>): Observable<Order> {

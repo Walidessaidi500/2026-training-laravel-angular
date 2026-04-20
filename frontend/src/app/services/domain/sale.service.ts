@@ -52,6 +52,10 @@ export class SaleService {
     return this.http.post<Sale>(this.apiUrl, data);
   }
 
+  process(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/process`, data);
+  }
+
   update(uuid: string, data: Partial<Sale>): Observable<Sale> {
     return this.http.put<Sale>(`${this.apiUrl}/${uuid}`, data);
   }

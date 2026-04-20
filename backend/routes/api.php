@@ -87,17 +87,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Órdenes
     Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/table/{tableUuid}', [OrderController::class, 'activeOrder']);
     Route::get('/orders/{uuid}', [OrderController::class, 'show']);
-    Route::post('/orders', [OrderController::class, 'store']);
-    Route::put('/orders/{uuid}', [OrderController::class, 'update']);
+    Route::post('/orders/sync', [OrderController::class, 'sync']);
     Route::delete('/orders/{uuid}', [OrderController::class, 'destroy']);
-    Route::post('/orders/{uuid}/close', [OrderController::class, 'close']);
 
     // Ventas
     Route::get('/sales', [SaleController::class, 'index']);
     Route::get('/sales/{uuid}', [SaleController::class, 'show']);
-    Route::post('/sales', [SaleController::class, 'store']);
-    Route::put('/sales/{uuid}', [SaleController::class, 'update']);
+    Route::post('/sales/process', [SaleController::class, 'process']);
     Route::delete('/sales/{uuid}', [SaleController::class, 'destroy']);
-    Route::post('/sales/{uuid}/close', [SaleController::class, 'close']);
 });

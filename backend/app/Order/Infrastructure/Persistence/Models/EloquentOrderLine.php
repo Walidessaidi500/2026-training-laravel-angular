@@ -38,21 +38,21 @@ class EloquentOrderLine extends Model
 
     public function restaurant()
     {
-        return $this->belongsTo(EloquentRestaurant::class);
+        return $this->belongsTo(EloquentRestaurant::class, 'restaurant_id');
     }
 
     public function order()
     {
-        return $this->belongsTo(EloquentOrder::class);
+        return $this->belongsTo(EloquentOrder::class, 'order_id');
     }
 
     public function product()
     {
-        return $this->belongsTo(EloquentProduct::class);
+        return $this->belongsTo(EloquentProduct::class, 'product_id');
     }
 
     public function user()
     {
-        return $this->belongsTo(EloquentUser::class);
+        return $this->belongsTo(EloquentUser::class, 'user_id');
     }
 }

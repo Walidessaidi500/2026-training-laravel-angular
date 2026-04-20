@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export interface Table {
+  id: number;
   uuid: string;
   zone_id: string;
   name: string;

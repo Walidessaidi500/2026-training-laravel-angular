@@ -25,13 +25,20 @@ class EloquentSaleLine extends Model
 
     protected $fillable = [
         'uuid',
+        'restaurant_id',
         'sale_id',
+        'order_line_id',
         'product_id',
         'user_id',
         'quantity',
         'price',
         'tax_percentage',
     ];
+
+    public function orderLine(): BelongsTo
+    {
+        return $this->belongsTo(\App\Order\Infrastructure\Persistence\Models\EloquentOrderLine::class, 'order_line_id');
+    }
 
     protected function casts(): array
     {

@@ -58,10 +58,11 @@
             <button
               *ngFor="let table of filteredTables"
               class="table-btn"
-              [class.free]="true"
+              [class.free]="!isTableOccupied(table)"
+              [class.occupied]="isTableOccupied(table)"
               (click)="onTableClick(table)">
               <span class="table-name">{{ table.name }}</span>
-              <span class="table-status-text">Libre</span>
+              <span class="table-status-text">{{ isTableOccupied(table) ? 'Ocupada' : 'Libre' }}</span>
             </button>
           </div>
         </main>

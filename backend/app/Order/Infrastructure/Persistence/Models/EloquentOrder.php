@@ -41,12 +41,12 @@ class EloquentOrder extends Model
 
     public function restaurant()
     {
-        return $this->belongsTo(EloquentRestaurant::class);
+        return $this->belongsTo(EloquentRestaurant::class, 'restaurant_id');
     }
 
     public function table()
     {
-        return $this->belongsTo(EloquentTable::class);
+        return $this->belongsTo(EloquentTable::class, 'table_id');
     }
 
     public function openedByUser()
@@ -61,6 +61,6 @@ class EloquentOrder extends Model
 
     public function orderLines()
     {
-        return $this->hasMany(EloquentOrderLine::class);
+        return $this->hasMany(EloquentOrderLine::class, 'order_id');
     }
 }

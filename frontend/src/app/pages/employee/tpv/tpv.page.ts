@@ -29,10 +29,12 @@ import { ProductService, Product } from '@services/domain/product.service';
 import { FamilyService, Family } from '@services/domain/family.service';
 import { TaxService, Tax } from '@services/domain/tax.service';
 import { OrderService, Order } from '@services/domain/order.service';
+import { SaleService } from '@services/domain/sale.service';
 import { AuthService } from '@services/auth/auth.service';
 import { Observable, map, of, forkJoin } from 'rxjs';
 
 interface CartItem {
+  uuid?: string;
   product: Product;
   quantity: number;
 }
@@ -51,6 +53,7 @@ export class TpvPage implements OnInit {
   private readonly familyService = inject(FamilyService);
   private readonly taxService = inject(TaxService);
   private readonly orderService = inject(OrderService);
+  private readonly saleService = inject(SaleService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -62,6 +65,7 @@ export class TpvPage implements OnInit {
   public selectedZoneUuid: string | null = null;
   public tables: Table[]= [];
   public filteredTables: Table[] = [];
+  public tableOrders: { [tableUuid: string]: boolean } = {};
 
   // Datos para vista de pedido
   public families: Family[] = [];
@@ -107,7 +111,8 @@ export class TpvPage implements OnInit {
       tables: this.tableService.list(1, 100),
       families: this.familyService.list(),
       taxes: this.taxService.list(),
-      products: this.productService.list(1, 500)
+      products: this.productService.list(1, 500),
+      activeOrders: this.orderService.list(1, 1000)
     }).subscribe({
       next: (res) => {
         this.zones = res.zones.data;
@@ -115,6 +120,16 @@ export class TpvPage implements OnInit {
         this.families = res.families.data;
         this.taxes = res.taxes.data;
         this.products = res.products.data;
+
+        // Map active orders to tables
+        res.activeOrders.data.forEach(order => {
+          if (order.status === 'open') {
+            const table = this.tables.find(t => t.id === order.table_id);
+            if (table) {
+              this.tableOrders[table.uuid] = true;
+            }
+          }
+        });
 
         if (this.zones.length > 0) {
           this.selectZone(this.zones[0].uuid);
@@ -136,12 +151,34 @@ export class TpvPage implements OnInit {
     this.filteredTables = this.tables.filter(t => t.zone_id === zoneUuid);
   }
 
+  public isTableOccupied(table: Table): boolean {
+    return !!this.tableOrders[table.uuid];
+  }
+
   public onTableClick(table: Table): void {
     this.selectedTable = table;
     this.viewState = 'order';
     this.cart = [];
-    // Aquí se cargaría el pedido abierto si existiera
-    // Por ahora simulamos que siempre empezamos un pedido nuevo
+    this.currentOrder = null;
+
+    this.orderService.getActiveOrderByTable(table.uuid).subscribe({
+      next: (order) => {
+        if (order) {
+          this.currentOrder = order;
+          this.cart = (order.order_lines || []).map(line => {
+            const product = this.products.find(p => p.uuid === line.product_uuid);
+            return {
+              uuid: line.uuid,
+              product: product!,
+              quantity: line.quantity
+            };
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar pedido activo', err);
+      }
+    });
   }
 
   public backToTables() {
@@ -193,21 +230,62 @@ export class TpvPage implements OnInit {
   }
 
   public sendOrder() {
-    if (this.cart.length === 0) return;
+    if (this.cart.length === 0 || !this.selectedTable) return;
 
-    // Lógica para guardar el pedido en el backend
-    console.log('Enviando pedido para mesa', this.selectedTable?.name, this.cart);
-    // Integrar con OrderService.create(...) cuando tengamos las líneas de pedido claras
+    const orderData = {
+      table_uuid: this.selectedTable.uuid,
+      diners: this.currentOrder?.diners || 1,
+      lines: this.cart.map(item => {
+        const tax = this.taxes.find(t => t.uuid === item.product.tax_id);
+        return {
+          uuid: item.uuid,
+          product_uuid: item.product.uuid,
+          quantity: item.quantity,
+          price: item.product.priceInCents,
+          tax_percentage: tax ? tax.percentage : 0
+        };
+      })
+    };
 
-    // Feedback visual
-    alert('Pedido enviado a cocina');
-    this.backToTables();
+    this.orderService.sync(orderData).subscribe({
+      next: () => {
+        alert('Comanda guardada y enviada a cocina');
+        this.backToTables();
+      },
+      error: (err) => {
+        console.error('Error al sincronizar el pedido', err);
+        alert('Error al enviar a cocina');
+      }
+    });
   }
 
   public closeTicket() {
-    if (this.cart.length === 0) return;
-    alert('Cerrando ticket y cobrando: ' + (this.total / 100).toFixed(2) + '€');
-    this.backToTables();
+    if (this.cart.length === 0 || !this.selectedTable) return;
+
+    const saleData = {
+      table_uuid: this.selectedTable.uuid,
+      diners: this.currentOrder?.diners || 1,
+      lines: this.cart.map(item => {
+        const tax = this.taxes.find(t => t.uuid === item.product.tax_id);
+        return {
+          product_uuid: item.product.uuid,
+          quantity: item.quantity,
+          price: item.product.priceInCents,
+          tax_percentage: tax ? tax.percentage : 0
+        };
+      })
+    };
+
+    this.saleService.process(saleData).subscribe({
+      next: () => {
+        alert('Ticket cerrado y cobrado correctamente');
+        this.backToTables();
+      },
+      error: (err) => {
+        console.error('Error al procesar la venta', err);
+        alert('Hubo un error al procesar la venta');
+      }
+    });
   }
 
   public logout() {

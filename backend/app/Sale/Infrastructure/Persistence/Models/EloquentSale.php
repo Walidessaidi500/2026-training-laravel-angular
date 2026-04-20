@@ -27,14 +27,16 @@ class EloquentSale extends Model
     protected $fillable = [
         'uuid',
         'restaurant_id',
-        'ticket_number',
-        'status',
+        'order_id',
         'table_id',
+        'user_id',
         'opened_by_user_id',
         'closed_by_user_id',
+        'ticket_number',
         'diners',
         'opened_at',
         'closed_at',
+        'value_date',
         'total',
     ];
 
@@ -46,12 +48,23 @@ class EloquentSale extends Model
             'total' => 'integer',
             'opened_at' => 'datetime',
             'closed_at' => 'datetime',
+            'value_date' => 'datetime',
         ];
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(\App\Order\Infrastructure\Persistence\Models\EloquentOrder::class, 'order_id');
     }
 
     public function table(): BelongsTo
     {
         return $this->belongsTo(EloquentTable::class, 'table_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(EloquentUser::class, 'user_id');
     }
 
     public function openedByUser(): BelongsTo

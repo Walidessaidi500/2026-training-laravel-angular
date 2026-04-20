@@ -6,7 +6,7 @@ use App\Product\Domain\ValueObject\Price;
 use App\Product\Domain\ValueObject\ProductName;
 use App\Product\Domain\ValueObject\Stock;
 use App\Shared\Domain\ValueObject\DomainDateTime;
-use App\Product\Domain\ValueObject\RestaurantId;
+use App\Shared\Domain\ValueObject\RestaurantId;
 use App\Shared\Domain\ValueObject\Uuid;
 
 class Product implements \JsonSerializable

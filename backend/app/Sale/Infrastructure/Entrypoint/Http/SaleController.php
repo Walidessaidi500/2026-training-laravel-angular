@@ -2,38 +2,35 @@
 
 namespace App\Sale\Infrastructure\Entrypoint\Http;
 
-use App\Sale\Infrastructure\Persistence\Models\EloquentSale;
-use App\Sale\Infrastructure\Persistence\Repositories\EloquentSaleRepository;
+use App\Sale\Application\ProcessSale\ProcessSale;
+use App\Sale\Application\ProcessSale\ProcessSaleRequest;
+use App\Sale\Domain\Interfaces\SaleRepositoryInterface;
+use App\Shared\Domain\ValueObject\Uuid;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class SaleController
 {
-    public function __construct(private EloquentSaleRepository $saleRepository) {}
+    public function __construct(
+        private SaleRepositoryInterface $saleRepository,
+        private ProcessSale $processSale
+    ) {
+    }
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->query('per_page', 15);
-        $page = $request->query('page', 1);
+        $perPage = (int) $request->query('per_page', 15);
+        $page = (int) $request->query('page', 1);
         $restaurantId = $request->user()?->restaurant_id;
 
         $sales = $this->saleRepository->list($page, $perPage, $restaurantId);
 
-        return response()->json([
-            'data' => $sales->items(),
-            'meta' => [
-                'current_page' => $sales->currentPage(),
-                'per_page' => $sales->perPage(),
-                'total' => $sales->total(),
-                'last_page' => $sales->lastPage(),
-            ],
-        ]);
+        return response()->json($sales);
     }
 
     public function show(string $uuid): JsonResponse
     {
-        $sale = $this->saleRepository->find($uuid);
+        $sale = $this->saleRepository->find(Uuid::create($uuid));
 
         if (! $sale) {
             return response()->json(['message' => 'Sale not found'], 404);
@@ -42,82 +39,35 @@ class SaleController
         return response()->json($sale);
     }
 
-    public function store(Request $request): JsonResponse
+    public function process(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'restaurant_id' => 'required|integer|exists:restaurants,id',
-            'order_id' => 'required|integer|exists:orders,id',
-            'user_id' => 'required|integer|exists:users,id',
-            'opened_by_user_id' => 'required|integer|exists:users,id',
-            'total' => 'required|integer|min:0',
+            'table_uuid' => 'required|string|exists:tables,uuid',
+            'diners' => 'required|integer|min:1',
+            'lines' => 'required|array|min:1',
+            'lines.*.product_uuid' => 'required|string|exists:products,uuid',
+            'lines.*.quantity' => 'required|integer|min:1',
+            'lines.*.price' => 'required|integer|min:0',
+            'lines.*.tax_percentage' => 'required|integer|min:0',
         ]);
 
-        $sale = EloquentSale::create([
-            'uuid' => Str::uuid()->toString(),
-            'restaurant_id' => $validated['restaurant_id'],
-            'order_id' => $validated['order_id'],
-            'user_id' => $validated['user_id'],
-            'opened_by_user_id' => $validated['opened_by_user_id'],
-            'total' => $validated['total'],
-            'opened_at' => now(),
-        ]);
+        $processSaleRequest = new ProcessSaleRequest(
+            $request->user()->restaurant_id,
+            $validated['table_uuid'],
+            $request->user()->uuid,
+            $validated['diners'],
+            $validated['lines']
+        );
 
-        return response()->json($sale, 201);
-    }
+        $this->processSale->execute($processSaleRequest);
 
-    public function update(Request $request, string $uuid): JsonResponse
-    {
-        $sale = $this->saleRepository->find($uuid);
-
-        if (! $sale) {
-            return response()->json(['message' => 'Sale not found'], 404);
-        }
-
-        $validated = $request->validate([
-            'total' => 'integer|min:0',
-            'closed_by_user_id' => 'nullable|integer|exists:users,id',
-        ]);
-
-        if (isset($validated['total'])) {
-            $sale->total = $validated['total'];
-        }
-
-        if (isset($validated['closed_by_user_id'])) {
-            $sale->closed_by_user_id = $validated['closed_by_user_id'];
-            $sale->closed_at = now();
-        }
-
-        $this->saleRepository->save($sale);
-
-        return response()->json($sale);
+        return response()->json(['message' => 'Sale processed successfully'], 201);
     }
 
     public function destroy(string $uuid): JsonResponse
     {
-        $sale = $this->saleRepository->find($uuid);
-
-        if (! $sale) {
-            return response()->json(['message' => 'Sale not found'], 404);
-        }
-
-        $this->saleRepository->delete($sale);
+        $this->saleRepository->delete(Uuid::create($uuid));
 
         return response()->json(['message' => 'Sale deleted']);
-    }
-
-    public function close(string $uuid): JsonResponse
-    {
-        $sale = $this->saleRepository->find($uuid);
-
-        if (! $sale) {
-            return response()->json(['message' => 'Sale not found'], 404);
-        }
-
-        $sale->closed_by_user_id = auth()->id();
-        $sale->closed_at = now();
-
-        $this->saleRepository->save($sale);
-
-        return response()->json($sale);
     }
 }
