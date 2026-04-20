@@ -60,6 +60,10 @@ export class SidebarComponent implements OnInit {
     this.onNavigate.emit(item);
   }
 
+  goHome(): void {
+    this.router.navigate(['/home']);
+  }
+
   logout(): void {
     this.onLogout.emit();
   }

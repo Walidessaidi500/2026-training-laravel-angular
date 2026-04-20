@@ -14,24 +14,24 @@
           </div>
         </div>
         <div class="header-right" *ngIf="currentUser">
-        <div class="user-chip" id="user-menu-trigger" style="cursor: pointer;">
-          <ion-icon name="person-circle-outline"></ion-icon>
-          <span>{{ currentUser.name }}</span>
-          <ion-icon name="chevron-down-outline" style="margin-left: 5px;"></ion-icon>
-        </div>
+          <div class="user-chip" id="user-menu-trigger" style="cursor: pointer;">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            <span>{{ currentUser.name }}</span>
+            <ion-icon name="chevron-down-outline" style="margin-left: 5px;"></ion-icon>
+          </div>
 
-        <ion-popover trigger="user-menu-trigger" triggerAction="click" dismissOnSelect="true">
-          <ng-template>
-            <ion-content>
-              <ion-list lines="none">
-                <ion-item button (click)="logout()" detail="false">
-                  <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
-                  <ion-label color="danger">Cerrar Sesión</ion-label>
-                </ion-item>
-              </ion-list>
-            </ion-content>
-          </ng-template>
-        </ion-popover>
+          <ion-popover trigger="user-menu-trigger" triggerAction="click" dismissOnSelect="true">
+            <ng-template>
+              <ion-content>
+                <ion-list lines="none">
+                  <ion-item button (click)="logout()" detail="false">
+                    <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+                    <ion-label color="danger">Cerrar Sesión</ion-label>
+                  </ion-item>
+                </ion-list>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
         </div>
       </div>
     </header>
@@ -109,9 +109,18 @@
                 <ion-icon name="receipt-outline"></ion-icon>
               </div>
               <h2>Detalle Pedido</h2>
-              <button class="clear-btn" (click)="clearCart()" *ngIf="cart.length > 0">
-                <ion-icon name="trash-outline"></ion-icon>
-              </button>
+              <div class="header-actions">
+                 <button class="icon-btn" (click)="editDiners()">
+                  <ion-icon name="people-outline"></ion-icon>
+                  <span>{{ currentOrder?.diners || tempDiners }}</span>
+                </button>
+                <button class="icon-btn" (click)="printProvisional()">
+                  <ion-icon name="print-outline"></ion-icon>
+                </button>
+                <button class="clear-btn" (click)="clearCart()" *ngIf="cart.length > 0">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
+              </div>
             </div>
 
             <div class="cart-items">
@@ -155,4 +164,69 @@
 
     </div>
   </div>
+
+  <!-- Modal: User Selection -->
+  <ion-modal [isOpen]="showUserSelection" (didDismiss)="showUserSelection = false" class="user-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>{{ userSelectionContext === 'opening' ? '¿Quién abre la mesa?' : '¿Quién cierra la venta?' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="showUserSelection = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="user-selection-grid">
+          <button *ngFor="let user of users" class="user-card" (click)="selectUser(user)">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            <span>{{ user.name }}</span>
+            <small>{{ user.role }}</small>
+          </button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal: Diners Selection (Keypad) -->
+  <ion-modal [isOpen]="showDinersSelection" (didDismiss)="showDinersSelection = false" class="diners-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Número de Comensales</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="diners-keypad-container">
+          <div class="diners-display">
+            <span>{{ tempDiners }}</span>
+            <ion-icon name="people-outline"></ion-icon>
+          </div>
+
+          <div class="keypad">
+            <button (click)="addDinerDigit('1')">1</button>
+            <button (click)="addDinerDigit('2')">2</button>
+            <button (click)="addDinerDigit('3')">3</button>
+            <button (click)="addDinerDigit('4')">4</button>
+            <button (click)="addDinerDigit('5')">5</button>
+            <button (click)="addDinerDigit('6')">6</button>
+            <button (click)="addDinerDigit('7')">7</button>
+            <button (click)="addDinerDigit('8')">8</button>
+            <button (click)="addDinerDigit('9')">9</button>
+            <button class="empty"></button>
+            <button (click)="addDinerDigit('0')">0</button>
+            <button (click)="removeDinerDigit()">
+              <ion-icon name="backspace-outline"></ion-icon>
+            </button>
+          </div>
+
+          <div class="keypad-actions">
+            <button class="btn-cancel" (click)="showDinersSelection = false">Cancelar</button>
+            <button class="btn-confirm" (click)="onDinersConfirm()">Aceptar</button>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>

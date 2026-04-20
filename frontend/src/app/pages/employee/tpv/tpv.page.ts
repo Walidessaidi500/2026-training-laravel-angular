@@ -20,7 +20,10 @@ import {
   cloudUploadOutline,
   walletOutline,
   logOutOutline,
-  chevronDownOutline
+  chevronDownOutline,
+  peopleOutline,
+  printOutline,
+  backspaceOutline
 } from 'ionicons/icons';
 
 import { TableService, Table } from '@services/domain/table.service';
@@ -30,8 +33,9 @@ import { FamilyService, Family } from '@services/domain/family.service';
 import { TaxService, Tax } from '@services/domain/tax.service';
 import { OrderService, Order } from '@services/domain/order.service';
 import { SaleService } from '@services/domain/sale.service';
+import { UserService, User } from '@services/domain/user.service';
 import { AuthService } from '@services/auth/auth.service';
-import { Observable, map, of, forkJoin } from 'rxjs';
+import { Observable, map, of, forkJoin, catchError } from 'rxjs';
 
 interface CartItem {
   uuid?: string;
@@ -54,6 +58,7 @@ export class TpvPage implements OnInit {
   private readonly taxService = inject(TaxService);
   private readonly orderService = inject(OrderService);
   private readonly saleService = inject(SaleService);
+  private readonly userService = inject(UserService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -66,6 +71,7 @@ export class TpvPage implements OnInit {
   public tables: Table[]= [];
   public filteredTables: Table[] = [];
   public tableOrders: { [tableUuid: string]: boolean } = {};
+  public users: User[] = [];
 
   // Datos para vista de pedido
   public families: Family[] = [];
@@ -76,6 +82,13 @@ export class TpvPage implements OnInit {
   public selectedTable: Table | null = null;
   public currentOrder: Order | null = null;
   public cart: CartItem[] = [];
+
+  // Control de Modales
+  public showUserSelection = false;
+  public showDinersSelection = false;
+  public userSelectionContext: 'opening' | 'closing' = 'opening';
+  public selectedOpUser: User | null = null;
+  public tempDiners: string = '1';
 
   public currentUser = this.authService.getUser();
 
@@ -96,8 +109,10 @@ export class TpvPage implements OnInit {
       cloudUploadOutline,
       walletOutline,
       logOutOutline,
-      chevronDownOutline
-
+      chevronDownOutline,
+      peopleOutline,
+      printOutline,
+      backspaceOutline
     });
   }
 
@@ -112,7 +127,13 @@ export class TpvPage implements OnInit {
       families: this.familyService.list(),
       taxes: this.taxService.list(),
       products: this.productService.list(1, 500),
-      activeOrders: this.orderService.list(1, 1000)
+      activeOrders: this.orderService.list(1, 1000),
+      users: this.userService.list(1, 100).pipe(
+        catchError(err => {
+          console.warn('No se pudo cargar la lista de usuarios (posible falta de permisos)', err);
+          return of({ data: [], meta: { current_page: 1, per_page: 100, total: 0, last_page: 1 } });
+        })
+      )
     }).subscribe({
       next: (res) => {
         this.zones = res.zones.data;
@@ -120,16 +141,14 @@ export class TpvPage implements OnInit {
         this.families = res.families.data;
         this.taxes = res.taxes.data;
         this.products = res.products.data;
+        this.users = res.users.data;
 
-        // Map active orders to tables
-        res.activeOrders.data.forEach(order => {
-          if (order.status === 'open') {
-            const table = this.tables.find(t => t.id === order.table_id);
-            if (table) {
-              this.tableOrders[table.uuid] = true;
-            }
-          }
-        });
+        // Si no hay usuarios cargados (falla permisos), usamos el actual como mínimo
+        if (this.users.length === 0 && this.currentUser) {
+          this.users = [this.currentUser as unknown as User];
+        }
+
+        this.processActiveOrders(res.activeOrders.data);
 
         if (this.zones.length > 0) {
           this.selectZone(this.zones[0].uuid);
@@ -140,6 +159,26 @@ export class TpvPage implements OnInit {
         if (this.families.length > 0) {
           this.selectFamily(this.families[0].uuid);
         }
+      }
+    });
+  }
+
+  private processActiveOrders(orders: Order[]) {
+    this.tableOrders = {}; // Limpiar estado anterior
+    orders.forEach(order => {
+      if (order.status === 'open') {
+        const table = this.tables.find(t => t.uuid === order.table_uuid);
+        if (table) {
+          this.tableOrders[table.uuid] = true;
+        }
+      }
+    });
+  }
+
+  private refreshTableStatus() {
+    this.orderService.list(1, 1000).subscribe({
+      next: (res) => {
+        this.processActiveOrders(res.data);
       }
     });
   }
@@ -157,6 +196,17 @@ export class TpvPage implements OnInit {
 
   public onTableClick(table: Table): void {
     this.selectedTable = table;
+
+    if (this.isTableOccupied(table)) {
+      this.loadOrderForTable(table);
+    } else {
+      // Mesa libre -> Iniciar flujo de apertura
+      this.userSelectionContext = 'opening';
+      this.showUserSelection = true;
+    }
+  }
+
+  private loadOrderForTable(table: Table) {
     this.viewState = 'order';
     this.cart = [];
     this.currentOrder = null;
@@ -165,7 +215,7 @@ export class TpvPage implements OnInit {
       next: (order) => {
         if (order) {
           this.currentOrder = order;
-          this.cart = (order.order_lines || []).map(line => {
+          this.cart = (order.lines || []).map(line => {
             const product = this.products.find(p => p.uuid === line.product_uuid);
             return {
               uuid: line.uuid,
@@ -181,11 +231,60 @@ export class TpvPage implements OnInit {
     });
   }
 
+  public selectUser(user: User) {
+    if (this.userSelectionContext === 'opening') {
+      this.selectedOpUser = user;
+      this.showUserSelection = false;
+      this.tempDiners = '1';
+      this.showDinersSelection = true;
+    } else {
+      // closing
+      this.showUserSelection = false;
+      this.processClosing(user);
+    }
+  }
+
+  public onDinersConfirm() {
+    this.showDinersSelection = false;
+    if (this.currentOrder) {
+      // Estamos editando comensales de un pedido abierto
+      this.currentOrder.diners = parseInt(this.tempDiners) || 1;
+      this.sendOrder(); // Sincronizar el cambio
+    } else {
+      // Es una apertura nueva
+      this.viewState = 'order';
+      this.cart = [];
+    }
+  }
+
+  public addDinerDigit(digit: string) {
+    if (this.tempDiners === '0') {
+      this.tempDiners = digit;
+    } else {
+      this.tempDiners += digit;
+    }
+  }
+
+  public removeDinerDigit() {
+    if (this.tempDiners.length > 1) {
+      this.tempDiners = this.tempDiners.slice(0, -1);
+    } else {
+      this.tempDiners = '0';
+    }
+  }
+
+  public editDiners() {
+    this.tempDiners = (this.currentOrder?.diners || 1).toString();
+    this.showDinersSelection = true;
+  }
+
   public backToTables() {
     this.viewState = 'tables';
     this.selectedTable = null;
     this.currentOrder = null;
     this.cart = [];
+    this.selectedOpUser = null;
+    this.refreshTableStatus(); // Refrescar estado al volver
   }
 
   // --- Lógica de Pedido ---
@@ -230,11 +329,12 @@ export class TpvPage implements OnInit {
   }
 
   public sendOrder() {
-    if (this.cart.length === 0 || !this.selectedTable) return;
+    if (!this.selectedTable) return;
 
     const orderData = {
       table_uuid: this.selectedTable.uuid,
-      diners: this.currentOrder?.diners || 1,
+      diners: this.currentOrder?.diners || parseInt(this.tempDiners) || 1,
+      opened_by_user_uuid: this.currentOrder?.opened_by_user_uuid || this.selectedOpUser?.uuid || this.currentUser?.uuid,
       lines: this.cart.map(item => {
         const tax = this.taxes.find(t => t.uuid === item.product.tax_id);
         return {
@@ -248,9 +348,12 @@ export class TpvPage implements OnInit {
     };
 
     this.orderService.sync(orderData).subscribe({
-      next: () => {
-        alert('Comanda guardada y enviada a cocina');
-        this.backToTables();
+      next: (res: any) => {
+        // Al sincronizar, si es nuevo se crea el currentOrder con su UUID
+        if (!this.currentOrder) {
+          this.currentOrder = res;
+        }
+        alert('Pedido sincronizado correctamente');
       },
       error: (err) => {
         console.error('Error al sincronizar el pedido', err);
@@ -259,11 +362,23 @@ export class TpvPage implements OnInit {
     });
   }
 
+  public printProvisional() {
+    alert('Imprimiendo ticket provisional...');
+    // Aquí se llamaría a un servicio de impresión o endpoint de backend si existiera
+  }
+
   public closeTicket() {
     if (this.cart.length === 0 || !this.selectedTable) return;
+    this.userSelectionContext = 'closing';
+    this.showUserSelection = true;
+  }
+
+  private processClosing(user: User) {
+    if (!this.selectedTable) return;
 
     const saleData = {
       table_uuid: this.selectedTable.uuid,
+      user_uuid: user.uuid, // Usuario que cierra
       diners: this.currentOrder?.diners || 1,
       lines: this.cart.map(item => {
         const tax = this.taxes.find(t => t.uuid === item.product.tax_id);
@@ -290,7 +405,6 @@ export class TpvPage implements OnInit {
 
   public logout() {
     this.authService.logout();
-    // Redirigir a login o mostrar mensaje
-   this.router.navigate(['/login']);
+    this.router.navigate(['/login']);
   }
 }

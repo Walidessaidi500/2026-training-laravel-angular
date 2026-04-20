@@ -303,21 +303,50 @@
       color: var(--ion-color-secondary);
     }
     
-    .clear-btn { 
-      background: var(--ion-color-danger-light); 
-      border: none; 
-      color: var(--ion-color-danger); 
-      cursor: pointer; 
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+    .header-actions {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      transition: all 0.2s;
-      
-      &:active { transform: scale(0.9); }
+      gap: 10px;
+
+      .icon-btn {
+        background: var(--ion-color-light);
+        border: 1px solid rgba(0,0,0,0.05);
+        color: var(--ion-color-secondary);
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        ion-icon { font-size: 20px; }
+        span { font-size: 10px; font-weight: 800; margin-top: -2px; }
+
+        &:active {
+          background: var(--ion-color-primary-light);
+          color: var(--ion-color-primary);
+          transform: scale(0.9);
+        }
+      }
+
+      .clear-btn { 
+        background: var(--ion-color-danger-light); 
+        border: none; 
+        color: var(--ion-color-danger); 
+        cursor: pointer; 
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        transition: all 0.2s;
+        
+        &:active { transform: scale(0.9); }
+      }
     }
   }
 
@@ -458,6 +487,133 @@
 
         ion-icon { font-size: 24px; }
       }
+    }
+  }
+}
+
+// User Selection Modal
+.user-modal {
+  --height: 80%;
+  --width: 90%;
+  --max-width: 800px;
+  --border-radius: 24px;
+
+  .user-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 24px;
+  }
+
+  .user-card {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+
+    ion-icon { font-size: 48px; color: var(--ion-color-primary); }
+    span { font-weight: 700; color: var(--ion-color-secondary); font-size: 16px; }
+    small { font-weight: 600; color: var(--ion-color-medium); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+
+    &:active {
+      transform: scale(0.95);
+      background: var(--ion-color-primary-light);
+      border-color: var(--ion-color-primary);
+    }
+  }
+}
+
+// Diners Keypad Modal
+.diners-modal {
+  --height: 580px;
+  --width: 400px;
+  --border-radius: 24px;
+
+  .diners-keypad-container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    height: 100%;
+  }
+
+  .diners-display {
+    width: 100%;
+    background: var(--ion-color-light);
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    
+    span { font-size: 48px; font-weight: 900; color: var(--ion-color-secondary); }
+    ion-icon { font-size: 32px; color: var(--ion-color-primary); }
+  }
+
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+
+    button {
+      height: 70px;
+      background: white;
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 16px;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--ion-color-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+
+      &:active {
+        background: var(--ion-color-primary-light);
+        color: var(--ion-color-primary);
+        transform: scale(0.9);
+      }
+
+      &.empty { background: transparent; border: none; box-shadow: none; cursor: default; }
+      
+      ion-icon { font-size: 24px; }
+    }
+  }
+
+  .keypad-actions {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    margin-top: 8px;
+
+    button {
+      flex: 1;
+      height: 56px;
+      border-radius: 16px;
+      border: none;
+      font-weight: 800;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.btn-cancel { background: var(--ion-color-light); color: var(--ion-color-medium); }
+      &.btn-confirm { background: var(--ion-color-primary); color: white; box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.2); }
+
+      &:active { transform: translateY(2px); }
     }
   }
 }
