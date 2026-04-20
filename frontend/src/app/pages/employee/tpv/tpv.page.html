@@ -179,10 +179,58 @@
       <ion-content>
         <div class="user-selection-grid">
           <button *ngFor="let user of users" class="user-card" (click)="selectUser(user)">
-            <ion-icon name="person-circle-outline"></ion-icon>
-            <span>{{ user.name }}</span>
-            <small>{{ user.role }}</small>
+            <div class="user-avatar-placeholder">
+              <ion-icon name="person-circle-outline"></ion-icon>
+            </div>
+            <span class="user-name">{{ user.name }}</span>
+            <span class="user-role-badge" [class]="user.role">{{ user.role }}</span>
           </button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal: PIN Entry -->
+  <ion-modal [isOpen]="showPinModal" (didDismiss)="showPinModal = false" class="pin-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Validar PIN - {{ selectedUserForPin?.name }}</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="pin-keypad-container">
+          <div class="pin-display">
+            <div class="pin-dots">
+              <div class="dot" [class.filled]="pinBuffer.length >= 1"></div>
+              <div class="dot" [class.filled]="pinBuffer.length >= 2"></div>
+              <div class="dot" [class.filled]="pinBuffer.length >= 3"></div>
+              <div class="dot" [class.filled]="pinBuffer.length >= 4"></div>
+              <div class="dot-more" *ngIf="pinBuffer.length > 4">...</div>
+            </div>
+          </div>
+
+          <div class="keypad">
+            <button (click)="addPinDigit('1')">1</button>
+            <button (click)="addPinDigit('2')">2</button>
+            <button (click)="addPinDigit('3')">3</button>
+            <button (click)="addPinDigit('4')">4</button>
+            <button (click)="addPinDigit('5')">5</button>
+            <button (click)="addPinDigit('6')">6</button>
+            <button (click)="addPinDigit('7')">7</button>
+            <button (click)="addPinDigit('8')">8</button>
+            <button (click)="addPinDigit('9')">9</button>
+            <button class="empty"></button>
+            <button (click)="addPinDigit('0')">0</button>
+            <button (click)="removePinDigit()">
+              <ion-icon name="backspace-outline"></ion-icon>
+            </button>
+          </div>
+
+          <div class="keypad-actions">
+            <button class="btn-cancel" (click)="showPinModal = false">Cancelar</button>
+            <button class="btn-confirm" (click)="onPinConfirm()">Aceptar</button>
+          </div>
         </div>
       </ion-content>
     </ng-template>

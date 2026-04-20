@@ -500,32 +500,201 @@
 
   .user-selection-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 20px;
-    padding: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 24px;
+    padding: 32px;
   }
 
   .user-card {
     background: white;
     border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 20px;
-    padding: 20px;
+    border-radius: 24px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    position: relative;
+    overflow: hidden;
 
-    ion-icon { font-size: 48px; color: var(--ion-color-primary); }
-    span { font-weight: 700; color: var(--ion-color-secondary); font-size: 16px; }
-    small { font-weight: 600; color: var(--ion-color-medium); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+    .user-avatar-placeholder {
+      width: 72px;
+      height: 72px;
+      background: var(--ion-color-light);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      
+      ion-icon { 
+        font-size: 48px; 
+        color: var(--ion-color-medium); 
+      }
+    }
+
+    .user-name { 
+      font-weight: 800; 
+      color: var(--ion-color-secondary); 
+      font-size: 17px; 
+      text-align: center;
+    }
+
+    .user-role-badge {
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 4px 12px;
+      border-radius: 10px;
+      background: var(--ion-color-light);
+      color: var(--ion-color-medium);
+
+      &.supervisor {
+        background: var(--ion-color-warning-light);
+        color: var(--ion-color-warning-shade);
+      }
+      &.operator {
+        background: var(--ion-color-primary-light);
+        color: var(--ion-color-primary);
+      }
+    }
 
     &:active {
-      transform: scale(0.95);
+      transform: scale(0.94);
       background: var(--ion-color-primary-light);
       border-color: var(--ion-color-primary);
+
+      .user-avatar-placeholder {
+        background: white;
+        ion-icon { color: var(--ion-color-primary); }
+      }
+    }
+  }
+}
+
+// PIN Modal Styles
+.pin-modal {
+  --height: 620px;
+  --width: 420px;
+  --border-radius: 28px;
+  --box-shadow: 0 28px 48px rgba(0,0,0,0.25);
+
+  .pin-keypad-container {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    height: 100%;
+    background: white;
+  }
+
+  .pin-display {
+    width: 100%;
+    background: var(--ion-color-light);
+    border-radius: 24px;
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,0,0,0.03);
+
+    .pin-dots {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+
+      .dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.1);
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid transparent;
+
+        &.filled {
+          background: var(--ion-color-primary);
+          transform: scale(1.3);
+          box-shadow: 0 0 15px rgba(var(--ion-color-primary-rgb), 0.4);
+        }
+      }
+      .dot-more {
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--ion-color-primary);
+        letter-spacing: 2px;
+      }
+    }
+  }
+
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+
+    button {
+      height: 76px;
+      background: white;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 20px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--ion-color-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+
+      &:active {
+        background: var(--ion-color-primary);
+        color: white;
+        transform: scale(0.92);
+        border-color: var(--ion-color-primary);
+        box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.3);
+      }
+
+      &.empty { background: transparent; border: none; box-shadow: none; cursor: default; }
+      
+      ion-icon { font-size: 32px; }
+    }
+  }
+
+  .keypad-actions {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    margin-top: 8px;
+
+    button {
+      flex: 1;
+      height: 64px;
+      border-radius: 20px;
+      border: none;
+      font-weight: 900;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &.btn-cancel { 
+        background: var(--ion-color-light); 
+        color: var(--ion-color-medium); 
+        &:active { background: #e0e0e0; }
+      }
+      &.btn-confirm { 
+        background: var(--ion-color-success); 
+        color: white; 
+        box-shadow: 0 8px 25px rgba(var(--ion-color-success-rgb), 0.25);
+        &:active { transform: translateY(2px); box-shadow: none; }
+      }
     }
   }
 }

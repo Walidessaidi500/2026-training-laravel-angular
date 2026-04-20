@@ -71,8 +71,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/tables/{uuid}', [TableController::class, 'update']);
     Route::delete('/tables/{uuid}', [TableController::class, 'destroy']);
 
-    // Usuarios - Consultas permitidas para Admin y Supervisor
-    Route::middleware('role:admin,supervisor')->group(function () {
+    // Usuarios - Consultas permitidas para Admin, Supervisor y Restaurante
+    Route::middleware('role:admin,supervisor,restaurant')->group(function () {
         Route::get('/users', [UserController::class, 'index']);
         Route::get('/users/{uuid}', [UserController::class, 'show']);
     });

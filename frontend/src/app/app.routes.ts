@@ -26,7 +26,7 @@ export const routes: Routes = [
   },
   {
     path: 'employee',
-    canActivate: [authGuard, roleGuard(['operator'])],
+    canActivate: [authGuard, roleGuard(['operator', 'supervisor', 'restaurant'])],
     loadChildren: () => import('./pages/employee/employee.routes').then((m) => m.EMPLOYEE_ROUTES),
   },
   {

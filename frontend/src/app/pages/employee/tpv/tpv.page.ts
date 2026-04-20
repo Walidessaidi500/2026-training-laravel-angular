@@ -90,8 +90,11 @@ export class TpvPage implements OnInit {
   // Control de Modales
   public showUserSelection = false;
   public showDinersSelection = false;
+  public showPinModal = false;
   public userSelectionContext: 'opening' | 'closing' = 'opening';
   public selectedOpUser: User | null = null;
+  public selectedUserForPin: User | null = null;
+  public pinBuffer: string = '';
   public tempDiners: string = '1';
 
   public currentUser = this.authService.getUser();
@@ -135,6 +138,10 @@ export class TpvPage implements OnInit {
       products: this.productService.list(1, 500),
       activeOrders: this.orderService.list(1, 1000),
       users: this.userService.list(1, 100).pipe(
+        map(res => ({
+          ...res,
+          data: res.data.filter(u => u.role === 'operator' || u.role === 'supervisor')
+        })),
         catchError(err => {
           console.warn('No se pudo cargar la lista de usuarios (posible falta de permisos)', err);
           return of({ data: [], meta: { current_page: 1, per_page: 100, total: 0, last_page: 1 } });
@@ -238,15 +245,47 @@ export class TpvPage implements OnInit {
   }
 
   public selectUser(user: User) {
-    if (this.userSelectionContext === 'opening') {
-      this.selectedOpUser = user;
-      this.showUserSelection = false;
-      this.tempDiners = '1';
-      this.showDinersSelection = true;
+    this.selectedUserForPin = user;
+    this.pinBuffer = '';
+    this.showUserSelection = false;
+    this.showPinModal = true;
+  }
+
+  public addPinDigit(digit: string) {
+    if (this.pinBuffer.length < 10) {
+      this.pinBuffer += digit;
+    }
+  }
+
+  public removePinDigit() {
+    if (this.pinBuffer.length > 0) {
+      this.pinBuffer = this.pinBuffer.slice(0, -1);
+    }
+  }
+
+  public onPinConfirm() {
+    if (!this.selectedUserForPin) return;
+
+    // Si el usuario no tiene PIN configurado, o si el PIN coincide
+    const userPin = this.selectedUserForPin.pin || '';
+    
+    if (userPin === this.pinBuffer) {
+      this.showPinModal = false;
+      const user = this.selectedUserForPin;
+      this.selectedUserForPin = null;
+      this.pinBuffer = '';
+
+      if (this.userSelectionContext === 'opening') {
+        this.selectedOpUser = user;
+        this.tempDiners = '1';
+        this.showDinersSelection = true;
+      } else {
+        // closing
+        this.processClosing(user);
+      }
     } else {
-      // closing
-      this.showUserSelection = false;
-      this.processClosing(user);
+      this.showToast('PIN incorrecto', 'danger', 'alert-circle');
+      this.pinBuffer = '';
     }
   }
 
@@ -303,7 +342,17 @@ export class TpvPage implements OnInit {
 
   public selectFamily(familyUuid: string) {
     this.selectedFamilyUuid = familyUuid;
-    this.filteredProducts = this.products.filter(p => p.family_id === familyUuid);
+    this.updateFilteredProducts();
+  }
+
+  private updateFilteredProducts() {
+    if (!this.selectedFamilyUuid) return;
+    this.filteredProducts = this.products.filter(p => 
+      p.family_id === this.selectedFamilyUuid && 
+      p.active && 
+      p.stock > 0 && 
+      p.tax_id
+    );
   }
 
   /**
@@ -317,6 +366,13 @@ export class TpvPage implements OnInit {
 
   public addToCart(product: Product) {
     const existingItem = this.cart.find(item => item.product.uuid === product.uuid);
+    const currentQtyInCart = existingItem ? existingItem.quantity : 0;
+
+    if (currentQtyInCart >= product.stock) {
+      this.showToast(`No queda más stock de ${product.name}`, 'danger', 'alert-circle');
+      return;
+    }
+
     if (existingItem) {
       existingItem.quantity++;
     } else {
@@ -366,10 +422,28 @@ export class TpvPage implements OnInit {
           this.currentOrder = res;
         }
         this.showToast('Pedido mandado a cocina correctamente', 'success', 'checkmark-circle');
+        this.refreshProducts(); // Refrescar stock tras enviar pedido
       },
       error: (err) => {
         console.error('Error al mandar el pedido', err);
         this.showToast('Error al enviar a cocina', 'danger', 'alert-circle');
+      }
+    });
+  }
+
+  private refreshProducts() {
+    this.productService.list(1, 500).subscribe({
+      next: (res) => {
+        this.products = res.data;
+        this.updateFilteredProducts();
+        
+        // Actualizar referencias en el carrito para reflejar stock actualizado
+        this.cart.forEach(item => {
+          const updatedProduct = this.products.find(p => p.uuid === item.product.uuid);
+          if (updatedProduct) {
+            item.product = updatedProduct;
+          }
+        });
       }
     });
   }
@@ -406,6 +480,7 @@ export class TpvPage implements OnInit {
     this.saleService.process(saleData).subscribe({
       next: () => {
         this.showToast('Ticket cerrado y cobrado correctamente', 'success', 'checkmark-circle');
+        this.refreshProducts(); // Importante refrescar stock al cobrar
         this.backToTables();
       },
       error: (err) => {

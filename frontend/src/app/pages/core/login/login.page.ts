@@ -61,6 +61,8 @@ export class LoginPage implements OnInit {
           this.router.navigate(['/supervisor/dashboard']);
         } else if (user?.role === 'admin') {
           this.router.navigate(['/admin']);
+        } else if (user?.role === 'restaurant') {
+          this.router.navigate(['/employee/tpv']);
         } else {
           this.router.navigate(['/employee/tpv']);
         }

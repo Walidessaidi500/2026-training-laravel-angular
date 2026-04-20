@@ -12,7 +12,7 @@ export const guestGuard: CanActivateFn = (route, state) => {
             router.navigate(['/supervisor/dashboard']);
         } else if (user?.role === 'admin') {
             router.navigate(['/admin/dashboard']);
-        } else if (user?.role === 'operator') {
+        } else if (user?.role === 'operator' || user?.role === 'restaurant') {
             router.navigate(['/employee/tpv']);
         }
         return false;

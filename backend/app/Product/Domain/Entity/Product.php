@@ -147,6 +147,18 @@ class Product implements \JsonSerializable
         $this->updatedAt = DomainDateTime::now();
     }
 
+    public function decrementStock(int $quantity): void
+    {
+        $this->stock = Stock::create($this->stock->value() - $quantity);
+        $this->updatedAt = DomainDateTime::now();
+    }
+
+    public function incrementStock(int $quantity): void
+    {
+        $this->stock = Stock::create($this->stock->value() + $quantity);
+        $this->updatedAt = DomainDateTime::now();
+    }
+
     public function toggleActive(): void
     {
         $this->active = !$this->active;
