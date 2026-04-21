@@ -42,16 +42,16 @@ import { OrderService } from '@services/domain/order.service';
 import { UserService } from '@services/domain/user.service';
 import { SaleService } from '@services/domain/sale.service';
 import { TableService } from '@services/domain/table.service';
-import { AccessDeniedComponent } from '@app/components/access-denied/access-denied.component';
-import { ProductFormComponent } from '@app/components/product-form/product-form.component';
-import { FamilyFormComponent } from '@app/components/families-form/families-form.component';
-import { TaxFormComponent } from '@app/components/tax-form/tax-form.component';
-import { UserFormComponent } from '@app/components/user-form/user-form.component';
-import { TablesFormComponent } from '@app/components/tables-form/tables-form.component';
-import { MicroStatCardComponent } from '@app/components/micro-stat-card/micro-stat-card.component';
-import { ShortcutListComponent, ShortcutItem } from '@app/components/shortcut-list/shortcut-list.component';
-import { AlertListComponent } from '@app/components/alert-list/alert-list.component';
-import { TimelineListComponent } from '@app/components/timeline-list/timeline-list.component';
+import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
+import { ProductFormComponent } from '@components/product-form/product-form.component';
+import { FamilyFormComponent } from '@components/families-form/families-form.component';
+import { TaxFormComponent } from '@components/tax-form/tax-form.component';
+import { UserFormComponent } from '@components/user-form/user-form.component';
+import { TablesFormComponent } from '@components/tables-form/tables-form.component';
+import { MicroStatCardComponent } from '@components/micro-stat-card/micro-stat-card.component';
+import { ShortcutListComponent, ShortcutItem } from '@components/shortcut-list/shortcut-list.component';
+import { AlertListComponent } from '@components/alert-list/alert-list.component';
+import { TimelineListComponent } from '@components/timeline-list/timeline-list.component';
 
 interface User {
   uuid: string;

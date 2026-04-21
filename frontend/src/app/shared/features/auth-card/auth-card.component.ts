@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CardComponent } from '../card/card.component';
-import { ButtonComponent } from '../button/button.component';
+import { CardComponent } from '@ui/card/card.component';
+import { ButtonComponent } from '@ui/button/button.component';
 
 @Component({
   selector: 'app-auth-card',

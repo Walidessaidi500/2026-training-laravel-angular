@@ -7,7 +7,7 @@ import {
   IonContent,
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { AuthCardComponent } from '../../../components/auth-card/auth-card.component';
+import { AuthCardComponent } from '@features/auth-card/auth-card.component';
 
 @Component({
   selector: 'app-home',

@@ -23,9 +23,25 @@
     "useDefineForClassFields": false,
     "paths": {
       "@app/*": ["src/app/*"],
-      "@services/*": ["src/app/services/*"],
-      "@providers/*": ["src/app/providers/*"],
-      "@components/*": ["src/app/components/*"],
+      "@app/services/*": ["src/app/core/services/*"],
+      "@app/providers/*": [
+        "src/app/core/guards/*",
+        "src/app/core/interceptors/*"
+      ],
+      "@core/*": ["src/app/core/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@ui/*": ["src/app/shared/ui/*"],
+      "@features/*": ["src/app/shared/features/*"],
+      "@components/*": [
+        "src/app/shared/ui/*",
+        "src/app/shared/features/*"
+      ],
+      "@services/*": ["src/app/core/services/*"],
+      "@guards/*": ["src/app/core/guards/*"],
+      "@providers/*": [
+        "src/app/core/guards/*",
+        "src/app/core/interceptors/*"
+      ],
       "@pages/*": ["src/app/pages/*"],
       "@environments/*": ["src/environments/*"]
     }
