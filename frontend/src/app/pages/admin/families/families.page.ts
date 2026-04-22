@@ -18,8 +18,7 @@ import { AuthService } from '@services/auth/auth.service';
 import { FamilyService } from '@services/domain/family.service';
 import { FamilyFormComponent, FamilyFormData } from '@components/families-form/families-form.component';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
-import { PageHeaderComponent } from '@components/page-header/page-header.component';
-import { DataListComponent } from '@components/data-list/data-list.component';
+
 
 export interface Family {
   uuid: string;
@@ -35,8 +34,7 @@ export interface Family {
   imports: [
     CommonModule, FormsModule, IonContent, IonIcon, IonList,
     IonItem, IonLabel, IonSkeletonText, IonSearchbar, IonSegment,
-    IonSegmentButton, AccessDeniedComponent, PageHeaderComponent,
-    DataListComponent,
+    IonSegmentButton, AccessDeniedComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

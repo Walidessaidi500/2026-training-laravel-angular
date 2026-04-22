@@ -19,14 +19,20 @@
   <!-- Content -->
   <div class="page-container" *ngIf="!isLoading && (isAdmin || isSupervisor)">
 
-    <app-page-header
-      title="Familias de Productos"
-      subtitle="Organiza tu catálogo en categorías lógicas"
-      buttonText="Nueva Familia"
-      buttonIcon="add-outline"
-      [showButton]="isAdmin"
-      (actionClick)="addNewFamily()">
-    </app-page-header>
+    <div class="page-header">
+      <div class="header-content">
+        <div class="icon-box primary">
+          <ion-icon name="folder-outline"></ion-icon>
+        </div>
+        <div>
+          <h1>Familias de Productos</h1>
+          <p class="subtitle">Organiza tu catálogo en categorías lógicas</p>
+        </div>
+      </div>
+      <button *ngIf="isAdmin" class="btn-primary" (click)="addNewFamily()">
+        <ion-icon name="add-outline"></ion-icon> Nueva Familia
+      </button>
+    </div>
 
     <!-- Stats -->
     <div class="stats-grid two-cols">
@@ -78,38 +84,47 @@
       </div>
     </div>
 
-    <!-- Main List -->
-    <app-data-list
-      label="LISTADO DE FAMILIAS"
-      [title]="filteredFamilies.length + ' familia(s)'"
-      emptyIcon="folder-outline"
-      emptyTitle="No hay familias"
-      [emptyDescription]="searchTerm ? 'No se encontraron familias que coincidan' : 'Comienza agregando la primera familia'"
-      [items]="filteredFamilies"
-      [itemTemplate]="familyItemRef">
-    </app-data-list>
-
-    <ng-template #familyItemRef let-family>
-      <ion-item lines="none" class="family-item animated-fadeIn">
-        <ion-label class="family-info">
-          <h2>{{ family.name }}</h2>
-          <div class="family-meta">
-            <span class="status-badge" [ngClass]="family.active ? 'active' : 'inactive'"
-              (click)="isAdmin ? toggleFamilyStatus(family) : null" [style.cursor]="isAdmin ? 'pointer' : 'default'">
-              <ion-icon [name]="family.active ? 'checkmark-circle' : 'close-circle'"></ion-icon>
-              {{ family.active ? 'ACTIVA' : 'INACTIVA' }}
-            </span>
-          </div>
-        </ion-label>
-        <div *ngIf="isAdmin" slot="end" class="actions">
-          <button class="action-btn edit-btn" (click)="editFamily(family)" title="Editar">
-            <ion-icon name="create-outline"></ion-icon>
-          </button>
-          <button class="action-btn delete-btn" (click)="deleteFamily(family)" title="Eliminar">
-            <ion-icon name="trash-outline"></ion-icon>
-          </button>
+    <!-- Table Panel -->
+    <div class="panel-card table-panel">
+      <div class="card-header">
+        <div>
+          <span class="label">LISTADO DE FAMILIAS</span>
+          <h3>{{ filteredFamilies.length }} familia{{ filteredFamilies.length !== 1 ? 's' : '' }}</h3>
         </div>
-      </ion-item>
-    </ng-template>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredFamilies.length === 0">
+        <div class="empty-icon"><ion-icon name="folder-outline"></ion-icon></div>
+        <p class="empty-title">No hay familias</p>
+        <p class="empty-description">
+          {{ searchTerm ? 'No se encontraron familias que coincidan' : 'Comienza agregando la primera familia' }}
+        </p>
+      </div>
+
+      <!-- List -->
+      <ion-list class="families-list" *ngIf="filteredFamilies.length > 0">
+        <ion-item lines="none" class="family-item animated-fadeIn" *ngFor="let family of filteredFamilies">
+          <ion-label class="family-info">
+            <h2>{{ family.name }}</h2>
+            <div class="family-meta">
+              <span class="status-badge" [ngClass]="family.active ? 'active' : 'inactive'"
+                (click)="isAdmin ? toggleFamilyStatus(family) : null" [style.cursor]="isAdmin ? 'pointer' : 'default'">
+                <ion-icon [name]="family.active ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+                {{ family.active ? 'ACTIVA' : 'INACTIVA' }}
+              </span>
+            </div>
+          </ion-label>
+          <div *ngIf="isAdmin" slot="end" class="actions">
+            <button class="action-btn edit-btn" (click)="editFamily(family)" title="Editar">
+              <ion-icon name="create-outline"></ion-icon>
+            </button>
+            <button class="action-btn delete-btn" (click)="deleteFamily(family)" title="Eliminar">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
   </div>
 </ion-content>
