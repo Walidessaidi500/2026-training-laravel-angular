@@ -229,10 +229,10 @@
   padding: 0;
 
   &.edit-btn {
-    color: var(--ion-color-primary);
-    border-color: var(--ion-color-primary);
-    background: rgba(var(--ion-color-primary-rgb), 0.08);
-    &:hover { background: var(--ion-color-primary-light); transform: translateY(-2px); box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.15); }
+    color: var(--ion-color-edit);
+    border-color: var(--ion-color-edit);
+    background: rgba(var(--ion-color-edit-rgb), 0.08);
+    &:hover { background: var(--ion-color-edit-light); transform: translateY(-2px); box-shadow: 0 2px 8px rgba(var(--ion-color-edit-rgb), 0.15); }
   }
 
   &.delete-btn {
