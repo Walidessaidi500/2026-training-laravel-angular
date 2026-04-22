@@ -19,6 +19,10 @@ import { FamilyService } from '@services/domain/family.service';
 import { FamilyFormComponent, FamilyFormData } from '@components/families-form/families-form.component';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 
+// Pipes
+import { ActiveStatusPipe } from '@shared/pipes/active-status.pipe';
+
+
 
 export interface Family {
   uuid: string;
@@ -34,7 +38,7 @@ export interface Family {
   imports: [
     CommonModule, FormsModule, IonContent, IonIcon, IonList,
     IonItem, IonLabel, IonSkeletonText, IonSearchbar, IonSegment,
-    IonSegmentButton, AccessDeniedComponent,
+    IonSegmentButton, AccessDeniedComponent, ActiveStatusPipe
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

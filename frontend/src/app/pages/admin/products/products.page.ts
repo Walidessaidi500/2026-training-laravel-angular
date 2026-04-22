@@ -23,6 +23,12 @@ import { TaxService } from '@services/domain/tax.service';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 import { ProductFormComponent, ProductFormData } from '@components/product-form/product-form.component';
 
+// Pipes
+import { PricePipe } from '@shared/pipes/price.pipe';
+import { ActiveStatusPipe } from '@shared/pipes/active-status.pipe';
+import { StockStatusPipe } from '@shared/pipes/stock-status.pipe';
+import { FallbackPipe } from '@shared/pipes/fallback.pipe';
+
 export interface Product {
   uuid: string;
   name: string;
@@ -46,6 +52,7 @@ export interface Product {
     IonSelect, IonSelectOption, IonNote, IonInfiniteScroll,
     IonInfiniteScrollContent, IonSegment, IonSegmentButton,
     AccessDeniedComponent,
+    PricePipe, ActiveStatusPipe, StockStatusPipe, FallbackPipe
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

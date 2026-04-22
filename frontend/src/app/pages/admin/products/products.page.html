@@ -161,18 +161,22 @@
           <ion-label class="product-info">
             <div class="title-row">
               <h2>{{ product.name }}</h2>
-              <span class="price-tag">{{ (product.priceInCents / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+              <span class="price-tag">{{ product.priceInCents | price }}</span>
             </div>
 
             <div class="product-meta">
-              <span class="meta-tag"><ion-icon name="folder-outline"></ion-icon> {{ product.family_name || 'Sin familia'
-                }}</span>
-              <span class="meta-tag"><ion-icon name="receipt-outline"></ion-icon> {{ product.tax_name || 'Sin impuesto'
-                }}</span>
+              <span class="meta-tag">
+                <ion-icon name="folder-outline"></ion-icon> 
+                {{ product.family_name | fallback:'Sin familia' }}
+              </span>
+              <span class="meta-tag">
+                <ion-icon name="receipt-outline"></ion-icon> 
+                {{ product.tax_name | fallback:'Sin impuesto' }}
+              </span>
 
               <span class="stock-badge"
                 [ngClass]="{'in-stock': product.stock > 5, 'low-stock': product.stock > 0 && product.stock <= 5, 'out-of-stock': product.stock <= 0}">
-                STOCK: {{ product.stock }}
+                STOCK: {{ product.stock | stockStatus }} ({{ product.stock }})
               </span>
 
               <span class="status-badge clickable" 
@@ -180,7 +184,7 @@
                     [ngClass]="product.active ? 'active' : 'inactive'"
                     (click)="toggleProductStatus(product, $event)">
                 <ion-icon [name]="product.active ? 'checkmark-circle' : 'close-circle'"></ion-icon>
-                {{ product.active ? 'ACTIVO' : 'INACTIVO' }}
+                {{ product.active | activeStatus }}
               </span>
             </div>
           </ion-label>

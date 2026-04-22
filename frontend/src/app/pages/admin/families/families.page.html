@@ -113,7 +113,7 @@
                     [ngClass]="family.active ? 'active' : 'inactive'"
                     (click)="toggleFamilyStatus(family, $event)">
                 <ion-icon [name]="family.active ? 'checkmark-circle' : 'close-circle'"></ion-icon>
-                {{ family.active ? 'ACTIVA' : 'INACTIVA' }}
+                {{ family.active | activeStatus }}
               </span>
             </div>
           </ion-label>
