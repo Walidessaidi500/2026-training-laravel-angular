@@ -1,100 +1,27 @@
 <?php
 
-use App\Family\Infrastructure\Entrypoint\Http\FamilyController;
-use App\Order\Infrastructure\Entrypoint\Http\OrderController;
-use App\Product\Infrastructure\Entrypoint\Http\ProductController;
-use App\Restaurant\Infrastructure\Entrypoint\Http\RestaurantController;
-use App\Sale\Infrastructure\Entrypoint\Http\SaleController;
-use App\Tax\Infrastructure\Entrypoint\Http\TaxController;
-use App\User\Infrastructure\Entrypoint\Http\DeleteController;
-use App\User\Infrastructure\Entrypoint\Http\GetAuthenticatedUserController;
 use App\User\Infrastructure\Entrypoint\Http\LoginController;
-use App\User\Infrastructure\Entrypoint\Http\PostController;
-use App\User\Infrastructure\Entrypoint\Http\PutController;
-use App\User\Infrastructure\Entrypoint\Http\UserController;
-use App\Zone\Infrastructure\Entrypoint\Http\TableController;
-use App\Zone\Infrastructure\Entrypoint\Http\ZoneController;
+use App\User\Infrastructure\Entrypoint\Http\GetAuthenticatedUserController;
 use Illuminate\Support\Facades\Route;
 
-// Rutas públicas
+// 1. Rutas Públicas (No requieren token)
 Route::post('/login', LoginController::class);
 
-// Rutas protegidas (requieren token Sanctum)
+// 2. Rutas Protegidas (Requieren token Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
-    // Autenticación
+    
+    // Ruta del usuario autenticado (es lo suficientemente general para dejarla aquí)
     Route::get('/me', GetAuthenticatedUserController::class);
 
-    // Usuarios
-    // (Movido a role:admin)
-
-    // Restaurantes
-    Route::get('/restaurants', [RestaurantController::class, 'index']);
-    Route::get('/restaurants/{uuid}', [RestaurantController::class, 'show']);
-    Route::post('/restaurants', [RestaurantController::class, 'store']);
-    Route::put('/restaurants/{uuid}', [RestaurantController::class, 'update']);
-    Route::delete('/restaurants/{uuid}', [RestaurantController::class, 'destroy']);
-
-    // Familias
-    Route::get('/families', [FamilyController::class, 'index']);
-    Route::get('/families/{uuid}', [FamilyController::class, 'show']);
-    Route::post('/families', [FamilyController::class, 'store']);
-    Route::put('/families/{uuid}', [FamilyController::class, 'update']);
-    Route::delete('/families/{uuid}', [FamilyController::class, 'destroy']);
-    Route::patch('/families/{uuid}/toggle-active', [FamilyController::class, 'toggleActive']);
-
-    // Impuestos
-    Route::get('/taxes', [TaxController::class, 'index']);
-    Route::get('/taxes/{uuid}', [TaxController::class, 'show']);
-    Route::post('/taxes', [TaxController::class, 'store']);
-    Route::put('/taxes/{uuid}', [TaxController::class, 'update']);
-    Route::delete('/taxes/{uuid}', [TaxController::class, 'destroy']);
-
-    // Productos
-    Route::get('/products', [ProductController::class, 'index']);
-    Route::get('/products/{uuid}', [ProductController::class, 'show']);
-    Route::post('/products', [ProductController::class, 'store']);
-    Route::put('/products/{uuid}', [ProductController::class, 'update']);
-    Route::delete('/products/{uuid}', [ProductController::class, 'destroy']);
-    Route::patch('/products/{uuid}/toggle-active', [ProductController::class, 'toggleActive']);
-
-    // Zonas
-    Route::get('/zones', [ZoneController::class, 'index']);
-    Route::get('/zones/{uuid}', [ZoneController::class, 'show']);
-    Route::post('/zones', [ZoneController::class, 'store']);
-    Route::put('/zones/{uuid}', [ZoneController::class, 'update']);
-    Route::delete('/zones/{uuid}', [ZoneController::class, 'destroy']);
-
-    // Mesas
-    Route::get('/tables', [TableController::class, 'index']);
-    Route::get('/tables/{uuid}', [TableController::class, 'show']);
-    Route::post('/tables', [TableController::class, 'store']);
-    Route::put('/tables/{uuid}', [TableController::class, 'update']);
-    Route::delete('/tables/{uuid}', [TableController::class, 'destroy']);
-
-    // Usuarios - Consultas permitidas para Admin, Supervisor y Restaurante
-    Route::middleware('role:admin,supervisor,restaurant')->group(function () {
-        Route::get('/users', [UserController::class, 'index']);
-        Route::get('/users/{uuid}', [UserController::class, 'show']);
-    });
-
-    // Usuarios - Acciones restringidas solo a Admin
-    Route::middleware('role:admin')->group(function () {
-        Route::post('/users', PostController::class);
-        Route::put('/users/{uuid}', PutController::class);
-        Route::delete('/users/{uuid}', DeleteController::class);
-        Route::patch('/users/{uuid}/toggle-active', [UserController::class, 'toggleActive']);
-    });
-
-    // Órdenes
-    Route::get('/orders', [OrderController::class, 'index']);
-    Route::get('/orders/table/{tableUuid}', [OrderController::class, 'activeOrder']);
-    Route::get('/orders/{uuid}', [OrderController::class, 'show']);
-    Route::post('/orders/sync', [OrderController::class, 'sync']);
-    Route::delete('/orders/{uuid}', [OrderController::class, 'destroy']);
-
-    // Ventas
-    Route::get('/sales', [SaleController::class, 'index']);
-    Route::get('/sales/{uuid}', [SaleController::class, 'show']);
-    Route::post('/sales/process', [SaleController::class, 'process']);
-    Route::delete('/sales/{uuid}', [SaleController::class, 'destroy']);
+    // 3. Carga de los submódulos por dominio
+    // Al incluirlos dentro de este grupo, TODOS heredan automáticamente el middleware 'auth:sanctum'
+    require __DIR__ . '/api/families.php';
+    require __DIR__ . '/api/orders.php';
+    require __DIR__ . '/api/products.php';
+    require __DIR__ . '/api/restaurants.php';
+    require __DIR__ . '/api/sales.php';
+    require __DIR__ . '/api/tables.php';
+    require __DIR__ . '/api/taxes.php';
+    require __DIR__ . '/api/users.php';
+    require __DIR__ . '/api/zones.php';
 });

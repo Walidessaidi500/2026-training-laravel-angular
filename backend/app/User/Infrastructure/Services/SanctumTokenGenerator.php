@@ -2,18 +2,23 @@
 
 namespace App\User\Infrastructure\Services;
 
-use App\User\Domain\Entity\User;
+use App\Shared\Domain\ValueObject\Uuid;
 use App\User\Domain\Interfaces\TokenGeneratorInterface;
 use App\User\Infrastructure\Persistence\Models\EloquentUser;
+use App\Restaurant\Infrastructure\Persistence\Models\EloquentRestaurant;
 
 class SanctumTokenGenerator implements TokenGeneratorInterface
 {
-    public function generate(User $user): string
+    public function generate(Uuid $id, string $type = 'user'): string
     {
-        $eloquentUser = EloquentUser::where('uuid', $user->id()->value())->firstOrFail();
+        if ($type === 'restaurant') {
+            $model = EloquentRestaurant::where('uuid', $id->value())->firstOrFail();
+        } else {
+            $model = EloquentUser::where('uuid', $id->value())->firstOrFail();
+        }
 
-        $eloquentUser->tokens()->delete();
+        $model->tokens()->delete();
 
-        return $eloquentUser->createToken('auth-token')->plainTextToken;
+        return $model->createToken('auth-token')->plainTextToken;
     }
 }

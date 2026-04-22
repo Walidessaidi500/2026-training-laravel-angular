@@ -133,9 +133,9 @@ export class TpvPage implements OnInit {
     forkJoin({
       zones: this.zoneService.list(1, 100),
       tables: this.tableService.list(1, 100),
-      families: this.familyService.list(),
+      families: this.familyService.list(true),
       taxes: this.taxService.list(),
-      products: this.productService.list(1, 500),
+      products: this.productService.list(1, 500, true),
       activeOrders: this.orderService.list(1, 1000),
       users: this.userService.list(1, 100).pipe(
         map(res => ({
@@ -432,7 +432,7 @@ export class TpvPage implements OnInit {
   }
 
   private refreshProducts() {
-    this.productService.list(1, 500).subscribe({
+    this.productService.list(1, 500, true).subscribe({
       next: (res) => {
         this.products = res.data;
         this.updateFilteredProducts();

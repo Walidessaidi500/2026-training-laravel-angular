@@ -12,6 +12,21 @@ use Illuminate\Support\Facades\DB;
 
 class EloquentOrderRepository implements OrderRepositoryInterface
 {
+    private function getInternalUserId(string $uuid): ?int
+    {
+        return DB::table('users')->where('uuid', $uuid)->value('id') 
+            ?? DB::table('restaurants')->where('uuid', $uuid)->value('id');
+    }
+
+    private function getUuidFromInternalId(int $id): ?string
+    {
+        // Nota: Esto es un poco ambiguo si hay IDs duplicados en ambas tablas, 
+        // pero en este sistema restaurant_id y user_id suelen estar claros por contexto.
+        // Como la FK apunta a 'users', primero buscamos en users.
+        return DB::table('users')->where('id', $id)->value('uuid')
+            ?? DB::table('restaurants')->where('id', $id)->value('uuid');
+    }
+
     public function save(Order $order): void
     {
         DB::transaction(function () use ($order) {
@@ -21,8 +36,8 @@ class EloquentOrderRepository implements OrderRepositoryInterface
                     'restaurant_id' => $order->restaurantId()->value(),
                     'status' => $order->status(),
                     'table_id' => DB::table('tables')->where('uuid', $order->tableId()->value())->value('id'),
-                    'opened_by_user_id' => DB::table('users')->where('uuid', $order->openedByUserId()->value())->value('id'),
-                    'closed_by_user_id' => $order->closedByUserId() ? DB::table('users')->where('uuid', $order->closedByUserId()->value())->value('id') : null,
+                    'opened_by_user_id' => $this->getInternalUserId($order->openedByUserId()->value()),
+                    'closed_by_user_id' => $order->closedByUserId() ? $this->getInternalUserId($order->closedByUserId()->value()) : null,
                     'diners' => $order->diners(),
                     'opened_at' => $order->openedAt()->value(),
                     'closed_at' => $order->closedAt()?->value(),
@@ -43,7 +58,7 @@ class EloquentOrderRepository implements OrderRepositoryInterface
                         'restaurant_id' => $line->restaurantId()->value(),
                         'order_id' => $eloquentOrder->id,
                         'product_id' => DB::table('products')->where('uuid', $line->productId()->value())->value('id'),
-                        'user_id' => DB::table('users')->where('uuid', $line->userId()->value())->value('id'),
+                        'user_id' => $this->getInternalUserId($line->userId()->value()),
                         'quantity' => $line->quantity(),
                         'price' => $line->price(),
                         'tax_percentage' => $line->taxPercentage(),
@@ -114,7 +129,7 @@ class EloquentOrderRepository implements OrderRepositoryInterface
                 $line->restaurant_id,
                 $line->order->uuid,
                 DB::table('products')->where('id', $line->product_id)->value('uuid'),
-                DB::table('users')->where('id', $line->user_id)->value('uuid'),
+                $this->getUuidFromInternalId($line->user_id),
                 $line->quantity,
                 $line->price,
                 $line->tax_percentage,
@@ -128,8 +143,8 @@ class EloquentOrderRepository implements OrderRepositoryInterface
             $eloquentOrder->restaurant_id,
             $eloquentOrder->status,
             DB::table('tables')->where('id', $eloquentOrder->table_id)->value('uuid'),
-            DB::table('users')->where('id', $eloquentOrder->opened_by_user_id)->value('uuid'),
-            $eloquentOrder->closed_by_user_id ? DB::table('users')->where('id', $eloquentOrder->closed_by_user_id)->value('uuid') : null,
+            $this->getUuidFromInternalId($eloquentOrder->opened_by_user_id),
+            $eloquentOrder->closed_by_user_id ? $this->getUuidFromInternalId($eloquentOrder->closed_by_user_id) : null,
             $eloquentOrder->diners,
             new \DateTimeImmutable($eloquentOrder->opened_at),
             $eloquentOrder->closed_at ? new \DateTimeImmutable($eloquentOrder->closed_at) : null,

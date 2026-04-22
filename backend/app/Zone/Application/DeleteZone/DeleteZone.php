@@ -3,7 +3,7 @@
 namespace App\Zone\Application\DeleteZone;
 
 use App\Shared\Domain\ValueObject\Uuid;
-use App\Zone\Domain\Interfaces\TableRepositoryInterface;
+use App\Table\Domain\Interfaces\TableRepositoryInterface;
 use App\Zone\Domain\Interfaces\ZoneRepositoryInterface;
 
 class DeleteZone

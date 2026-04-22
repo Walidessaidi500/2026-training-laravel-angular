@@ -8,7 +8,7 @@ use App\Product\Infrastructure\Persistence\Models\EloquentProduct;
 use App\Sale\Infrastructure\Persistence\Models\EloquentSale;
 use App\Sale\Infrastructure\Persistence\Models\EloquentSaleLine;
 use App\User\Infrastructure\Persistence\Models\EloquentUser;
-use App\Zone\Infrastructure\Persistence\Models\EloquentTable;
+use App\Table\Infrastructure\Persistence\Models\EloquentTable;
 use Illuminate\Database\Seeder;
 
 class SaleSeeder extends Seeder

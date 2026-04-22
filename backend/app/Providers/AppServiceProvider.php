@@ -16,9 +16,9 @@ use App\User\Domain\Interfaces\UserRepositoryInterface;
 use App\User\Infrastructure\Persistence\Repositories\EloquentUserRepository;
 use App\User\Infrastructure\Services\LaravelPasswordHasher;
 use App\User\Infrastructure\Services\SanctumTokenGenerator;
-use App\Zone\Domain\Interfaces\TableRepositoryInterface;
+use App\Table\Domain\Interfaces\TableRepositoryInterface;
 use App\Zone\Domain\Interfaces\ZoneRepositoryInterface;
-use App\Zone\Infrastructure\Persistence\Repositories\EloquentTableRepository;
+use App\Table\Infrastructure\Persistence\Repositories\EloquentTableRepository;
 use App\Zone\Infrastructure\Persistence\Repositories\EloquentZoneRepository;
 use Illuminate\Support\ServiceProvider;
 

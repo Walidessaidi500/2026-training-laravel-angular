@@ -4,7 +4,7 @@ namespace App\Order\Infrastructure\Persistence\Models;
 
 use App\Restaurant\Infrastructure\Persistence\Models\EloquentRestaurant;
 use App\User\Infrastructure\Persistence\Models\EloquentUser;
-use App\Zone\Infrastructure\Persistence\Models\EloquentTable;
+use App\Table\Infrastructure\Persistence\Models\EloquentTable;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

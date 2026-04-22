@@ -3,7 +3,7 @@
 namespace App\Sale\Infrastructure\Persistence\Models;
 
 use App\User\Infrastructure\Persistence\Models\EloquentUser;
-use App\Zone\Infrastructure\Persistence\Models\EloquentTable;
+use App\Table\Infrastructure\Persistence\Models\EloquentTable;
 use Database\Factories\SaleFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

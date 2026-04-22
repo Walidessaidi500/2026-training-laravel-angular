@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Table\Domain\Interfaces;
+
+use App\Shared\Domain\ValueObject\Uuid;
+use App\Table\Domain\Entity\Table;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+interface TableRepositoryInterface
+{
+    public function save(Table $table): void;
+
+    public function findById(Uuid $id): ?Table;
+
+    
+    public function findAll(): array;
+
+    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator;
+
+    public function delete(Uuid $id): void;
+    public function deleteByZoneUuid(Uuid $zoneUuid): void;
+}

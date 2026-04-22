@@ -32,8 +32,12 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  list(page: number = 1, perPage: number = 100): Observable<ProductListResponse> {
-    return this.http.get<ProductListResponse>(`${this.apiUrl}?page=${page}&per_page=${perPage}`);
+  list(page: number = 1, perPage: number = 100, active?: boolean): Observable<ProductListResponse> {
+    let url = `${this.apiUrl}?page=${page}&per_page=${perPage}`;
+    if (active !== undefined) {
+      url += `&active=${active ? 1 : 0}`;
+    }
+    return this.http.get<ProductListResponse>(url);
   }
 
   get(uuid: string): Observable<Product> {

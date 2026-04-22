@@ -2,11 +2,11 @@
 
 namespace App\User\Application\GetAuthenticatedUser;
 
-use App\User\Infrastructure\Persistence\Models\EloquentUser;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class GetAuthenticatedUser
 {
-    public function execute(EloquentUser $user): GetAuthenticatedUserResponse
+    public function execute(Authenticatable $user): GetAuthenticatedUserResponse
     {
         return GetAuthenticatedUserResponse::create(
             uuid: $user->uuid,

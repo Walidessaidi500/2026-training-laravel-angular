@@ -60,7 +60,7 @@ class EloquentProductRepository implements ProductRepositoryInterface
             ->all();
     }
 
-    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator
+    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null, ?bool $active = null): LengthAwarePaginator
     {
         $query = $this->model->newQuery()
             ->with(['family', 'tax'])
@@ -68,6 +68,17 @@ class EloquentProductRepository implements ProductRepositoryInterface
 
         if ($restaurantId !== null) {
             $query->where('restaurant_id', $restaurantId);
+        }
+
+        if ($active !== null) {
+            $query->where('active', $active);
+
+            // Si se pide activos (para el TPV), debemos filtrar también por familia activa
+            if ($active === true) {
+                $query->whereHas('family', function ($q) {
+                    $q->where('active', true);
+                });
+            }
         }
 
         return $query

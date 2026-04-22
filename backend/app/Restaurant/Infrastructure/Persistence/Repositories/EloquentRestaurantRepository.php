@@ -43,6 +43,26 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
         );
     }
 
+    public function findByEmail(\App\Shared\Domain\ValueObject\Email $email): ?Restaurant
+    {
+        $eloquent = EloquentRestaurant::where('email', $email->value())->first();
+
+        if ($eloquent === null) {
+            return null;
+        }
+
+        return Restaurant::fromPersistence(
+            $eloquent->uuid,
+            $eloquent->name,
+            $eloquent->legal_name,
+            $eloquent->tax_id,
+            $eloquent->email,
+            $eloquent->password,
+            new \DateTimeImmutable($eloquent->created_at),
+            new \DateTimeImmutable($eloquent->updated_at),
+        );
+    }
+
     public function delete(Uuid $id): void
     {
         EloquentRestaurant::where('uuid', $id->value())->delete();

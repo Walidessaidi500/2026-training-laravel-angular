@@ -28,8 +28,12 @@ export class FamilyService {
 
   constructor(private http: HttpClient) {}
 
-  list(): Observable<FamilyListResponse> {
-    return this.http.get<FamilyListResponse>(this.apiUrl);
+  list(active?: boolean): Observable<FamilyListResponse> {
+    let url = this.apiUrl;
+    if (active !== undefined) {
+      url += `?active=${active ? 1 : 0}`;
+    }
+    return this.http.get<FamilyListResponse>(url);
   }
 
   get(uuid: string): Observable<Family> {

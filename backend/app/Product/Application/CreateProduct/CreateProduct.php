@@ -15,12 +15,13 @@ class CreateProduct
 {
     public function __construct(
         private ProductRepositoryInterface $productRepository,
+        // authservice
     ) {}
 
     // Recibe tipos primitivos y los convierte en VOs
     public function __invoke(
         ?string $familyId,
-        ?string $taxId,
+        string $taxId,
         string $name,
         int $priceInCents,
         int $stock,
@@ -28,6 +29,8 @@ class CreateProduct
         bool $active = true,
         ?string $imageSrc = null,
     ): ProductResponse {
+        // valida si el usuario tiene permiso para realizar la acción
+
         $product = Product::dddCreate(
             $familyId ? Uuid::create($familyId) : null,
             $taxId ? Uuid::create($taxId) : null,

@@ -30,7 +30,7 @@ class Product implements \JsonSerializable
 
     public static function dddCreate(
         ?Uuid $familyId,
-        ?Uuid $taxId,
+        Uuid $taxId,
         ProductName $name,
         Price $price,
         Stock $stock,

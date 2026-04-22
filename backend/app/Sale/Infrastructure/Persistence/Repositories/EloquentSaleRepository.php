@@ -12,6 +12,18 @@ use Illuminate\Support\Facades\DB;
 
 class EloquentSaleRepository implements SaleRepositoryInterface
 {
+    private function getInternalUserId(string $uuid): ?int
+    {
+        return DB::table('users')->where('uuid', $uuid)->value('id') 
+            ?? DB::table('restaurants')->where('uuid', $uuid)->value('id');
+    }
+
+    private function getUuidFromInternalId(int $id): ?string
+    {
+        return DB::table('users')->where('id', $id)->value('uuid')
+            ?? DB::table('restaurants')->where('id', $id)->value('uuid');
+    }
+
     public function save(Sale $sale): void
     {
         DB::transaction(function () use ($sale) {
@@ -21,9 +33,9 @@ class EloquentSaleRepository implements SaleRepositoryInterface
                     'restaurant_id' => $sale->restaurantId()->value(),
                     'order_id' => DB::table('orders')->where('uuid', $sale->orderId()->value())->value('id'),
                     'table_id' => DB::table('tables')->where('uuid', $sale->tableId()->value())->value('id'),
-                    'user_id' => DB::table('users')->where('uuid', $sale->userId()->value())->value('id'),
-                    'opened_by_user_id' => DB::table('users')->where('uuid', $sale->openedByUserId()->value())->value('id'),
-                    'closed_by_user_id' => $sale->closedByUserId() ? DB::table('users')->where('uuid', $sale->closedByUserId()->value())->value('id') : null,
+                    'user_id' => $this->getInternalUserId($sale->userId()->value()),
+                    'opened_by_user_id' => $this->getInternalUserId($sale->openedByUserId()->value()),
+                    'closed_by_user_id' => $sale->closedByUserId() ? $this->getInternalUserId($sale->closedByUserId()->value()) : null,
                     'ticket_number' => $sale->ticketNumber(),
                     'diners' => $sale->diners(),
                     'opened_at' => $sale->openedAt()->value(),
@@ -49,7 +61,7 @@ class EloquentSaleRepository implements SaleRepositoryInterface
                         'sale_id' => $eloquentSale->id,
                         'order_line_id' => DB::table('order_lines')->where('uuid', $line->orderLineId()->value())->value('id'),
                         'product_id' => DB::table('products')->where('uuid', $line->productId()->value())->value('id'),
-                        'user_id' => DB::table('users')->where('uuid', $line->userId()->value())->value('id'),
+                        'user_id' => $this->getInternalUserId($line->userId()->value()),
                         'quantity' => $line->quantity(),
                         'price' => $line->price(),
                         'tax_percentage' => $line->taxPercentage(),
@@ -105,7 +117,7 @@ class EloquentSaleRepository implements SaleRepositoryInterface
                 $line->sale->uuid,
                 DB::table('order_lines')->where('id', $line->order_line_id)->value('uuid'),
                 DB::table('products')->where('id', $line->product_id)->value('uuid'),
-                DB::table('users')->where('id', $line->user_id)->value('uuid'),
+                $this->getUuidFromInternalId($line->user_id),
                 $line->quantity,
                 $line->price,
                 $line->tax_percentage,
@@ -119,9 +131,9 @@ class EloquentSaleRepository implements SaleRepositoryInterface
             $eloquentSale->restaurant_id,
             DB::table('orders')->where('id', $eloquentSale->order_id)->value('uuid'),
             DB::table('tables')->where('id', $eloquentSale->table_id)->value('uuid'),
-            DB::table('users')->where('id', $eloquentSale->user_id)->value('uuid'),
-            DB::table('users')->where('id', $eloquentSale->opened_by_user_id)->value('uuid'),
-            $eloquentSale->closed_by_user_id ? DB::table('users')->where('id', $eloquentSale->closed_by_user_id)->value('uuid') : null,
+            $this->getUuidFromInternalId($eloquentSale->user_id),
+            $this->getUuidFromInternalId($eloquentSale->opened_by_user_id),
+            $eloquentSale->closed_by_user_id ? $this->getUuidFromInternalId($eloquentSale->closed_by_user_id) : null,
             $eloquentSale->ticket_number,
             $eloquentSale->diners,
             new \DateTimeImmutable($eloquentSale->opened_at),
