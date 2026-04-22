@@ -108,8 +108,10 @@
           <ion-label class="family-info">
             <h2>{{ family.name }}</h2>
             <div class="family-meta">
-              <span class="status-badge" [ngClass]="family.active ? 'active' : 'inactive'"
-                (click)="isAdmin ? toggleFamilyStatus(family) : null" [style.cursor]="isAdmin ? 'pointer' : 'default'">
+              <span class="status-badge clickable" 
+                    style="cursor: pointer;"
+                    [ngClass]="family.active ? 'active' : 'inactive'"
+                    (click)="toggleFamilyStatus(family, $event)">
                 <ion-icon [name]="family.active ? 'checkmark-circle' : 'close-circle'"></ion-icon>
                 {{ family.active ? 'ACTIVA' : 'INACTIVA' }}
               </span>

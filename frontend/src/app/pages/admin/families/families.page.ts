@@ -208,22 +208,7 @@ export class FamiliesPage implements OnInit {
     await alert.present();
   }
 
-  toggleFamilyStatus(family: Family): void {
-    this.familyService.toggle(family.uuid).subscribe({
-      next: (updatedFamily: any) => {
-        family.active = !family.active;
-        this.calculateStats();
-        this.showToast(
-          `Familia ${family.active ? 'activada' : 'desactivada'} correctamente`,
-          'success',
-          family.active ? 'checkmark-circle' : 'close-circle'
-        );
-      },
-      error: () => {
-        this.showToast('Error al cambiar el estado de la familia', 'danger', 'alert-circle');
-      }
-    });
-  }
+  
 
   private performDeleteFamily(uuid: string): void {
     this.familyService.delete(uuid).subscribe({
@@ -239,4 +224,28 @@ export class FamiliesPage implements OnInit {
     const toast = await this.toastController.create({ message, duration: 2500, position: 'top', color, icon });
     await toast.present();
   }
+
+  toggleFamilyStatus(family: Family, event: Event): void {
+      event.stopPropagation();
+      const previousStatus = family.active;
+      family.active = !previousStatus;
+      const updatePayload: any = {
+        name: family.name,
+        active: family.active
+      };
+  
+      this.familyService.update(family.uuid, updatePayload).subscribe({
+        next: () => {
+          this.showToast(`Familia ${family.active ? 'activada' : 'desactivada'}`, 'success', 'checkmark-circle');        
+          
+          this.calculateStats();
+        },
+        error: (error) => {
+          console.error('Error al cambiar estado:', error);
+  
+          family.active = previousStatus;
+          this.showToast('Error al cambiar el estado', 'danger', 'alert-circle');
+        }
+      });
+    }
 }
