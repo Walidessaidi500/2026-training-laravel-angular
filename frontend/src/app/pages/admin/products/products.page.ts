@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonIcon, IonList, IonItem, IonLabel,
   IonSkeletonText, IonSearchbar, IonSelect, IonSelectOption,
-  IonNote, ModalController, AlertController, ToastController,
+  IonNote, ModalController,
   IonInfiniteScroll, IonInfiniteScrollContent, IonSegment, IonSegmentButton
 } from '@ionic/angular/standalone';
 
@@ -20,6 +20,10 @@ import { AuthService } from '@services/auth/auth.service';
 import { ProductService } from '@services/domain/product.service';
 import { FamilyService } from '@services/domain/family.service';
 import { TaxService } from '@services/domain/tax.service';
+import { UiService } from '@services/ui.service';
+import { FilterService } from '@services/filter.service';
+import { UtilsService } from '@services/utils.service';
+import { CrudHelperService } from '@services/crud-helper.service';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 import { ProductFormComponent, ProductFormData } from '@components/product-form/product-form.component';
 
@@ -67,7 +71,7 @@ export class ProductsPage implements OnInit {
   families: any[] = [];
   taxes: any[] = [];
 
-  
+
   filteredProducts: Product[] = [];
 
   // Filtros
@@ -84,7 +88,7 @@ export class ProductsPage implements OnInit {
     outOfStock: 0
   };
 
-  
+
   currentPage = 1;
   lastPage = 1;
   perPage = 10; // Reducimos para que la paginación sea más evidente
@@ -96,8 +100,10 @@ export class ProductsPage implements OnInit {
     private familyService: FamilyService,
     private taxService: TaxService,
     private modalController: ModalController,
-    private alertController: AlertController,
-    private toastController: ToastController
+    private uiService: UiService,
+    private filterService: FilterService,
+    private utilsService: UtilsService,
+    private crudHelper: CrudHelperService
   ) {
     addIcons({
       'cube-outline': cubeOutline,
@@ -120,17 +126,16 @@ export class ProductsPage implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-    const role = this.currentUser?.role;
 
-    if (!this.currentUser || (role !== 'admin' && role !== 'supervisor')) {
+    if (!this.currentUser || (!this.authService.hasRole('admin') && !this.authService.hasRole('supervisor'))) {
       this.isAdmin = false;
       this.isSupervisor = false;
       this.isLoading = false;
       return;
     }
 
-    this.isAdmin = role === 'admin';
-    this.isSupervisor = role === 'supervisor';
+    this.isAdmin = this.authService.hasRole('admin');
+    this.isSupervisor = this.authService.hasRole('supervisor');
     this.loadInitialData();
   }
 
@@ -168,10 +173,6 @@ export class ProductsPage implements OnInit {
     if (!isAppend) {
       this.isLoading = true;
       this.currentPage = !isAppend && this.displayMode === 'scroll' ? 1 : this.currentPage;
-      if (this.displayMode === 'pagination' && !isAppend) {
-         // Si cambiamos a paginación y no es append, nos aseguramos de estar en la pag 1 si es necesario
-         // Pero mejor dejamos que el usuario navegue.
-      }
       this.isInfiniteDisabled = false;
     }
 
@@ -228,9 +229,15 @@ export class ProductsPage implements OnInit {
       this.productStats.active = aggregates.active;
       this.productStats.outOfStock = aggregates.out_of_stock;
     } else {
-      this.productStats.total = this.products.length;
-      this.productStats.active = this.products.filter(p => p.active).length;
-      this.productStats.outOfStock = this.products.filter(p => p.stock <= 0).length;
+      const stats = this.utilsService.calculateStats(this.products, [
+        { label: 'active', filterFn: (p) => p.active },
+        { label: 'outOfStock', filterFn: (p) => p.stock <= 0 },
+      ]);
+      this.productStats = {
+        total: stats['total'],
+        active: stats['active'],
+        outOfStock: stats['outOfStock'],
+      };
     }
   }
 
@@ -239,53 +246,29 @@ export class ProductsPage implements OnInit {
   }
 
   onSearchChange(event: any): void {
-    this.searchTerm = event.detail.value?.toLowerCase() || '';
+    this.searchTerm = event.detail.value || '';
     this.applyFilters();
   }
 
   private applyFilters(): void {
-    let filtered = [...this.products];
-
-    
-    if (this.searchTerm) {
-      filtered = filtered.filter(p => p.name.toLowerCase().includes(this.searchTerm));
-    }
-
-    
-    if (this.selectedFamily !== 'all') {
-      if (this.selectedFamily === 'none') {
-        filtered = filtered.filter(p => !p.family_id);
-      } else {
-        filtered = filtered.filter(p => p.family_id === this.selectedFamily);
-      }
-    }
-
-    
-    if (this.selectedTax !== 'all') {
-      if (this.selectedTax === 'none') {
-        filtered = filtered.filter(p => !p.tax_id);
-      } else {
-        filtered = filtered.filter(p => p.tax_id === this.selectedTax);
-      }
-    }
-
-    
-    if (this.selectedStatus !== 'all') {
-      const isActive = this.selectedStatus === 'active';
-      filtered = filtered.filter(p => p.active === isActive);
-    }
-
-    if (this.selectedStock !== 'all') {
-      if (this.selectedStock === 'in_stock') {
-        filtered = filtered.filter(p => p.stock > 0);
-      } else if (this.selectedStock === 'out_of_stock') {
-        filtered = filtered.filter(p => p.stock <= 0);
-      } else if (this.selectedStock === 'low_stock') {
-        filtered = filtered.filter(p => p.stock > 0 && p.stock <= 5);
-      }
-    }
-
-    this.filteredProducts = filtered;
+    this.filteredProducts = this.filterService.applyFilters(this.products, {
+      searchTerm: this.searchTerm,
+      searchProperties: ['name'],
+      status: this.selectedStatus,
+      propertyFilters: [
+        { property: 'family_id', value: this.selectedFamily },
+        { property: 'tax_id', value: this.selectedTax },
+      ],
+      customFilters: [
+        (p) => {
+          if (this.selectedStock === 'all') return true;
+          if (this.selectedStock === 'in_stock') return p.stock > 0;
+          if (this.selectedStock === 'out_of_stock') return p.stock <= 0;
+          if (this.selectedStock === 'low_stock') return p.stock > 0 && p.stock <= 5;
+          return true;
+        }
+      ]
+    });
   }
 
   async addNewProduct(): Promise<void> {
@@ -326,83 +309,44 @@ export class ProductsPage implements OnInit {
 
   private handleCreateProduct(formData: ProductFormData): void {
     this.isLoading = true;
-
-    this.productService.create(formData).subscribe({
-      next: () => {
-        this.showToast('Producto creado exitosamente', 'success', 'checkmark-circle');
-        this.loadProducts();
-      },
-      error: (error) => {
-        console.error('Error creating product:', error);
-        this.showToast('Error al crear el producto', 'danger', 'alert-circle');
-        this.isLoading = false;
-      },
-    });
+    this.crudHelper.handleCreate(
+      this.productService.create(formData),
+      'Producto creado exitosamente',
+      () => this.loadProducts(),
+      () => this.isLoading = false
+    );
   }
 
   private handleUpdateProduct(uuid: string, formData: ProductFormData): void {
     this.isLoading = true;
-
-    this.productService.update(uuid, formData).subscribe({
-      next: () => {
-        this.showToast('Producto actualizado exitosamente', 'success', 'checkmark-circle');
-        this.loadProducts();
-      },
-      error: (error) => {
-        console.error('Error updating product:', error);
-        this.showToast('Error al actualizar el producto', 'danger', 'alert-circle');
-        this.isLoading = false;
-      },
-    });
+    this.crudHelper.handleUpdate(
+      this.productService.update(uuid, formData),
+      'Producto actualizado exitosamente',
+      () => this.loadProducts(),
+      () => this.isLoading = false
+    );
   }
 
- 
+
 
   async deleteProduct(product: Product): Promise<void> {
-    const alert = await this.alertController.create({
-      header: 'Eliminar Producto',
-      message: '¿Estás seguro de que deseas eliminar ' + product.name + '? Esta acción no se puede deshacer.',
-      backdropDismiss: false,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => {
-            this.performDeleteProduct(product.uuid);
-          }
-        }
-      ],
-    });
-
-    await alert.present();
+    await this.uiService.confirmDelete(
+      'Eliminar Producto',
+      '¿Estás seguro de que deseas eliminar ' + product.name + '? Esta acción no se puede deshacer.',
+      () => this.performDeleteProduct(product.uuid)
+    );
   }
 
   private performDeleteProduct(uuid: string): void {
     this.isLoading = true;
-
-
-    this.productService.delete(uuid).subscribe({
-      next: () => {
-        this.showToast('Producto eliminado exitosamente', 'success', 'checkmark-circle');
-        this.loadProducts();
-      },
-      error: (error) => {
-        console.error('Error deleting product:', error);
-        this.showToast('Error al eliminar el producto', 'danger', 'alert-circle');
-        this.isLoading = false;
-      },
-    });
+    this.crudHelper.handleDelete(
+      this.productService.delete(uuid),
+      'Producto eliminado exitosamente',
+      () => this.loadProducts(),
+      () => this.isLoading = false
+    );
   }
 
-  private async showToast(message: string, color: 'success' | 'danger', icon: string): Promise<void> {
-    const toast = await this.toastController.create({ message, duration: 2500, position: 'top', color, icon });
-    await toast.present();
-  }
-  
   toggleProductStatus(product: Product, event: Event): void {
     event.stopPropagation();
     const previousStatus = product.active;
@@ -418,15 +362,15 @@ export class ProductsPage implements OnInit {
 
     this.productService.update(product.uuid, updatePayload).subscribe({
       next: () => {
-        this.showToast(`Producto ${product.active ? 'activado' : 'desactivado'}`, 'success', 'checkmark-circle');        
-        
+        this.uiService.showSuccess(`Producto ${product.active ? 'activado' : 'desactivada'}`);        
+
         this.calculateStats();
       },
       error: (error) => {
         console.error('Error al cambiar estado:', error);
 
         product.active = previousStatus;
-        this.showToast('Error al cambiar el estado', 'danger', 'alert-circle');
+        this.uiService.showError('Error al cambiar el estado');
       }
     });
   }

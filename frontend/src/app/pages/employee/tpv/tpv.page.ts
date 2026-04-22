@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, AlertController, ToastController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { Router } from '@angular/router';
 import {
@@ -37,6 +37,7 @@ import { OrderService, Order } from '@services/domain/order.service';
 import { SaleService } from '@services/domain/sale.service';
 import { UserService, User } from '@services/domain/user.service';
 import { AuthService } from '@services/auth/auth.service';
+import { UiService } from '@services/ui.service';
 import { Observable, map, of, forkJoin, catchError } from 'rxjs';
 
 interface CartItem {
@@ -62,9 +63,8 @@ export class TpvPage implements OnInit {
   private readonly saleService = inject(SaleService);
   private readonly userService = inject(UserService);
   private readonly authService = inject(AuthService);
+  private readonly uiService = inject(UiService);
   private readonly router = inject(Router);
-  private readonly alertController = inject(AlertController);
-  private readonly toastController = inject(ToastController);
 
   // Estados de vista
   public viewState: 'tables' | 'order' = 'tables';
@@ -284,7 +284,7 @@ export class TpvPage implements OnInit {
         this.processClosing(user);
       }
     } else {
-      this.showToast('PIN incorrecto', 'danger', 'alert-circle');
+      this.uiService.showError('PIN incorrecto');
       this.pinBuffer = '';
     }
   }
@@ -371,7 +371,7 @@ export class TpvPage implements OnInit {
     const currentQtyInCart = existingItem ? existingItem.quantity : 0;
 
     if (currentQtyInCart >= product.stock) {
-      this.showToast(`No queda más stock de ${product.name}`, 'danger', 'alert-circle');
+      this.uiService.showError(`No queda más stock de ${product.name}`);
       return;
     }
 
@@ -423,12 +423,12 @@ export class TpvPage implements OnInit {
         if (!this.currentOrder) {
           this.currentOrder = res;
         }
-        this.showToast('Pedido mandado a cocina correctamente', 'success', 'checkmark-circle');
+        this.uiService.showSuccess('Pedido mandado a cocina correctamente');
         this.refreshProducts(); // Refrescar stock tras enviar pedido
       },
       error: (err) => {
         console.error('Error al mandar el pedido', err);
-        this.showToast('Error al enviar a cocina', 'danger', 'alert-circle');
+        this.uiService.showError('Error al enviar a cocina');
       }
     });
   }
@@ -451,7 +451,7 @@ export class TpvPage implements OnInit {
   }
 
   public printProvisional() {
-    this.showToast('Imprimiendo ticket provisional...', 'success', 'checkmark-circle');
+    this.uiService.showSuccess('Imprimiendo ticket provisional...');
     // Aquí se llamaría a un servicio de impresión o endpoint de backend si existiera
   }
 
@@ -481,13 +481,13 @@ export class TpvPage implements OnInit {
 
     this.saleService.process(saleData).subscribe({
       next: () => {
-        this.showToast('Ticket cerrado y cobrado correctamente', 'success', 'checkmark-circle');
+        this.uiService.showSuccess('Ticket cerrado y cobrado correctamente');
         this.refreshProducts(); // Importante refrescar stock al cobrar
         this.backToTables();
       },
       error: (err) => {
         console.error('Error al procesar la venta', err);
-        this.showToast('Hubo un error al procesar la venta', 'danger', 'alert-circle');
+        this.uiService.showError('Hubo un error al procesar la venta');
       }
     });
   }
@@ -495,16 +495,5 @@ export class TpvPage implements OnInit {
   public logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
-  }
-
-  private async showToast(message: string, color: 'success' | 'danger', icon: string): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2500,
-      position: 'top',
-      color,
-      icon
-    });
-    await toast.present();
   }
 }

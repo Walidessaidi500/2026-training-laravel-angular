@@ -2,9 +2,7 @@ import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  ModalController, 
   AlertController, 
-  ToastController,
   IonContent,
   IonIcon,
   IonList,
@@ -27,6 +25,10 @@ import {
 } from 'ionicons/icons';
 import { ZoneService, Zone } from '@services/domain/zone.service';
 import { AuthService } from '@services/auth/auth.service';
+import { UiService } from '@services/ui.service';
+import { FilterService } from '@services/filter.service';
+import { UtilsService } from '@services/utils.service';
+import { CrudHelperService } from '@services/crud-helper.service';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 
 @Component({
@@ -62,8 +64,11 @@ export class ZoneListComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private zoneService: ZoneService,
+    private uiService: UiService,
     private alertCtrl: AlertController,
-    private toastCtrl: ToastController
+    private filterService: FilterService,
+    private utilsService: UtilsService,
+    private crudHelper: CrudHelperService
   ) {
     addIcons({
       'business-outline': businessOutline,
@@ -80,7 +85,7 @@ export class ZoneListComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    if (!this.currentUser || !this.authService.hasRole('admin')) {
       this.isAdmin = false;
       this.isLoading = false;
       return;
@@ -101,25 +106,21 @@ export class ZoneListComponent implements OnInit {
       error: (err) => {
         console.error('Error loading zones:', err);
         this.isLoading = false;
-        this.showToast('Error al cargar las zonas', 'danger', 'alert-circle');
+        this.uiService.showError('Error al cargar las zonas');
       }
     });
   }
 
   public onSearchChange(event: any): void {
-    this.searchTerm = event.detail.value?.toLowerCase() || '';
+    this.searchTerm = event.detail.value || '';
     this.applyFilters();
   }
 
   private applyFilters(): void {
-    if (!this.searchTerm) {
-      this.filteredZones = [...this.zones];
-      return;
-    }
-    
-    this.filteredZones = this.zones.filter(zone => 
-      zone.name.toLowerCase().includes(this.searchTerm)
-    );
+    this.filteredZones = this.filterService.applyFilters(this.zones, {
+      searchTerm: this.searchTerm,
+      searchProperties: ['name']
+    });
   }
 
   
@@ -146,13 +147,11 @@ export class ZoneListComponent implements OnInit {
           text: 'Crear',
           handler: (data) => {
             if (!data.name) return false;
-            this.zoneService.create(data.name).subscribe({
-              next: () => {
-                this.showToast('Zona creada correctamente', 'success', 'checkmark-circle');
-                this.loadZones();
-              },
-              error: () => this.showToast('Error al crear la zona', 'danger', 'alert-circle')
-            });
+            this.crudHelper.handleCreate(
+              this.zoneService.create(data.name),
+              'Zona creada correctamente',
+              () => this.loadZones()
+            );
             return true;
           }
         }
@@ -183,13 +182,11 @@ export class ZoneListComponent implements OnInit {
           text: 'Guardar',
           handler: (data) => {
             if (!data.name) return false;
-            this.zoneService.update(zone.uuid, data.name).subscribe({
-              next: () => {
-                this.showToast('Zona actualizada', 'success', 'checkmark-circle');
-                this.loadZones();
-              },
-              error: () => this.showToast('Error al actualizar', 'danger', 'alert-circle')
-            });
+            this.crudHelper.handleUpdate(
+              this.zoneService.update(zone.uuid, data.name),
+              'Zona actualizada',
+              () => this.loadZones()
+            );
             return true;
           }
         }
@@ -200,45 +197,20 @@ export class ZoneListComponent implements OnInit {
   }
 
   public async onDeleteZone(zone: Zone): Promise<void> {
-    const alert = await this.alertCtrl.create({
-      header: 'Eliminar Zona',
-      message: `¿Estás seguro de que quieres eliminar la zona "${zone.name}"?`,
-      cssClass: 'custom-alert',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => {
-            this.zoneService.delete(zone.uuid).subscribe({
-              next: () => {
-                this.showToast('Zona eliminada', 'success', 'checkmark-circle');
-                this.loadZones();
-              },
-              error: (err) => {
-                const message = err.status === 400 ? 'No se puede eliminar una zona con mesas' : 'Error al eliminar';
-                this.showToast(message, 'danger', 'alert-circle');
-              }
-            });
+    await this.uiService.confirmDelete(
+      'Eliminar Zona',
+      `¿Estás seguro de que quieres eliminar la zona "${zone.name}"?`,
+      () => {
+        this.crudHelper.handleDelete(
+          this.zoneService.delete(zone.uuid),
+          'Zona eliminada',
+          () => this.loadZones(),
+          (err) => {
+            const message = err.status === 400 ? 'No se puede eliminar una zona con mesas' : 'Error al eliminar';
+            this.uiService.showError(message);
           }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  private async showToast(message: string, color: 'success' | 'danger' = 'success', icon: string): Promise<void> {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2500,
-      color,
-      icon,
-      position: 'top'
-    });
-    await toast.present();
+        );
+      }
+    );
   }
 }

@@ -2,14 +2,17 @@ import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ModalController, 
-  AlertController, 
-  ToastController,
+  AlertController,
   IonContent,
   IonIcon,
   IonSkeletonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { AuthService } from '@services/auth/auth.service';
+import { UiService } from '@services/ui.service';
+import { FilterService } from '@services/filter.service';
+import { UtilsService } from '@services/utils.service';
+import { CrudHelperService } from '@services/crud-helper.service';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 import { TablesFormComponent } from '@components/tables-form/tables-form.component';
 import {
@@ -66,9 +69,12 @@ export class TablesComponent implements OnInit {
     private authService: AuthService,
     private tableService: TableService,
     private zoneService: ZoneService,
+    private uiService: UiService,
+    private modalCtrl: ModalController,
     private alertCtrl: AlertController,
-    private toastCtrl: ToastController,
-    private modalCtrl: ModalController
+    private filterService: FilterService,
+    private utilsService: UtilsService,
+    private crudHelper: CrudHelperService
   ) {
     addIcons({
       'grid-outline': gridOutline,
@@ -118,7 +124,7 @@ export class TablesComponent implements OnInit {
       
       this.promptTableName(zoneId, selectedZone?.name);
     } else {
-      this.showToast('Primero debes crear al menos una zona', 'danger');
+      this.uiService.showError('Primero debes crear al menos una zona');
     }
   }
 
@@ -140,19 +146,15 @@ export class TablesComponent implements OnInit {
           handler: (data) => {
             if (!data.name) return false;
             this.isLoading = true;
-            this.tableService.create({
-              name: data.name,
-              zone_id: zoneId
-            }).subscribe({
-              next: () => {
-                this.showToast('Mesa creada correctamente');
-                this.loadData();
-              },
-              error: () => {
-                this.showToast('Error al crear la mesa', 'danger');
-                this.isLoading = false;
-              }
-            });
+            this.crudHelper.handleCreate(
+              this.tableService.create({
+                name: data.name,
+                zone_id: zoneId
+              }),
+              'Mesa creada correctamente',
+              () => this.loadData(),
+              () => this.isLoading = false
+            );
             return true;
           }
         }
@@ -177,61 +179,43 @@ export class TablesComponent implements OnInit {
     const { data } = await modal.onWillDismiss();
     if (data) {
       this.isLoading = true;
-      this.tableService.update(table.uuid, data).subscribe({
-        next: () => {
-          this.showToast('Mesa actualizada correctamente');
-          this.loadData();
-        },
-        error: () => {
-          this.showToast('Error al actualizar la mesa', 'danger');
-          this.isLoading = false;
-        }
-      });
+      this.crudHelper.handleUpdate(
+        this.tableService.update(table.uuid, data),
+        'Mesa actualizada correctamente',
+        () => this.loadData(),
+        () => this.isLoading = false
+      );
     }
   }
 
   public async deleteTable(table: Table): Promise<void> {
-    const alert = await this.alertCtrl.create({
-      header: 'Eliminar Mesa',
-      message: `¿Estás seguro de que quieres eliminar la mesa "${table.name}"? Esta acción no se puede deshacer.`,
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => {
-            this.isLoading = true;
-            this.tableService.delete(table.uuid).subscribe({
-              next: () => {
-                this.showToast('Mesa eliminada correctamente');
-                this.loadData();
-              },
-              error: () => {
-                this.showToast('Error al eliminar la mesa', 'danger');
-                this.isLoading = false;
-              }
-            });
-          }
-        }
-      ]
-    });
-
-    await alert.present();
+    await this.uiService.confirmDelete(
+      'Eliminar Mesa',
+      `¿Estás seguro de que quieres eliminar la mesa "${table.name}"? Esta acción no se puede deshacer.`,
+      () => {
+        this.isLoading = true;
+        this.crudHelper.handleDelete(
+          this.tableService.delete(table.uuid),
+          'Mesa eliminada correctamente',
+          () => this.loadData(),
+          () => this.isLoading = false
+        );
+      }
+    );
   }
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-    const role = this.currentUser?.role;
 
-    if (!this.currentUser || (role !== 'admin' && role !== 'supervisor')) {
+    if (!this.currentUser || (!this.authService.hasRole('admin') && !this.authService.hasRole('supervisor'))) {
       this.isAdmin = false;
       this.isSupervisor = false;
       this.isLoading = false;
       return;
     }
     
-    this.isAdmin = role === 'admin';
-    this.isSupervisor = role === 'supervisor';
+    this.isAdmin = this.authService.hasRole('admin');
+    this.isSupervisor = this.authService.hasRole('supervisor');
     this.loadData();
   }
 
@@ -250,13 +234,13 @@ export class TablesComponent implements OnInit {
             this.isLoading = false;
           },
           error: () => {
-            this.showToast('Error al cargar las mesas', 'danger');
+            this.uiService.showError('Error al cargar las mesas');
             this.isLoading = false;
           }
         });
       },
       error: () => {
-        this.showToast('Error al cargar las zonas', 'danger');
+        this.uiService.showError('Error al cargar las zonas');
         this.isLoading = false;
       }
     });
@@ -288,15 +272,5 @@ export class TablesComponent implements OnInit {
   public getActiveZoneName(): string {
     if (this.activeZoneId === 'all') return 'Todas las zonas';
     return this.zones.find(z => z.uuid === this.activeZoneId)?.name || '';
-  }
-
-  private async showToast(message: string, color: 'success' | 'danger' = 'success'): Promise<void> {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2500,
-      color,
-      position: 'top'
-    });
-    await toast.present();
   }
 }

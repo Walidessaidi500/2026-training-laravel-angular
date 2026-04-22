@@ -12,8 +12,6 @@ import {
   IonSegment,
   IonSegmentButton,
   ModalController,
-  AlertController,
-  ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -29,6 +27,10 @@ import {
 } from 'ionicons/icons';
 import { AuthService } from '@services/auth/auth.service';
 import { UserService } from '@services/domain/user.service';
+import { UiService } from '@services/ui.service';
+import { FilterService } from '@services/filter.service';
+import { UtilsService } from '@services/utils.service';
+import { CrudHelperService } from '@services/crud-helper.service';
 import { UserFormComponent, UserFormData } from '@components/user-form/user-form.component';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 
@@ -95,8 +97,10 @@ export class UsersPage implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private modalController: ModalController,
-    private alertController: AlertController,
-    private toastController: ToastController
+    private uiService: UiService,
+    private filterService: FilterService,
+    private utilsService: UtilsService,
+    private crudHelper: CrudHelperService
   ) {
     addIcons({
       'people-outline': peopleOutline,
@@ -115,15 +119,15 @@ export class UsersPage implements OnInit {
     this.currentUser = this.authService.getUser();
     const role = this.currentUser?.role?.toLowerCase();
 
-    if (!this.currentUser || (role !== 'admin' && role !== 'supervisor')) {
+    if (!this.currentUser || (!this.authService.hasRole('admin') && !this.authService.hasRole('supervisor'))) {
       this.isAdmin = false;
       this.isSupervisor = false;
       this.isLoading = false;
       return;
     }
 
-    this.isAdmin = role === 'admin';
-    this.isSupervisor = role === 'supervisor';
+    this.isAdmin = this.authService.hasRole('admin');
+    this.isSupervisor = this.authService.hasRole('supervisor');
     this.loadUsers();
   }
 
@@ -150,12 +154,19 @@ export class UsersPage implements OnInit {
   }
 
   private calculateStats(): void {
-    this.userStats.total = this.users.length;
-    this.userStats.admins = this.users.filter((u) => u.role.toLowerCase() === 'admin').length;
+    const stats = this.utilsService.calculateStats(this.users, [
+      { label: 'admins', filterFn: (u) => u.role.toLowerCase() === 'admin' },
+    ]);
+    this.userStats = {
+      total: stats['total'],
+      active: 0,
+      inactive: 0,
+      admins: stats['admins'],
+    };
   }
 
   onSearchChange(event: any): void {
-    this.searchTerm = event.detail.value?.toLowerCase() || '';
+    this.searchTerm = event.detail.value || '';
     this.applyFilters();
   }
 
@@ -165,32 +176,17 @@ export class UsersPage implements OnInit {
   }
 
   private applyFilters(): void {
-    let filtered = this.users;
-
-    
-    if (this.selectedRole !== 'all') {
-      filtered = filtered.filter((u) => u.role.toLowerCase() === this.selectedRole.toLowerCase());
-    }
-
-    
-    if (this.searchTerm) {
-      filtered = filtered.filter(
-        (u) =>
-          u.name.toLowerCase().includes(this.searchTerm) ||
-          u.email.toLowerCase().includes(this.searchTerm)
-      );
-    }
-
-    this.filteredUsers = filtered;
+    this.filteredUsers = this.filterService.applyFilters(this.users, {
+      searchTerm: this.searchTerm,
+      searchProperties: ['name', 'email'],
+      propertyFilters: [
+        { property: 'role', value: this.selectedRole }
+      ]
+    });
   }
 
   getInitials(name: string): string {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    return this.utilsService.getInitials(name);
   }
 
 
@@ -244,89 +240,35 @@ export class UsersPage implements OnInit {
   }
 
   async deleteUser(user: User): Promise<void> {
-    const alert = await this.alertController.create({
-      header: 'Eliminar Usuario',
-      message: `¿Estás seguro de que deseas eliminar a <strong>${user.name}</strong>? Esta acción no se puede deshacer.`,
-      backdropDismiss: false,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          handler: () => {
-            console.log('Delete cancelled');
-          },
-        },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => {
-            this.performDeleteUser(user.uuid);
-          },
-        },
-      ],
-    });
-
-    await alert.present();
+    await this.uiService.confirmDelete(
+      'Eliminar Usuario',
+      `¿Estás seguro de que deseas eliminar a <strong>${user.name}</strong>? Esta acción no se puede deshacer.`,
+      () => this.performDeleteUser(user.uuid)
+    );
   }
 
   private handleCreateUser(formData: UserFormData): void {
-    this.userService.create(formData).subscribe({
-      next: (response) => {
-        this.showSuccessToast('Usuario creado exitosamente');
-        this.loadUsers();
-      },
-      error: (error) => {
-        console.error('Error creating user:', error);
-        this.showErrorToast('Error al crear el usuario');
-      },
-    });
+    this.crudHelper.handleCreate(
+      this.userService.create(formData),
+      'Usuario creado exitosamente',
+      () => this.loadUsers()
+    );
   }
 
   private handleUpdateUser(uuid: string, formData: UserFormData): void {
-    this.userService.update(uuid, formData).subscribe({
-      next: (response) => {
-        this.showSuccessToast('Usuario actualizado exitosamente');
-        this.loadUsers();
-      },
-      error: (error) => {
-        console.error('Error updating user:', error);
-        this.showErrorToast('Error al actualizar el usuario');
-      },
-    });
+    this.crudHelper.handleUpdate(
+      this.userService.update(uuid, formData),
+      'Usuario actualizado exitosamente',
+      () => this.loadUsers()
+    );
   }
 
   private performDeleteUser(uuid: string): void {
-    this.userService.delete(uuid).subscribe({
-      next: (response) => {
-        this.showSuccessToast('Usuario eliminado exitosamente');
-        this.loadUsers();
-      },
-      error: (error) => {
-        console.error('Error deleting user:', error);
-        this.showErrorToast('Error al eliminar el usuario');
-      },
-    });
-  }
-
-  private async showSuccessToast(message: string): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2000,
-      position: 'top',
-      color: 'success',
-      icon: 'checkmark-circle',
-    });
-    await toast.present();
-  }
-
-  private async showErrorToast(message: string): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2000,
-      position: 'top',
-      color: 'danger',
-      icon: 'alert-circle',
-    });
-    await toast.present();
+    this.crudHelper.handleDelete(
+      this.userService.delete(uuid),
+      'Usuario eliminado exitosamente',
+      () => this.loadUsers()
+    );
   }
 }
+

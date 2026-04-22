@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonIcon, IonList, IonItem, IonLabel,
   IonSkeletonText, IonSearchbar, IonSegment, IonSegmentButton,
-  ModalController, AlertController, ToastController,
+  ModalController
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
@@ -16,13 +16,15 @@ import {
 
 import { AuthService } from '@services/auth/auth.service';
 import { FamilyService } from '@services/domain/family.service';
+import { UiService } from '@services/ui.service';
+import { FilterService } from '@services/filter.service';
+import { UtilsService } from '@services/utils.service';
+import { CrudHelperService } from '@services/crud-helper.service';
 import { FamilyFormComponent, FamilyFormData } from '@components/families-form/families-form.component';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 
 // Pipes
 import { ActiveStatusPipe } from '@shared/pipes/active-status.pipe';
-
-
 
 export interface Family {
   uuid: string;
@@ -62,8 +64,10 @@ export class FamiliesPage implements OnInit {
     private authService: AuthService,
     private familyService: FamilyService,
     private modalController: ModalController,
-    private alertController: AlertController,
-    private toastController: ToastController
+    private uiService: UiService,
+    private filterService: FilterService,
+    private utilsService: UtilsService,
+    private crudHelper: CrudHelperService
   ) {
     addIcons({
       'folder-outline': folderOutline,
@@ -79,9 +83,8 @@ export class FamiliesPage implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-    const role = this.currentUser?.role;
 
-    if (!this.currentUser || role !== 'admin') {
+    if (!this.currentUser || !this.authService.hasRole('admin')) {
       this.isAdmin = false;
       this.isSupervisor = false;
       this.isLoading = false;
@@ -110,12 +113,17 @@ export class FamiliesPage implements OnInit {
   }
 
   private calculateStats(): void {
-    this.familyStats.total = this.families.length;
-    this.familyStats.active = this.families.filter(f => f.active).length;
+    const stats = this.utilsService.calculateStats(this.families, [
+      { label: 'active', filterFn: (f) => f.active },
+    ]);
+    this.familyStats = {
+      total: stats['total'],
+      active: stats['active'],
+    };
   }
 
   onSearchChange(event: any): void {
-    this.searchTerm = event.detail.value?.toLowerCase() || '';
+    this.searchTerm = event.detail.value || '';
     this.applyFilters();
   }
 
@@ -125,20 +133,11 @@ export class FamiliesPage implements OnInit {
   }
 
   private applyFilters(): void {
-    let filtered = this.families;
-
-    if (this.searchTerm) {
-      filtered = filtered.filter((f) =>
-        f.name.toLowerCase().includes(this.searchTerm)
-      );
-    }
-
-    if (this.selectedStatus !== 'all') {
-      const wantActive = this.selectedStatus === 'active';
-      filtered = filtered.filter((f) => f.active === wantActive);
-    }
-
-    this.filteredFamilies = filtered;
+    this.filteredFamilies = this.filterService.applyFilters(this.families, {
+      searchTerm: this.searchTerm,
+      searchProperties: ['name'],
+      status: this.selectedStatus
+    });
   }
 
   async addNewFamily(): Promise<void> {
@@ -169,64 +168,38 @@ export class FamiliesPage implements OnInit {
 
   private handleCreateFamily(formData: FamilyFormData): void {
     this.isLoading = true;
-    this.familyService.create(formData).subscribe({
-      next: () => {
-        this.showToast('Familia creada exitosamente', 'success', 'checkmark-circle');
-        this.loadFamilies();
-      },
-      error: () => {
-        this.showToast('Error al crear la familia', 'danger', 'alert-circle');
-        this.isLoading = false;
-      },
-    });
+    this.crudHelper.handleCreate(
+      this.familyService.create(formData),
+      'Familia creada exitosamente',
+      () => this.loadFamilies(),
+      () => this.isLoading = false
+    );
   }
 
   private handleUpdateFamily(uuid: string, formData: FamilyFormData): void {
     this.isLoading = true;
-    this.familyService.update(uuid, formData).subscribe({
-      next: () => {
-        this.showToast('Familia actualizada exitosamente', 'success', 'checkmark-circle');
-        this.loadFamilies();
-      },
-      error: () => {
-        this.showToast('Error al actualizar la familia', 'danger', 'alert-circle');
-        this.isLoading = false;
-      },
-    });
+    this.crudHelper.handleUpdate(
+      this.familyService.update(uuid, formData),
+      'Familia actualizada exitosamente',
+      () => this.loadFamilies(),
+      () => this.isLoading = false
+    );
   }
 
   async deleteFamily(family: Family): Promise<void> {
-    const alert = await this.alertController.create({
-      header: 'Eliminar Familia',
-      message: `¿Estás seguro de que deseas eliminar <strong>${family.name}</strong>? Los productos asociados podrían quedarse sin categoría.`,
-      backdropDismiss: false,
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => this.performDeleteFamily(family.uuid),
-        },
-      ],
-    });
-    await alert.present();
+    await this.uiService.confirmDelete(
+      'Eliminar Familia',
+      `¿Estás seguro de que deseas eliminar <strong>${family.name}</strong>? Los productos asociados podrían quedarse sin categoría.`,
+      () => this.performDeleteFamily(family.uuid)
+    );
   }
-
-  
 
   private performDeleteFamily(uuid: string): void {
-    this.familyService.delete(uuid).subscribe({
-      next: () => {
-        this.showToast('Familia eliminada exitosamente', 'success', 'checkmark-circle');
-        this.loadFamilies();
-      },
-      error: () => this.showToast('Error al eliminar la familia', 'danger', 'alert-circle'),
-    });
-  }
-
-  private async showToast(message: string, color: 'success' | 'danger', icon: string): Promise<void> {
-    const toast = await this.toastController.create({ message, duration: 2500, position: 'top', color, icon });
-    await toast.present();
+    this.crudHelper.handleDelete(
+      this.familyService.delete(uuid),
+      'Familia eliminada exitosamente',
+      () => this.loadFamilies()
+    );
   }
 
   toggleFamilyStatus(family: Family, event: Event): void {
@@ -240,7 +213,7 @@ export class FamiliesPage implements OnInit {
   
       this.familyService.update(family.uuid, updatePayload).subscribe({
         next: () => {
-          this.showToast(`Familia ${family.active ? 'activada' : 'desactivada'}`, 'success', 'checkmark-circle');        
+          this.uiService.showSuccess(`Familia ${family.active ? 'activada' : 'desactivada'}`);        
           
           this.calculateStats();
         },
@@ -248,7 +221,7 @@ export class FamiliesPage implements OnInit {
           console.error('Error al cambiar estado:', error);
   
           family.active = previousStatus;
-          this.showToast('Error al cambiar el estado', 'danger', 'alert-circle');
+          this.uiService.showError('Error al cambiar el estado');
         }
       });
     }

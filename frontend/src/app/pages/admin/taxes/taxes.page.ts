@@ -10,8 +10,6 @@ import {
   IonSkeletonText,
   IonSearchbar,
   ModalController,
-  AlertController,
-  ToastController,
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
@@ -28,6 +26,10 @@ import {
 
 import { AuthService } from '@services/auth/auth.service';
 import { TaxService } from '@services/domain/tax.service';
+import { UiService } from '@services/ui.service';
+import { FilterService } from '@services/filter.service';
+import { UtilsService } from '@services/utils.service';
+import { CrudHelperService } from '@services/crud-helper.service';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 import { TaxFormComponent, TaxFormData } from '@components/tax-form/tax-form.component';
 
@@ -75,8 +77,10 @@ export class TaxesPage implements OnInit {
     private authService: AuthService,
     private taxService: TaxService,
     private modalController: ModalController,
-    private alertController: AlertController,
-    private toastController: ToastController
+    private uiService: UiService,
+    private filterService: FilterService,
+    private utilsService: UtilsService,
+    private crudHelper: CrudHelperService
   ) {
     addIcons({
       'receipt-outline': receiptOutline,
@@ -93,7 +97,7 @@ export class TaxesPage implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
 
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    if (!this.currentUser || !this.authService.hasRole('admin')) {
       this.isAdmin = false;
       this.isLoading = false;
       return;
@@ -130,19 +134,15 @@ export class TaxesPage implements OnInit {
   }
 
   onSearchChange(event: any): void {
-    this.searchTerm = event.detail.value?.toLowerCase() || '';
+    this.searchTerm = event.detail.value || '';
     this.applyFilters();
   }
 
   private applyFilters(): void {
-    if (!this.searchTerm) {
-      this.filteredTaxes = this.taxes;
-      return;
-    }
-
-    this.filteredTaxes = this.taxes.filter((t) =>
-      t.name.toLowerCase().includes(this.searchTerm)
-    );
+    this.filteredTaxes = this.filterService.applyFilters(this.taxes, {
+      searchTerm: this.searchTerm,
+      searchProperties: ['name']
+    });
   }
 
   async addNewTax(): Promise<void> {
@@ -194,17 +194,12 @@ export class TaxesPage implements OnInit {
       percentage: formData.rate
     };
 
-    this.taxService.create(apiData).subscribe({
-      next: () => {
-        this.showToast('Impuesto creado exitosamente', 'success', 'checkmark-circle');
-        this.loadTaxes();
-      },
-      error: (error) => {
-        console.error('Error creating tax:', error);
-        this.showToast('Error al crear el impuesto', 'danger', 'alert-circle');
-        this.isLoading = false;
-      },
-    });
+    this.crudHelper.handleCreate(
+      this.taxService.create(apiData),
+      'Impuesto creado exitosamente',
+      () => this.loadTaxes(),
+      () => this.isLoading = false
+    );
   }
 
   private handleUpdateTax(uuid: string, formData: TaxFormData): void {
@@ -215,65 +210,29 @@ export class TaxesPage implements OnInit {
       percentage: formData.rate
     };
 
-    this.taxService.update(uuid, apiData).subscribe({
-      next: () => {
-        this.showToast('Impuesto actualizado exitosamente', 'success', 'checkmark-circle');
-        this.loadTaxes();
-      },
-      error: (error) => {
-        console.error('Error updating tax:', error);
-        this.showToast('Error al actualizar el impuesto', 'danger', 'alert-circle');
-        this.isLoading = false;
-      },
-    });
+    this.crudHelper.handleUpdate(
+      this.taxService.update(uuid, apiData),
+      'Impuesto actualizado exitosamente',
+      () => this.loadTaxes(),
+      () => this.isLoading = false
+    );
   }
 
   async deleteTax(tax: Tax): Promise<void> {
-    const alert = await this.alertController.create({
-      header: 'Eliminar Impuesto',
-      message: `¿Estás seguro de que deseas eliminar <strong>${tax.name}</strong>? Esta acción podría afectar a productos existentes.`,
-      backdropDismiss: false,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => {
-            this.performDeleteTax(tax.uuid);
-          },
-        },
-      ],
-    });
-
-    await alert.present();
+    await this.uiService.confirmDelete(
+      'Eliminar Impuesto',
+      `¿Estás seguro de que deseas eliminar <strong>${tax.name}</strong>? Esta acción podría afectar a productos existentes.`,
+      () => this.performDeleteTax(tax.uuid)
+    );
   }
 
   private performDeleteTax(uuid: string): void {
     this.isLoading = true;
-    this.taxService.delete(uuid).subscribe({
-      next: () => {
-        this.showToast('Impuesto eliminado exitosamente', 'success', 'checkmark-circle');
-        this.loadTaxes();
-      },
-      error: (error) => {
-        console.error('Error deleting tax:', error);
-        this.showToast('Error al eliminar el impuesto', 'danger', 'alert-circle');
-        this.isLoading = false;
-      },
-    });
-  }
-
-  private async showToast(message: string, color: 'success' | 'danger', icon: string): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2500,
-      position: 'top',
-      color,
-      icon,
-    });
-    await toast.present();
+    this.crudHelper.handleDelete(
+      this.taxService.delete(uuid),
+      'Impuesto eliminado exitosamente',
+      () => this.loadTaxes(),
+      () => this.isLoading = false
+    );
   }
 }
