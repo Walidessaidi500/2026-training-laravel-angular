@@ -116,6 +116,20 @@
           </ion-select>
         </div>
       </div>
+
+      <!-- Toggle de Visualización -->
+      <div class="display-mode-row">
+        <ion-segment [(ngModel)]="displayMode" (ionChange)="onDisplayModeChange()" class="custom-segment">
+          <ion-segment-button value="scroll">
+            <ion-label>Scroll Infinito</ion-label>
+            <ion-icon name="infinite-outline"></ion-icon>
+          </ion-segment-button>
+          <ion-segment-button value="pagination">
+            <ion-label>Paginación</ion-label>
+            <ion-icon name="list-outline"></ion-icon>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
     </div>
 
     <!-- Main List Panel -->
@@ -124,6 +138,10 @@
         <div>
           <span class="label">LISTADO DE PRODUCTOS</span>
           <h3>{{ filteredProducts.length }} resultado{{ filteredProducts.length !== 1 ? 's' : '' }}</h3>
+        </div>
+        <!-- Controles de Paginación superior opcional o indicador de página -->
+        <div class="pagination-header" *ngIf="displayMode === 'pagination'">
+          <span class="page-indicator">Página {{ currentPage }} de {{ lastPage }}</span>
         </div>
       </div>
 
@@ -157,7 +175,10 @@
                 STOCK: {{ product.stock }}
               </span>
 
-              <span class="status-badge" [ngClass]="product.active ? 'active' : 'inactive'">
+              <span class="status-badge clickable" 
+                    style="cursor: pointer;"
+                    [ngClass]="product.active ? 'active' : 'inactive'"
+                    (click)="toggleProductStatus(product, $event)">
                 <ion-icon [name]="product.active ? 'checkmark-circle' : 'close-circle'"></ion-icon>
                 {{ product.active ? 'ACTIVO' : 'INACTIVO' }}
               </span>
@@ -176,10 +197,23 @@
       </ion-list>
 
       <!-- Infinite Scroll -->
-      <ion-infinite-scroll (ionInfinite)="loadMore($event)" [disabled]="isInfiniteDisabled">
+      <ion-infinite-scroll *ngIf="displayMode === 'scroll'" (ionInfinite)="loadMore($event)" [disabled]="isInfiniteDisabled">
         <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más productos...">
         </ion-infinite-scroll-content>
       </ion-infinite-scroll>
+
+      <!-- Pagination Controls -->
+      <div class="pagination-footer" *ngIf="displayMode === 'pagination'">
+        <button class="pagination-btn" [disabled]="currentPage === 1" (click)="prevPage()">
+          <ion-icon name="chevron-back-outline"></ion-icon> Anterior
+        </button>
+        <div class="page-numbers">
+           <span class="current-page-badge">Página {{ currentPage }} de {{ lastPage }}</span>
+        </div>
+        <button class="pagination-btn" [disabled]="currentPage === lastPage" (click)="nextPage()">
+          Siguiente <ion-icon name="chevron-forward-outline"></ion-icon>
+        </button>
+      </div>
     </div>
   </div>
 </ion-content>

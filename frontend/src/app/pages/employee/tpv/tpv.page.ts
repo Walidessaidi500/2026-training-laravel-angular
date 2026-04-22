@@ -309,7 +309,7 @@ export class TpvPage implements OnInit {
   }
 
   public addDinerDigit(digit: string) {
-    if (this.tempDiners === '0' || this.tempDiners === '1') {
+    if (this.tempDiners === '0') {
       this.tempDiners = digit;
     } else {
       this.tempDiners += digit;
@@ -318,9 +318,11 @@ export class TpvPage implements OnInit {
 
   public removeDinerDigit() {
     if (this.tempDiners.length > 1) {
-      this.tempDiners = this.tempDiners.slice(0, -1);
+    this.tempDiners = this.tempDiners.slice(0, -1);
     } else {
-      this.tempDiners = '1';
+      // Si borran el último dígito, lo dejamos en '0' para que el siguiente click lo reemplace.
+      // Al confirmar, onDinersConfirm ya se encargará de pasarlo a 1 si lo dejan en 0.
+      this.tempDiners = '0';
     }
   }
 

@@ -5,14 +5,15 @@ import {
   IonContent, IonIcon, IonList, IonItem, IonLabel,
   IonSkeletonText, IonSearchbar, IonSelect, IonSelectOption,
   IonNote, ModalController, AlertController, ToastController,
-  IonInfiniteScroll, IonInfiniteScrollContent
+  IonInfiniteScroll, IonInfiniteScrollContent, IonSegment, IonSegmentButton
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
 import {
   cubeOutline, cube, addOutline,
   createOutline, trashOutline, checkmarkCircle,
-  closeCircle, alertCircle, optionsOutline, warningOutline, receiptOutline
+  closeCircle, alertCircle, optionsOutline, warningOutline, receiptOutline,
+  chevronBackOutline, chevronForwardOutline, infiniteOutline, listOutline
 } from 'ionicons/icons';
 
 import { AuthService } from '@services/auth/auth.service';
@@ -42,7 +43,9 @@ export interface Product {
   imports: [
     CommonModule, FormsModule, IonContent, IonIcon, IonList,
     IonItem, IonLabel, IonSkeletonText, IonSearchbar,
-    IonSelect, IonSelectOption, AccessDeniedComponent,
+    IonSelect, IonSelectOption, IonNote, IonInfiniteScroll,
+    IonInfiniteScrollContent, IonSegment, IonSegmentButton,
+    AccessDeniedComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -66,6 +69,7 @@ export class ProductsPage implements OnInit {
   selectedTax = 'all';
   selectedStatus = 'all';
   selectedStock = 'all';
+  displayMode: 'scroll' | 'pagination' = 'scroll';
 
   productStats = {
     total: 0,
@@ -76,7 +80,7 @@ export class ProductsPage implements OnInit {
   
   currentPage = 1;
   lastPage = 1;
-  perPage = 20;
+  perPage = 10; // Reducimos para que la paginación sea más evidente
   isInfiniteDisabled = false;
 
   constructor(
@@ -100,6 +104,10 @@ export class ProductsPage implements OnInit {
       'options-outline': optionsOutline,
       'warning-outline': warningOutline,
       'receipt-outline': receiptOutline,
+      'chevron-back-outline': chevronBackOutline,
+      'chevron-forward-outline': chevronForwardOutline,
+      'infinite-outline': infiniteOutline,
+      'list-outline': listOutline
     });
   }
 
@@ -131,10 +139,32 @@ export class ProductsPage implements OnInit {
     });
   }
 
+  onDisplayModeChange(): void {
+    this.loadProducts();
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.lastPage) {
+      this.currentPage++;
+      this.loadProducts();
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadProducts();
+    }
+  }
+
   private loadProducts(isAppend: boolean = false, event?: any): void {
     if (!isAppend) {
       this.isLoading = true;
-      this.currentPage = 1;
+      this.currentPage = !isAppend && this.displayMode === 'scroll' ? 1 : this.currentPage;
+      if (this.displayMode === 'pagination' && !isAppend) {
+         // Si cambiamos a paginación y no es append, nos aseguramos de estar en la pag 1 si es necesario
+         // Pero mejor dejamos que el usuario navegue.
+      }
       this.isInfiniteDisabled = false;
     }
 
@@ -364,5 +394,33 @@ export class ProductsPage implements OnInit {
   private async showToast(message: string, color: 'success' | 'danger', icon: string): Promise<void> {
     const toast = await this.toastController.create({ message, duration: 2500, position: 'top', color, icon });
     await toast.present();
+  }
+  
+  toggleProductStatus(product: Product, event: Event): void {
+    event.stopPropagation();
+    const previousStatus = product.active;
+    product.active = !previousStatus;
+    const updatePayload: any = {
+      name: product.name,
+      priceInCents: product.priceInCents,
+      stock: product.stock,
+      family_id: product.family_id,
+      tax_id: product.tax_id,
+      active: product.active
+    };
+
+    this.productService.update(product.uuid, updatePayload).subscribe({
+      next: () => {
+        this.showToast(`Producto ${product.active ? 'activado' : 'desactivado'}`, 'success', 'checkmark-circle');        
+        
+        this.calculateStats();
+      },
+      error: (error) => {
+        console.error('Error al cambiar estado:', error);
+
+        product.active = previousStatus;
+        this.showToast('Error al cambiar el estado', 'danger', 'alert-circle');
+      }
+    });
   }
 }
