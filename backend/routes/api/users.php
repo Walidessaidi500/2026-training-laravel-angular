@@ -6,7 +6,7 @@ use App\User\Infrastructure\Entrypoint\Http\PostController;
 use App\User\Infrastructure\Entrypoint\Http\PutController;
 use App\User\Infrastructure\Entrypoint\Http\DeleteController;
 
-Route::middleware('role:admin,supervisor')->group(function () {
+Route::middleware('role:admin,supervisor,restaurant')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{uuid}', [UserController::class, 'show']);
 });
