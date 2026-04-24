@@ -37,7 +37,7 @@ import { OrderService, Order } from '@services/domain/order.service';
 import { SaleService } from '@services/domain/sale.service';
 import { UserService, User } from '@services/domain/user.service';
 import { AuthService } from '@services/auth/auth.service';
-import { UiService } from '@services/ui.service';
+import { UiService } from '@app/core/services/ui/ui.service';
 import { Observable, map, of, forkJoin, catchError } from 'rxjs';
 
 interface CartItem {

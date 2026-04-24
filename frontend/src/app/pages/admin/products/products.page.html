@@ -117,19 +117,7 @@
         </div>
       </div>
 
-      <!-- Toggle de Visualización -->
-      <div class="display-mode-row">
-        <ion-segment [(ngModel)]="displayMode" (ionChange)="onDisplayModeChange()" class="custom-segment">
-          <ion-segment-button value="scroll">
-            <ion-label>Scroll Infinito</ion-label>
-            <ion-icon name="infinite-outline"></ion-icon>
-          </ion-segment-button>
-          <ion-segment-button value="pagination">
-            <ion-label>Paginación</ion-label>
-            <ion-icon name="list-outline"></ion-icon>
-          </ion-segment-button>
-        </ion-segment>
-      </div>
+      
     </div>
 
     <!-- Main List Panel -->
@@ -143,6 +131,19 @@
         <div class="pagination-header" *ngIf="displayMode === 'pagination'">
           <span class="page-indicator">Página {{ currentPage }} de {{ lastPage }}</span>
         </div>
+        <!-- Toggle de Visualización -->
+      <div class="display-mode-row">
+        <ion-segment [(ngModel)]="displayMode" (ionChange)="onDisplayModeChange()" class="custom-segment">
+          <ion-segment-button value="scroll">
+            <ion-label>Scroll Infinito</ion-label>
+            <ion-icon name="infinite-outline"></ion-icon>
+          </ion-segment-button>
+          <ion-segment-button value="pagination">
+            <ion-label>Paginación</ion-label>
+            <ion-icon name="list-outline"></ion-icon>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
       </div>
 
       <!-- Empty State -->
@@ -175,8 +176,8 @@
               </span>
 
               <span class="stock-badge"
-                [ngClass]="{'in-stock': product.stock > 5, 'low-stock': product.stock > 0 && product.stock <= 5, 'out-of-stock': product.stock <= 0}">
-                STOCK: {{ product.stock | stockStatus }} ({{ product.stock }})
+                [ngClass]="{'in-stock': product.stock > 5, 'low-stock': product.stock > 0 && product.stock <= 10, 'out-of-stock': product.stock <= 0}">
+                {{ product.stock | stockStatus }} ({{ product.stock }})
               </span>
 
               <span class="status-badge clickable" 

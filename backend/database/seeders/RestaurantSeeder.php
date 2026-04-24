@@ -30,17 +30,25 @@ class RestaurantSeeder extends Seeder
                 'tax_id' => 'B11223344',
                 'email' => 'napoli@example.com',
             ],
+            [
+                'name' => 'Los Gomez',
+                'legal_name' => 'Los Gomez S.L.',
+                'tax_id' => 'B12323242',
+                'email' => 'losgomez@yurest.com',
+            ],
         ];
 
         foreach ($restaurants as $data) {
-            EloquentRestaurant::create([
-                'uuid' => Str::uuid()->toString(),
-                'name' => $data['name'],
-                'legal_name' => $data['legal_name'],
-                'tax_id' => $data['tax_id'],
-                'email' => $data['email'],
-                'password' => Hash::make('password'),
-            ]);
+            EloquentRestaurant::updateOrCreate(
+                ['email' => $data['email']],
+                [
+                    'uuid' => Str::uuid()->toString(),
+                    'name' => $data['name'],
+                    'legal_name' => $data['legal_name'],
+                    'tax_id' => $data['tax_id'],
+                    'password' => Hash::make('password'),
+                ]
+            );
         }
     }
 }

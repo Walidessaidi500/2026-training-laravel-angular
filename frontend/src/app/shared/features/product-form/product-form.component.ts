@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
@@ -29,7 +29,8 @@ export interface ProductFormData {
     CommonModule, ReactiveFormsModule, IonHeader, IonToolbar, IonTitle,
     IonContent, IonItem, IonLabel, IonInput, IonToggle, IonButton,
     IonButtons, IonIcon, IonNote, IonSelect, IonSelectOption
-  ]
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ProductFormComponent implements OnInit {
   @Input() product: any = null;
@@ -46,14 +47,15 @@ export class ProductFormComponent implements OnInit {
     private modalCtrl: ModalController,
     private authService: AuthService
   ) {
-    const user = this.authService.getUser();
-    this.isAdmin = user?.role === 'admin';
-    this.isSupervisor = user?.role === 'supervisor';
-
+    // Registrar iconos inmediatamente
     addIcons({
       'close-outline': closeOutline,
       'save-outline': saveOutline
     });
+
+    const user = this.authService.getUser();
+    this.isAdmin = user?.role === 'admin';
+    this.isSupervisor = user?.role === 'supervisor';
 
     this.productForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
@@ -77,7 +79,6 @@ export class ProductFormComponent implements OnInit {
         active: this.product.active ?? true
       });
 
-      
       if (this.isSupervisor) {
         this.productForm.get('price')?.disable();
         this.productForm.get('family_id')?.disable();

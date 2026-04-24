@@ -20,10 +20,10 @@ import { AuthService } from '@services/auth/auth.service';
 import { ProductService } from '@services/domain/product.service';
 import { FamilyService } from '@services/domain/family.service';
 import { TaxService } from '@services/domain/tax.service';
-import { UiService } from '@services/ui.service';
-import { FilterService } from '@services/filter.service';
-import { UtilsService } from '@services/utils.service';
-import { CrudHelperService } from '@services/crud-helper.service';
+import { UiService } from '@app/core/services/ui/ui.service';
+import { FilterService } from '@app/core/services/helper/filter.service';
+import { UtilsService } from '@app/core/services/helper/utils.service';
+import { CrudHelperService } from '@app/core/services/helper/crud-helper.service';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 import { ProductFormComponent, ProductFormData } from '@components/product-form/product-form.component';
 
@@ -91,7 +91,7 @@ export class ProductsPage implements OnInit {
 
   currentPage = 1;
   lastPage = 1;
-  perPage = 10; // Reducimos para que la paginación sea más evidente
+  perPage = 10;
   isInfiniteDisabled = false;
 
   constructor(
@@ -362,7 +362,7 @@ export class ProductsPage implements OnInit {
 
     this.productService.update(product.uuid, updatePayload).subscribe({
       next: () => {
-        this.uiService.showSuccess(`Producto ${product.active ? 'activado' : 'desactivada'}`);        
+        this.uiService.showSuccess(`Producto ${product.active ? 'activado' : 'desactivado'}`);        
 
         this.calculateStats();
       },

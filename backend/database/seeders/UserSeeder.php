@@ -13,12 +13,22 @@ class UserSeeder extends Seeder
         $restaurants = EloquentRestaurant::all();
 
         foreach ($restaurants as $restaurant) {
+            // Admin específico para Los Gomez si es el caso
+            if ($restaurant->name === 'Los Gomez') {
+                EloquentUser::factory()->admin()->create([
+                    'restaurant_id' => $restaurant->id,
+                    'name' => 'Admin Yurest',
+                    'email' => 'admin@yurest.com',
+                    'pin' => '1234',
+                ]);
+            }
+
             // Admin principal
             EloquentUser::factory()->admin()->create([
                 'restaurant_id' => $restaurant->id,
                 'name' => 'Admin - '.$restaurant->name,
                 'email' => 'admin-'.$restaurant->id.'@tpv.com',
-                'pin' => '1234',
+                'pin' => '1111',
             ]);
 
             // Supervisor

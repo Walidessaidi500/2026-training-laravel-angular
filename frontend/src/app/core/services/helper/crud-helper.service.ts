@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { UiService } from './ui.service';
+import { UiService } from '../ui/ui.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +9,7 @@ export class CrudHelperService {
   constructor(private uiService: UiService) {}
 
   /**
-   * Handles the creation of an item with standardized UI notifications
+   * Handles de creacion con notificaciones estandarizadas de UI
    */
   handleCreate<T>(
     createObservable: Observable<T>,
@@ -31,7 +31,7 @@ export class CrudHelperService {
   }
 
   /**
-   * Handles the update of an item with standardized UI notifications
+   * Handles de actualizacion con notificaciones estandarizadas de UI
    */
   handleUpdate<T>(
     updateObservable: Observable<T>,
@@ -53,7 +53,7 @@ export class CrudHelperService {
   }
 
   /**
-   * Handles the deletion of an item with standardized UI notifications
+   * Handles de eliminacion con notificaciones estandarizadas de UI
    */
   handleDelete<T>(
     deleteObservable: Observable<T>,

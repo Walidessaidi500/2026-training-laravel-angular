@@ -17,7 +17,7 @@ class ZoneFactory extends Factory
     {
         return [
             'uuid' => (string) Str::uuid(),
-            'name' => fake()->unique()->word(),
+            'name' => fake()->word(),
         ];
     }
 }

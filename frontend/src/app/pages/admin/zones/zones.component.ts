@@ -25,10 +25,10 @@ import {
 } from 'ionicons/icons';
 import { ZoneService, Zone } from '@services/domain/zone.service';
 import { AuthService } from '@services/auth/auth.service';
-import { UiService } from '@services/ui.service';
-import { FilterService } from '@services/filter.service';
-import { UtilsService } from '@services/utils.service';
-import { CrudHelperService } from '@services/crud-helper.service';
+import { UiService } from '@app/core/services/ui/ui.service';
+import { FilterService } from '@app/core/services/helper/filter.service';
+import { UtilsService } from '@app/core/services/helper/utils.service';
+import { CrudHelperService } from '@app/core/services/helper/crud-helper.service';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 
 @Component({

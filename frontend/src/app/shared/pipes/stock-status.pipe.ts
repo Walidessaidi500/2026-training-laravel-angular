@@ -7,7 +7,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class StockStatusPipe implements PipeTransform {
   transform(stock: number): string {
     if (stock <= 0) return 'Agotado';
-    if (stock <= 5) return 'Últimas unidades';
+    if (stock <= 10) return 'Últimas unidades';
     return 'En stock';
   }
 }

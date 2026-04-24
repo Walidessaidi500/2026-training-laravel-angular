@@ -3,11 +3,11 @@ import { Injectable } from '@angular/core';
 export interface FilterCriteria<T> {
   searchTerm?: string;
   searchProperties?: (keyof T)[];
-  status?: string; // 'all', 'active', 'inactive'
+  status?: string; // 'active', 'inactive', 'all'
   propertyFilters?: {
     property: keyof T;
     value: any;
-    treatAsNone?: any; // Value that should be treated as 'none' (e.g., 'none' string)
+    treatAsNone?: any; // Valor que se tratará como "ninguno" (ej. 'none', null, undefined)
   }[];
   customFilters?: ((item: T) => boolean)[];
 }
@@ -17,7 +17,7 @@ export interface FilterCriteria<T> {
 })
 export class FilterService {
   /**
-   * Applies multiple filters to a list of items
+   * Aplica múltiples filtros a una lista de objetos según los criterios especificados
    */
   applyFilters<T>(items: T[], criteria: FilterCriteria<T>): T[] {
     if (!items || !items.length) {
@@ -35,12 +35,12 @@ export class FilterService {
       );
     }
 
-    // 2. Status filter (requires 'active' property)
+    // 2. Estado activo/inactivo
     if (criteria.status && criteria.status !== 'all') {
       filtered = this.filterByStatus(filtered as any, criteria.status) as any;
     }
 
-    // 3. Property filters
+    // 3. Filtros por propiedad específica
     if (criteria.propertyFilters?.length) {
       criteria.propertyFilters.forEach((filter) => {
         filtered = this.filterByProperty(
@@ -52,7 +52,7 @@ export class FilterService {
       });
     }
 
-    // 4. Custom filters
+    // 4. Filtros personalizados
     if (criteria.customFilters?.length) {
       criteria.customFilters.forEach((filterFn) => {
         filtered = filtered.filter(filterFn);

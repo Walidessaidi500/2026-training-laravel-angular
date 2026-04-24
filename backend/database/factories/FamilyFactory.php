@@ -18,7 +18,7 @@ class FamilyFactory extends Factory
         return [
             'uuid' => (string) Str::uuid(),
             'restaurant_id' => 1,
-            'name' => fake()->unique()->word(),
+            'name' => fake()->word(),
             'active' => true,
         ];
     }

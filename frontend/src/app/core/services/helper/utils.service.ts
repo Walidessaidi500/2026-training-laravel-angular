@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class UtilsService {
   /**
-   * Calculates common stats from an array of objects
+   * Calcula estadísticas comunes a partir de un array de objetos
    */
   calculateStats<T>(
     items: T[],
@@ -26,7 +26,7 @@ export class UtilsService {
   }
 
   /**
-   * Formats a name to initials
+   * Formatos comunes de texto, como obtener iniciales de un nombre
    */
   getInitials(name: string): string {
     if (!name) return '';
@@ -40,7 +40,7 @@ export class UtilsService {
   }
 
   /**
-   * Deep clone an object
+   * Clona profundamente un objeto usando JSON (útil para objetos simples sin funciones ni fechas)
    */
   deepClone<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
