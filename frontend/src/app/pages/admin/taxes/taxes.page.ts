@@ -1,12 +1,11 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
   IonIcon,
   IonList,
-  IonItem,
-  IonLabel,
+  IonItem, IonLabel,
   IonSkeletonText,
   IonSearchbar,
   ModalController,
@@ -25,19 +24,21 @@ import {
 } from 'ionicons/icons';
 
 import { AuthService } from '@services/auth/auth.service';
-import { TaxService } from '@services/domain/tax.service';
+import { InventoryFacade } from '@app/core/facades/inventory.facade';
 import { UiService } from '@app/core/services/ui/ui.service';
 import { FilterService } from '@app/core/services/helper/filter.service';
 import { UtilsService } from '@app/core/services/helper/utils.service';
 import { CrudHelperService } from '@app/core/services/helper/crud-helper.service';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 import { TaxFormComponent, TaxFormData } from '@components/tax-form/tax-form.component';
+import { Subject, takeUntil, map } from 'rxjs';
 
 
 interface Tax {
   uuid: string;
   name: string;
   rate: number;
+  percentage?: number;
   restaurant_id?: number;
 }
 
@@ -60,7 +61,17 @@ interface Tax {
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TaxesPage implements OnInit {
+export class TaxesPage implements OnInit, OnDestroy {
+  private readonly authService = inject(AuthService);
+  private readonly facade = inject(InventoryFacade);
+  private readonly modalController = inject(ModalController);
+  private readonly uiService = inject(UiService);
+  private readonly filterService = inject(FilterService);
+  private readonly utilsService = inject(UtilsService);
+  private readonly crudHelper = inject(CrudHelperService);
+
+  private readonly destroy$ = new Subject<void>();
+
   currentUser: any = null;
   isAdmin = false;
   isLoading = true;
@@ -73,15 +84,7 @@ export class TaxesPage implements OnInit {
     total: 0
   };
 
-  constructor(
-    private authService: AuthService,
-    private taxService: TaxService,
-    private modalController: ModalController,
-    private uiService: UiService,
-    private filterService: FilterService,
-    private utilsService: UtilsService,
-    private crudHelper: CrudHelperService
-  ) {
+  constructor() {
     addIcons({
       'receipt-outline': receiptOutline,
       'receipt': receipt,
@@ -104,29 +107,32 @@ export class TaxesPage implements OnInit {
     }
 
     this.isAdmin = true;
-    this.loadTaxes();
-  }
 
-  private loadTaxes(): void {
-    this.isLoading = true;
-    this.taxService.list().subscribe({
-      next: (response: any) => {
-        
-        const rawData = response.data || response || [];
-        this.taxes = rawData.map((t: any) => ({
+    // Suscribirse a los datos del facade
+    this.facade.taxes$
+      .pipe(
+        takeUntil(this.destroy$),
+        map(taxes => taxes.map(t => ({
           ...t,
-          rate: t.percentage !== undefined ? t.percentage : (t.rate || 0)
-        }));
-
+          rate: t.percentage || 0
+        })))
+      )
+      .subscribe(mappedTaxes => {
+        this.taxes = mappedTaxes as Tax[];
         this.calculateStats();
         this.applyFilters();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading taxes:', error);
-        this.isLoading = false;
-      },
-    });
+      });
+
+    this.facade.isLoading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => this.isLoading = loading);
+
+    this.facade.loadAll();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private calculateStats(): void {
@@ -187,34 +193,26 @@ export class TaxesPage implements OnInit {
   }
 
   private handleCreateTax(formData: TaxFormData): void {
-    this.isLoading = true;
-    
     const apiData = {
       name: formData.name,
       percentage: formData.rate
     };
 
     this.crudHelper.handleCreate(
-      this.taxService.create(apiData),
-      'Impuesto creado exitosamente',
-      () => this.loadTaxes(),
-      () => this.isLoading = false
+      this.facade.createTax(apiData),
+      'Impuesto creado exitosamente'
     );
   }
 
   private handleUpdateTax(uuid: string, formData: TaxFormData): void {
-    this.isLoading = true;
-    
     const apiData = {
       name: formData.name,
       percentage: formData.rate
     };
 
     this.crudHelper.handleUpdate(
-      this.taxService.update(uuid, apiData),
-      'Impuesto actualizado exitosamente',
-      () => this.loadTaxes(),
-      () => this.isLoading = false
+      this.facade.updateTax(uuid, apiData),
+      'Impuesto actualizado exitosamente'
     );
   }
 
@@ -227,12 +225,9 @@ export class TaxesPage implements OnInit {
   }
 
   private performDeleteTax(uuid: string): void {
-    this.isLoading = true;
     this.crudHelper.handleDelete(
-      this.taxService.delete(uuid),
-      'Impuesto eliminado exitosamente',
-      () => this.loadTaxes(),
-      () => this.isLoading = false
+      this.facade.deleteTax(uuid),
+      'Impuesto eliminado exitosamente'
     );
   }
 }

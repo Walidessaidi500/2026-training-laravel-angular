@@ -1,5 +1,6 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import {
   IonContent,
   IonIcon,
@@ -12,36 +13,22 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  cashOutline,
-  chevronForward,
-  arrowUp,
-  arrowDown,
-  people,
-  cart,
-  pieChart,
-  cube,
-  arrowForwardOutline,
-  checkmarkCircle,
-  time,
-  closeCircle,
-  flashOutline,
-  alertCircle,
-  warning,
-  person,
-  cash,
-  folder,
-  receipt,
-  restaurant
+  cashOutline, chevronForward, arrowUp, arrowDown, people, cart,
+  pieChart, cube, arrowForwardOutline, checkmarkCircle, time,
+  closeCircle, flashOutline, alertCircle, warning, person, cash,
+  folder, receipt, restaurant
 } from 'ionicons/icons';
+
+// Facades
+import { AdminDashboardFacade, DashboardData } from '@app/core/facades/admin-dashboard.facade';
+import { InventoryFacade } from '@app/core/facades/inventory.facade';
+import { UsersFacade } from '@app/core/facades/users.facade';
+
+// Services
 import { AuthService } from '@services/auth/auth.service';
-import { ProductService } from '@services/domain/product.service';
-import { FamilyService } from '@services/domain/family.service';
-import { TaxService } from '@services/domain/tax.service';
-import { ZoneService } from '@services/domain/zone.service';
-import { OrderService } from '@services/domain/order.service';
-import { UserService } from '@services/domain/user.service';
-import { SaleService } from '@services/domain/sale.service';
 import { TableService } from '@services/domain/table.service';
+
+// Components
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 import { ProductFormComponent } from '@components/product-form/product-form.component';
 import { FamilyFormComponent } from '@components/families-form/families-form.component';
@@ -52,14 +39,7 @@ import { MicroStatCardComponent } from '@components/micro-stat-card/micro-stat-c
 import { ShortcutListComponent, ShortcutItem } from '@components/shortcut-list/shortcut-list.component';
 import { AlertListComponent } from '@components/alert-list/alert-list.component';
 import { TimelineListComponent } from '@components/timeline-list/timeline-list.component';
-
-interface User {
-  uuid: string;
-  name: string;
-  email: string;
-  role: string;
-  restaurant_id?: number;
-}
+import { Observable, firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -88,63 +68,23 @@ interface User {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class DashboardPage implements OnInit {
-  
-  currentUser: User | null = null;
-  isAdmin = false;
-  restaurantId: number | undefined;
+  private readonly facade = inject(AdminDashboardFacade);
+  private readonly inventoryFacade = inject(InventoryFacade);
+  private readonly usersFacade = inject(UsersFacade);
+  private readonly authService = inject(AuthService);
+  private readonly tableService = inject(TableService);
+  private readonly modalController = inject(ModalController);
+  private readonly toastController = inject(ToastController);
+  private readonly router = inject(Router);
 
-  
-  families: any[] = [];
-  taxes: any[] = [];
+  public readonly dashboardData$: Observable<DashboardData> = this.facade.dashboardData$;
+  public readonly isLoading$: Observable<boolean> = this.facade.isLoading$;
 
-  // Productos
-  totalProducts = 0;
-  activeProducts = 0;
+  public currentUser: any = null;
+  public isAdmin = false;
+  public restaurantId: number | undefined;
 
-  // Familias
-  totalFamilies = 0;
-  activeFamilies = 0;
-
-  // Impuestos
-  totalTaxes = 0;
-
-  // Zonas
-  totalZones = 0;
-
-  // Órdenes
-  totalOrders = 0;
-  openOrders = 0;
-
-  // Usuarios
-  totalUsers = 0;
-
-  // Ventas
-  totalSales = 0;
-  totalRevenue = 0;
-
-  isLoading = true;
-
-  dashboardData = {
-    revenue: {
-      total: 0,
-      trendPercentage: 0,
-      thisWeek: 0,
-      avgOrder: 0,
-      mrr: 0,
-    },
-    metrics: {
-      activeUsers: 0,
-      ordersToday: 0,
-      conversionRate: 0,
-      totalProducts: 0,
-    },
-    recentOrders: [] as any[],
-    alerts: [] as any[],
-    activities: [] as any[],
-  };
-
-  dashboardShortcuts: ShortcutItem[] = [
-    { id: 'order', icon: 'cart', iconColor: 'primary', title: 'Nuevo Pedido', description: 'Crear una transacción' },
+  public dashboardShortcuts: ShortcutItem[] = [
     { id: 'product', icon: 'cube', iconColor: 'primary', title: 'Añadir producto', description: 'Listar nuevo item' },
     { id: 'user', icon: 'people', iconColor: 'warning', title: 'Nuevo Usuario', description: 'Dar acceso al sistema' },
     { id: 'family', icon: 'folder', iconColor: 'success', title: 'Nueva Familia', description: 'Categorizar productos' },
@@ -152,19 +92,7 @@ export class DashboardPage implements OnInit {
     { id: 'table', icon: 'restaurant', iconColor: 'primary', title: 'Nueva Mesa', description: 'Crear nueva mesa' }
   ];
 
-  constructor(
-    private authService: AuthService,
-    private productService: ProductService,
-    private familyService: FamilyService,
-    private taxService: TaxService,
-    private zoneService: ZoneService,
-    private orderService: OrderService,
-    private userService: UserService,
-    private saleService: SaleService,
-    private modalController: ModalController,
-    private toastController: ToastController,
-    private tableService: TableService
-  ) {
+  constructor() {
     addIcons({
       'cash-outline': cashOutline,
       'chevron-forward': chevronForward,
@@ -190,213 +118,17 @@ export class DashboardPage implements OnInit {
   }
 
   ngOnInit(): void {
-    
     this.currentUser = this.authService.getUser();
-
+    this.isAdmin = this.authService.hasRole('admin');
     
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
-      this.isAdmin = false;
-      this.dashboardData.alerts.push({
-        type: 'danger',
-        title: 'Acceso denegado',
-        description: 'No tienes permisos para ver este dashboard. Requiere rol de administrador.',
-        timeAgo: 'Ahora',
-      });
-      this.isLoading = false;
-      return;
+    if (this.isAdmin) {
+      this.restaurantId = this.currentUser?.restaurant_id;
+      this.facade.loadStatistics();
     }
-
-    this.isAdmin = true;
-    this.restaurantId = this.currentUser.restaurant_id;
-    this.loadStatistics();
-  }
-
-  private loadStatistics(): void {
-    
-    const now = new Date();
-    this.dashboardData.alerts.push({
-      type: 'success',
-      title: '¡Bienvenido!',
-      description: `Dashboard del Restaurante #${this.restaurantId} - ${this.currentUser?.name || 'Usuario'}`,
-      timeAgo: 'Hace unos momentos',
-    });
-
-    
-    this.dashboardData.activities.push({
-      type: 'login',
-      icon: 'person',
-      title: 'Sesión iniciada',
-      description: `${this.currentUser?.name} inició sesión como administrador del restaurante #${this.restaurantId}`,
-      timeAgo: 'Hace unos segundos',
-    });
-
-    
-    this.productService.list().subscribe({
-      next: (response) => {
-        
-        this.totalProducts = response.meta.total;
-        this.activeProducts = response.data.filter((p) => p.active).length;
-        this.dashboardData.metrics.totalProducts = this.totalProducts;
-
-        this.dashboardData.activities.push({
-          type: 'info',
-          icon: 'cube',
-          title: `${this.totalProducts} productos en el restaurante`,
-          description: `${this.activeProducts} productos activos`,
-          timeAgo: 'Hace segundos',
-        });
-      },
-      error: (error) => {
-        console.error('Error cargando los productos:', error);
-        this.dashboardData.alerts.push({
-          type: 'danger',
-          title: 'Error al cargar productos',
-          description: error?.message || 'No se pudieron cargar los datos de productos de tu restaurante',
-          timeAgo: 'Hace unos momentos',
-        });
-      },
-    });
-
-    
-    this.familyService.list().subscribe({
-      next: (response) => {
-        this.families = response.data || [];
-        this.totalFamilies = response.meta.total;
-        this.activeFamilies = this.families.filter((f) => f.active).length;
-      },
-      error: (error) => console.error('Error cargando las familias:', error),
-    });
-
-    
-    this.taxService.list().subscribe({
-      next: (response) => {
-        this.taxes = response.data || [];
-        this.totalTaxes = response.meta.total;
-      },
-      error: (error) => console.error('Error cargando los impuestos:', error),
-    });
-
-    
-    this.zoneService.list().subscribe({
-      next: (response) => {
-        
-        this.totalZones = response.meta.total;
-      },
-      error: (error) => console.error('Error cargando las zonas:', error),
-    });
-
-    
-    this.orderService.list().subscribe({
-      next: (response) => {
-        
-        const userOrders = response.data || [];
-
-        this.totalOrders = userOrders.length;
-        this.openOrders = userOrders.filter((o: any) => o.status === 'open').length;
-
-        this.dashboardData.metrics.ordersToday = this.openOrders;
-
-        
-        this.dashboardData.recentOrders = userOrders.slice(0, 5).map((order: any) => ({
-          id: order.uuid || order.id,
-          customerName: `Mesa ${order.table_id || 'N/A'}`,
-          customerInitials: 'M',
-          itemsCount: order.items_count || 0,
-          total: order.total || 0,
-          date: order.opened_at ? new Date(order.opened_at).toLocaleDateString() : 'N/A',
-          status: order.status === 'open' ? 'Processing' : order.status === 'closed' ? 'Completed' : 'Cancelled',
-          colorAvatar: '#6b4ec9',
-        }));
-
-        this.dashboardData.activities.push({
-          type: 'info',
-          icon: 'cart',
-          title: `${this.totalOrders} órdenes en tu restaurante`,
-          description: `${this.openOrders} órdenes abiertas`,
-          timeAgo: 'Hace segundos',
-        });
-      },
-      error: (error) => {
-        console.error('Error cargando los pedidos:', error);
-        this.dashboardData.alerts.push({
-          type: 'danger',
-          title: 'Error al cargar órdenes',
-          description: error?.message || 'No se pudieron cargar las órdenes de tu restaurante',
-          timeAgo: 'Hace unos momentos',
-        });
-      },
-    });
-
-    
-    this.userService.list().subscribe({
-      next: (response) => {
-        
-        const restaurantUsers = response.data || [];
-
-        this.totalUsers = restaurantUsers.length;
-        this.dashboardData.metrics.activeUsers = this.totalUsers;
-
-        this.dashboardData.activities.push({
-          type: 'info',
-          icon: 'people',
-          title: `${this.totalUsers} usuarios activos`,
-          description: `Usuarios en tu restaurante`,
-          timeAgo: 'Hace segundos',
-        });
-      },
-      error: (error) => {
-        console.error('Error cargando los usuarios:', error);
-        this.dashboardData.alerts.push({
-          type: 'danger',
-          title: 'Error al cargar usuarios',
-          description: error?.message || 'No se pudieron cargar los usuarios de tu restaurante',
-          timeAgo: 'Hace unos momentos',
-        });
-      },
-    });
-
-    
-    this.saleService.list().subscribe({
-      next: (response) => {
-        
-        const restaurantSales = response.data || [];
-
-        this.totalSales = restaurantSales.length;
-        this.totalRevenue = restaurantSales.reduce((sum, sale: any) => sum + (sale.total || 0), 0);
-
-        this.dashboardData.revenue.total = this.totalRevenue;
-        this.dashboardData.revenue.thisWeek = this.totalRevenue * 0.4; // Aproximado
-        this.dashboardData.revenue.avgOrder = this.totalRevenue / Math.max(this.totalSales, 1);
-        this.dashboardData.revenue.mrr = this.totalRevenue * 30; 
-        this.dashboardData.revenue.trendPercentage = 12.5;
-        this.dashboardData.metrics.conversionRate = 3.5;
-
-        this.dashboardData.activities.push({
-          type: 'success',
-          icon: 'cash',
-          title: `Ingresos del restaurante: ${this.dashboardData.revenue.total.toFixed(2)}€`,
-          description: `${this.totalSales} ventas registradas en tu restaurante`,
-          timeAgo: 'Hace segundos',
-        });
-
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error cargando las ventas:', error);
-        this.dashboardData.alerts.push({
-          type: 'danger',
-          title: 'Error al cargar ventas',
-          description: error?.message || 'No se pudieron cargar los datos de ventas de tu restaurante',
-          timeAgo: 'Hace unos momentos',
-          });
-        this.isLoading = false;
-      },
-    });
   }
 
   handleShortcutClick(id: string): void {
     switch(id) {
-      case 'order': this.crearOrden(); break;
       case 'product': this.agregarProducto(); break;
       case 'user': this.agregarUsuario(); break;
       case 'family': this.agregarFamilia(); break;
@@ -405,63 +137,37 @@ export class DashboardPage implements OnInit {
     }
   }
 
-  crearOrden(): void {
-    console.log('Crear una nueva orden');
+  navigateTo(path: string): void {
+    this.router.navigate([path]);
   }
 
   async agregarProducto(): Promise<void> {
+    const families = await firstValueFrom(this.facade.getFamilies());
+    const taxes = await firstValueFrom(this.facade.getTaxes());
+
     const modal = await this.modalController.create({
       component: ProductFormComponent,
       cssClass: 'fullscreen-modal',
-      componentProps: {
-        families: this.families,
-        taxes: this.taxes
-      }
+      componentProps: { families, taxes }
     });
 
     await modal.present();
-
     const { data } = await modal.onWillDismiss();
 
     if (data) {
-      this.isLoading = true;
-      this.productService.create(data).subscribe({
-        next: async () => {
-          const toast = await this.toastController.create({
-            message: 'Producto creado correctamente',
-            duration: 2000,
-            color: 'success',
-            position: 'bottom'
-          });
-          await toast.present();
-
-          this.dashboardData.alerts.unshift({
-            type: 'success',
-            title: 'Inventario actualizado',
-            description: `Se ha añadido el producto "${data.name}" al catálogo.`,
-            timeAgo: 'Justo ahora'
-          });
-
-          this.dashboardData.activities.unshift({
+      this.inventoryFacade.createProduct(data).subscribe({
+        next: async (res) => {
+          this.showSuccessToast('Producto creado correctamente');
+          this.facade.addActivity({
             type: 'info',
             icon: 'cube',
             title: 'Nuevo producto',
-            description: `${this.currentUser?.name} añadió "${data.name}"`,
+            description: `${this.currentUser?.name} añadió "${res.name}"`,
             timeAgo: 'Justo ahora'
           });
-
-          this.loadStatistics();
+          this.facade.loadStatistics();
         },
-        error: async (error) => {
-          const toast = await this.toastController.create({
-            message: 'Error al crear el producto: ' + (error.error?.message || 'Error desconocido'),
-            duration: 3000,
-            color: 'danger',
-            position: 'bottom'
-          });
-          await toast.present();
-          this.isLoading = false;
-        }
+        error: (err) => this.showErrorToast(err)
       });
     }
   }
@@ -473,38 +179,22 @@ export class DashboardPage implements OnInit {
     });
 
     await modal.present();
-
     const { data } = await modal.onWillDismiss();
 
     if (data) {
-      this.isLoading = true;
-      this.familyService.create(data).subscribe({
-        next: async () => {
-          const toast = await this.toastController.create({
-            message: 'Familia creada con éxito',
-            duration: 2000,
-            color: 'success'
-          });
-          await toast.present();
-
-          this.dashboardData.alerts.unshift({
-            type: 'success',
-            title: 'Categoría añadida',
-            description: `Nueva familia: "${data.name}"`,
-            timeAgo: 'Justo ahora'
-          });
-
-          this.dashboardData.activities.unshift({
+      this.inventoryFacade.createFamily(data).subscribe({
+        next: async (res) => {
+          this.showSuccessToast('Familia creada con éxito');
+          this.facade.addActivity({
             type: 'info',
             icon: 'folder',
             title: 'Nueva familia',
-            description: `${this.currentUser?.name} creó "${data.name}"`,
+            description: `${this.currentUser?.name} creó "${res.name}"`,
             timeAgo: 'Justo ahora'
           });
-
-          this.loadStatistics();
+          this.facade.loadStatistics();
         },
-        error: () => this.isLoading = false
+        error: (err) => this.showErrorToast(err)
       });
     }
   }
@@ -516,38 +206,15 @@ export class DashboardPage implements OnInit {
     });
 
     await modal.present();
-
     const { data } = await modal.onWillDismiss();
 
     if (data) {
-      this.isLoading = true;
-      this.taxService.create(data).subscribe({
-        next: async () => {
-          const toast = await this.toastController.create({
-            message: 'Impuesto creado con éxito',
-            duration: 2000,
-            color: 'success'
-          });
-          await toast.present();
-
-          this.dashboardData.alerts.unshift({
-            type: 'success',
-            title: 'Impuesto configurado',
-            description: `Añadido: ${data.name} (${data.rate}%)`,
-            timeAgo: 'Justo ahora'
-          });
-
-          this.dashboardData.activities.unshift({
-            type: 'info',
-            icon: 'receipt',
-            title: 'Nuevo impuesto',
-            description: `${this.currentUser?.name} configuró "${data.name}"`,
-            timeAgo: 'Justo ahora'
-          });
-
-          this.loadStatistics();
+      this.inventoryFacade.createTax(data).subscribe({
+        next: async (res) => {
+          this.showSuccessToast('Impuesto configurado');
+          this.facade.loadStatistics();
         },
-        error: () => this.isLoading = false
+        error: (err) => this.showErrorToast(err)
       });
     }
   }
@@ -559,82 +226,59 @@ export class DashboardPage implements OnInit {
     });
 
     await modal.present();
-
     const { data } = await modal.onWillDismiss();
 
     if (data) {
-      this.isLoading = true;
-      this.userService.create(data).subscribe({
-        next: async () => {
-          const toast = await this.toastController.create({
-            message: 'Usuario creado con éxito',
-            duration: 2000,
-            color: 'success'
-          });
-          await toast.present();
-
-          this.dashboardData.alerts.unshift({
-            type: 'success',
-            title: 'Nuevo acceso',
-            description: `Usuario creado: ${data.name}`,
-            timeAgo: 'Justo ahora'
-          });
-
-          this.dashboardData.activities.unshift({
-            type: 'info',
-            icon: 'people',
-            title: 'Nuevo compañero',
-            description: `${this.currentUser?.name} registró a ${data.name}`,
-            timeAgo: 'Justo ahora'
-          });
-
-          this.loadStatistics();
+      this.usersFacade.createUser(data).subscribe({
+        next: () => {
+          this.showSuccessToast('Usuario creado con éxito');
+          this.facade.loadStatistics();
         },
-        error: () => this.isLoading = false
+        error: (err) => this.showErrorToast(err)
       });
     }
   }
 
   async agregarMesa(): Promise<void> {
+    const zones = await firstValueFrom(this.facade.getZones());
+    
     const modal = await this.modalController.create({
       component: TablesFormComponent,
-      cssClass: 'fullscreen-modal'
+      cssClass: 'fullscreen-modal',
+      componentProps: { zones }
     });
 
     await modal.present();
-
     const { data } = await modal.onWillDismiss();
 
     if (data) {
-      this.isLoading = true;
       this.tableService.create(data).subscribe({
-        next: async () => {
-          const toast = await this.toastController.create({
-            message: 'Mesa creada con éxito',
-            duration: 2000,
-            color: 'success'
-          });
-          await toast.present();
-
-          this.dashboardData.alerts.unshift({
-            type: 'success',
-            title: 'Nueva mesa',
-            description: `Mesa creada: ${data.name}`,
-            timeAgo: 'Justo ahora'
-          });
-
-          this.dashboardData.activities.unshift({
-            type: 'info',
-            icon: 'restaurant',
-            title: 'Nueva mesa',
-            description: `${this.currentUser?.name} creó "${data.name}"`,
-            timeAgo: 'Justo ahora'
-          });
-
-          this.loadStatistics();
+        next: () => {
+          this.showSuccessToast('Mesa creada con éxito');
+          this.facade.loadStatistics();
         },
-        error: () => this.isLoading = false
+        error: (err) => this.showErrorToast(err)
       });
     }
+  }
+
+  private async showSuccessToast(message: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color: 'success',
+      position: 'bottom'
+    });
+    await toast.present();
+  }
+
+  private async showErrorToast(error: any): Promise<void> {
+    const toast = await this.toastController.create({
+      message: 'Error: ' + (error.error?.message || 'Operación fallida'),
+      duration: 3000,
+      color: 'danger',
+      position: 'bottom'
+    });
+    await toast.present();
   }
 }

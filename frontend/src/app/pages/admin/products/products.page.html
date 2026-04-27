@@ -1,9 +1,9 @@
 <ion-content class="products-background">
-  <app-access-denied *ngIf="!isAdmin && !isSupervisor && !isLoading" [user]="currentUser"
+  <app-access-denied *ngIf="!isAdmin && !isSupervisor && !(isLoading$ | async)" [user]="currentUser"
     message="Esta página solo está disponible para administradores y supervisores."></app-access-denied>
 
   <!-- Skeleton Loading -->
-  <div class="page-container" *ngIf="isLoading">
+  <div class="page-container" *ngIf="isLoading$ | async">
     <div class="page-header">
       <ion-skeleton-text animated style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text>
     </div>
@@ -17,7 +17,7 @@
   </div>
 
   <!-- Content -->
-  <div class="page-container" *ngIf="!isLoading && (isAdmin || isSupervisor)">
+  <div class="page-container" *ngIf="!(isLoading$ | async) && (isAdmin || isSupervisor)">
 
     <div class="page-header">
       <div class="header-content">
@@ -35,7 +35,7 @@
     </div>
 
     <!-- Stats Section -->
-    <div class="stats-grid three-cols">
+    <div class="stats-grid three-cols" *ngIf="productStats$ | async as productStats">
       <div class="panel-card stat-card">
         <div class="stat-content">
           <div class="icon-box primary-light"><ion-icon name="cube" color="primary"></ion-icon></div>
@@ -81,7 +81,7 @@
             (ionChange)="onFilterChange()" interface="popover">
             <ion-select-option value="all">Todas las familias</ion-select-option>
             <ion-select-option value="none">Sin familia asignada</ion-select-option>
-            <ion-select-option *ngFor="let fam of families" [value]="fam.uuid">{{ fam.name }}</ion-select-option>
+            <ion-select-option *ngFor="let fam of (families$ | async)" [value]="fam.uuid">{{ fam.name }}</ion-select-option>
           </ion-select>
         </div>
 
@@ -91,7 +91,7 @@
             (ionChange)="onFilterChange()" interface="popover">
             <ion-select-option value="all">Todos los impuestos</ion-select-option>
             <ion-select-option value="none">Sin impuesto asignado</ion-select-option>
-            <ion-select-option *ngFor="let tax of taxes" [value]="tax.uuid">{{ tax.name }}</ion-select-option>
+            <ion-select-option *ngFor="let tax of (taxes$ | async)" [value]="tax.uuid">{{ tax.name }}</ion-select-option>
           </ion-select>
         </div>
 
@@ -116,46 +116,41 @@
           </ion-select>
         </div>
       </div>
-
-      
     </div>
 
     <!-- Main List Panel -->
-    <div class="panel-card table-panel">
+    <div class="panel-card table-panel" *ngIf="displayedProducts$ | async as displayedProducts">
       <div class="card-header">
-        <div>
+        <div *ngIf="filteredProducts$ | async as filteredProducts">
           <span class="label">LISTADO DE PRODUCTOS</span>
           <h3>{{ filteredProducts.length }} resultado{{ filteredProducts.length !== 1 ? 's' : '' }}</h3>
         </div>
-        <!-- Controles de Paginación superior opcional o indicador de página -->
-        <div class="pagination-header" *ngIf="displayMode === 'pagination'">
-          <span class="page-indicator">Página {{ currentPage }} de {{ lastPage }}</span>
-        </div>
+        
         <!-- Toggle de Visualización -->
-      <div class="display-mode-row">
-        <ion-segment [(ngModel)]="displayMode" (ionChange)="onDisplayModeChange()" class="custom-segment">
-          <ion-segment-button value="scroll">
-            <ion-label>Scroll Infinito</ion-label>
-            <ion-icon name="infinite-outline"></ion-icon>
-          </ion-segment-button>
-          <ion-segment-button value="pagination">
-            <ion-label>Paginación</ion-label>
-            <ion-icon name="list-outline"></ion-icon>
-          </ion-segment-button>
-        </ion-segment>
-      </div>
+        <div class="display-mode-row">
+          <ion-segment [(ngModel)]="displayMode" (ionChange)="onDisplayModeChange()" class="custom-segment">
+            <ion-segment-button value="scroll">
+              <ion-label>Scroll Infinito</ion-label>
+              <ion-icon name="infinite-outline"></ion-icon>
+            </ion-segment-button>
+            <ion-segment-button value="pagination">
+              <ion-label>Paginación</ion-label>
+              <ion-icon name="list-outline"></ion-icon>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
       </div>
 
       <!-- Empty State -->
-      <div class="empty-state" *ngIf="filteredProducts.length === 0">
+      <div class="empty-state" *ngIf="displayedProducts.length === 0">
         <div class="empty-icon"><ion-icon name="options-outline"></ion-icon></div>
         <p class="empty-title">Sin resultados</p>
         <p class="empty-description">No hay productos que coincidan con los filtros aplicados.</p>
       </div>
 
       <!-- List -->
-      <ion-list class="products-list" *ngIf="filteredProducts.length > 0">
-        <ion-item lines="none" class="product-item animated-fadeIn" *ngFor="let product of filteredProducts">
+      <ion-list class="products-list" *ngIf="displayedProducts.length > 0">
+        <ion-item lines="none" class="product-item animated-fadeIn" *ngFor="let product of displayedProducts">
           <div class="product-icon">
             <ion-icon name="cube-outline"></ion-icon>
           </div>

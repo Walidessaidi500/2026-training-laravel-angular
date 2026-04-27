@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -25,26 +25,24 @@ import {
   alertCircle,
   personOutline
 } from 'ionicons/icons';
+
+// Facades
+import { UsersFacade } from '@app/core/facades/users.facade';
+
+// Services
 import { AuthService } from '@services/auth/auth.service';
-import { UserService } from '@services/domain/user.service';
 import { UiService } from '@app/core/services/ui/ui.service';
 import { FilterService } from '@app/core/services/helper/filter.service';
 import { UtilsService } from '@app/core/services/helper/utils.service';
-import { CrudHelperService } from '@app/core/services/helper/crud-helper.service';
+
+// Components
 import { UserFormComponent, UserFormData } from '@components/user-form/user-form.component';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
+import { PageHeaderComponent } from '@app/shared/ui/page-header/page-header.component';
 
-
-interface User {
-  uuid: string;
-  name: string;
-  email: string;
-  role: string;
-  restaurant_id?: number;
-  status?: string;
-  pin?: string;
-  created_at?: string;
-}
+// Types
+import { User } from '@services/domain/user.service';
+import { combineLatest, map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-users',
@@ -64,28 +62,34 @@ interface User {
     IonSegment,
     IonSegmentButton,
     AccessDeniedComponent,
+    PageHeaderComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class UsersPage implements OnInit {
-  currentUser: User | null = null;
-  isAdmin = false;
-  isSupervisor = false;
-  isLoading = true;
+  private readonly usersFacade = inject(UsersFacade);
+  private readonly authService = inject(AuthService);
+  private readonly modalController = inject(ModalController);
+  private readonly uiService = inject(UiService);
+  private readonly filterService = inject(FilterService);
+  private readonly utilsService = inject(UtilsService);
 
-  users: User[] = [];
-  filteredUsers: User[] = [];
-  searchTerm = '';
-  selectedRole = 'all';
+  // State Observables
+  public readonly users$ = this.usersFacade.users$;
+  public readonly isLoading$ = this.usersFacade.isLoading$;
+  
+  // Combined State
+  public filteredUsers$: Observable<User[]>;
+  public userStats$: Observable<any>;
 
-  userStats = {
-    total: 0,
-    active: 0,
-    inactive: 0,
-    admins: 0,
-  };
+  // UI State
+  public currentUser: any = null;
+  public isAdmin = false;
+  public isSupervisor = false;
+  public searchTerm = '';
+  public selectedRole = 'all';
 
-  roleColors: { [key: string]: string } = {
+  private readonly roleColors: { [key: string]: string } = {
     admin: 'danger',
     customer: 'success',
     staff: 'warning',
@@ -93,15 +97,7 @@ export class UsersPage implements OnInit {
     supervisor: 'tertiary',
   };
 
-  constructor(
-    private authService: AuthService,
-    private userService: UserService,
-    private modalController: ModalController,
-    private uiService: UiService,
-    private filterService: FilterService,
-    private utilsService: UtilsService,
-    private crudHelper: CrudHelperService
-  ) {
+  constructor() {
     addIcons({
       'people-outline': peopleOutline,
       'add-outline': addOutline,
@@ -113,70 +109,72 @@ export class UsersPage implements OnInit {
       'alert-circle': alertCircle,
       'person-outline': personOutline,
     });
+
+    // Initialize filtered users stream
+    this.filteredUsers$ = this.users$.pipe(
+      map(users => {
+        let allUsers = [...users];
+        if (this.isSupervisor) {
+          allUsers = allUsers.filter(u => u.role.toLowerCase() !== 'admin');
+        }
+        return this.applyFilters(allUsers);
+      })
+    );
+
+    // Initialize stats stream
+    this.userStats$ = this.users$.pipe(
+      map(users => {
+        const stats = this.utilsService.calculateStats(users, [
+          { label: 'admins', filterFn: (u) => u.role.toLowerCase() === 'admin' },
+        ]);
+        return {
+          total: stats['total'],
+          active: 0,
+          inactive: 0,
+          admins: stats['admins'],
+        };
+      })
+    );
   }
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-    const role = this.currentUser?.role?.toLowerCase();
 
     if (!this.currentUser || (!this.authService.hasRole('admin') && !this.authService.hasRole('supervisor'))) {
       this.isAdmin = false;
       this.isSupervisor = false;
-      this.isLoading = false;
       return;
     }
 
     this.isAdmin = this.authService.hasRole('admin');
     this.isSupervisor = this.authService.hasRole('supervisor');
-    this.loadUsers();
-  }
-
-  private loadUsers(): void {
-    this.userService.list().subscribe({
-      next: (response: any) => {
-        let allUsers = response.data || response || [];
-        
-        
-        if (this.isSupervisor) {
-          allUsers = allUsers.filter((u: User) => u.role.toLowerCase() !== 'admin');
-        }
-
-        this.users = allUsers;
-        this.calculateStats();
-        this.applyFilters();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading users:', error);
-        this.isLoading = false;
-      },
-    });
-  }
-
-  private calculateStats(): void {
-    const stats = this.utilsService.calculateStats(this.users, [
-      { label: 'admins', filterFn: (u) => u.role.toLowerCase() === 'admin' },
-    ]);
-    this.userStats = {
-      total: stats['total'],
-      active: 0,
-      inactive: 0,
-      admins: stats['admins'],
-    };
+    this.usersFacade.loadUsers(1, 100);
   }
 
   onSearchChange(event: any): void {
     this.searchTerm = event.detail.value || '';
-    this.applyFilters();
+    this.refreshFilters();
   }
 
   onRoleChange(event: any): void {
     this.selectedRole = event.detail.value;
-    this.applyFilters();
+    this.refreshFilters();
   }
 
-  private applyFilters(): void {
-    this.filteredUsers = this.filterService.applyFilters(this.users, {
+  private refreshFilters(): void {
+    this.filteredUsers$ = this.users$.pipe(
+      map(users => {
+        let allUsers = [...users];
+        if (this.isSupervisor) {
+          allUsers = allUsers.filter(u => u.role.toLowerCase() !== 'admin');
+        }
+        return this.applyFilters(allUsers);
+      })
+    );
+  }
+
+  private applyFilters(users: User[]): User[] {
+    return this.filterService.applyFilters(users, {
       searchTerm: this.searchTerm,
       searchProperties: ['name', 'email'],
       propertyFilters: [
@@ -189,27 +187,25 @@ export class UsersPage implements OnInit {
     return this.utilsService.getInitials(name);
   }
 
-
   getRoleBadgeClass(role: string): string {
-    return this.roleColors[role] || 'medium';
+    return this.roleColors[role.toLowerCase()] || 'medium';
   }
 
   async addNewUser(): Promise<void> {
     const modal = await this.modalController.create({
       component: UserFormComponent,
-      componentProps: {
-        user: null,
-      },
       cssClass: 'fullscreen-modal',
       backdropDismiss: false,
     });
 
     await modal.present();
-
-    const { data } = await modal.onDidDismiss();
+    const { data } = await modal.onDidDismiss<UserFormData>();
 
     if (data) {
-      this.handleCreateUser(data);
+      this.usersFacade.createUser(data).subscribe({
+        next: () => this.uiService.showSuccess('Usuario creado exitosamente'),
+        error: (err) => this.uiService.showError('Error al crear usuario: ' + (err.error?.message || 'Error desconocido'))
+      });
     }
   }
 
@@ -222,7 +218,6 @@ export class UsersPage implements OnInit {
           name: user.name,
           email: user.email,
           role: user.role,
-          status: user.status,
           pin: user.pin,
         },
       },
@@ -231,44 +226,26 @@ export class UsersPage implements OnInit {
     });
 
     await modal.present();
-
-    const { data } = await modal.onDidDismiss();
+    const { data } = await modal.onDidDismiss<UserFormData>();
 
     if (data) {
-      this.handleUpdateUser(user.uuid, data);
+      this.usersFacade.updateUser(user.uuid, data).subscribe({
+        next: () => this.uiService.showSuccess('Usuario actualizado exitosamente'),
+        error: () => this.uiService.showError('Error al actualizar usuario')
+      });
     }
   }
 
   async deleteUser(user: User): Promise<void> {
     await this.uiService.confirmDelete(
       'Eliminar Usuario',
-      `¿Estás seguro de que deseas eliminar a <strong>${user.name}</strong>? Esta acción no se puede deshacer.`,
-      () => this.performDeleteUser(user.uuid)
-    );
-  }
-
-  private handleCreateUser(formData: UserFormData): void {
-    this.crudHelper.handleCreate(
-      this.userService.create(formData),
-      'Usuario creado exitosamente',
-      () => this.loadUsers()
-    );
-  }
-
-  private handleUpdateUser(uuid: string, formData: UserFormData): void {
-    this.crudHelper.handleUpdate(
-      this.userService.update(uuid, formData),
-      'Usuario actualizado exitosamente',
-      () => this.loadUsers()
-    );
-  }
-
-  private performDeleteUser(uuid: string): void {
-    this.crudHelper.handleDelete(
-      this.userService.delete(uuid),
-      'Usuario eliminado exitosamente',
-      () => this.loadUsers()
+      `¿Estás seguro de que deseas eliminar a <strong>${user.name}</strong>?`,
+      () => {
+        this.usersFacade.deleteUser(user.uuid).subscribe({
+          next: () => this.uiService.showSuccess('Usuario eliminado exitosamente'),
+          error: () => this.uiService.showError('Error al eliminar usuario')
+        });
+      }
     );
   }
 }
-

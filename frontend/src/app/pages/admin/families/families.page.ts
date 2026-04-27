@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -15,7 +15,7 @@ import {
 } from 'ionicons/icons';
 
 import { AuthService } from '@services/auth/auth.service';
-import { FamilyService } from '@services/domain/family.service';
+import { InventoryFacade } from '@app/core/facades/inventory.facade';
 import { UiService } from '@app/core/services/ui/ui.service';
 import { FilterService } from '@app/core/services/helper/filter.service';
 import { UtilsService } from '@app/core/services/helper/utils.service';
@@ -25,6 +25,7 @@ import { AccessDeniedComponent } from '@components/access-denied/access-denied.c
 
 // Pipes
 import { ActiveStatusPipe } from '@shared/pipes/active-status.pipe';
+import { Subject, takeUntil } from 'rxjs';
 
 export interface Family {
   uuid: string;
@@ -44,7 +45,17 @@ export interface Family {
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class FamiliesPage implements OnInit {
+export class FamiliesPage implements OnInit, OnDestroy {
+  private readonly authService = inject(AuthService);
+  private readonly facade = inject(InventoryFacade);
+  private readonly modalController = inject(ModalController);
+  private readonly uiService = inject(UiService);
+  private readonly filterService = inject(FilterService);
+  private readonly utilsService = inject(UtilsService);
+  private readonly crudHelper = inject(CrudHelperService);
+
+  private readonly destroy$ = new Subject<void>();
+
   currentUser: any = null;
   isAdmin = false;
   isSupervisor = false;
@@ -60,15 +71,7 @@ export class FamiliesPage implements OnInit {
     active: 0,
   };
 
-  constructor(
-    private authService: AuthService,
-    private familyService: FamilyService,
-    private modalController: ModalController,
-    private uiService: UiService,
-    private filterService: FilterService,
-    private utilsService: UtilsService,
-    private crudHelper: CrudHelperService
-  ) {
+  constructor() {
     addIcons({
       'folder-outline': folderOutline,
       'folder': folder,
@@ -93,23 +96,26 @@ export class FamiliesPage implements OnInit {
 
     this.isAdmin = true;
     this.isSupervisor = false;
-    this.loadFamilies();
-  }
 
-  private loadFamilies(): void {
-    this.isLoading = true;
-    this.familyService.list().subscribe({
-      next: (response: any) => {
-        this.families = response.data || response || [];
+    // Suscribirse a los datos del facade
+    this.facade.families$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(families => {
+        this.families = families as Family[];
         this.calculateStats();
         this.applyFilters();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading families:', error);
-        this.isLoading = false;
-      },
-    });
+      });
+
+    this.facade.isLoading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => this.isLoading = loading);
+
+    this.facade.loadAll();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private calculateStats(): void {
@@ -167,22 +173,16 @@ export class FamiliesPage implements OnInit {
   }
 
   private handleCreateFamily(formData: FamilyFormData): void {
-    this.isLoading = true;
     this.crudHelper.handleCreate(
-      this.familyService.create(formData),
-      'Familia creada exitosamente',
-      () => this.loadFamilies(),
-      () => this.isLoading = false
+      this.facade.createFamily(formData),
+      'Familia creada exitosamente'
     );
   }
 
   private handleUpdateFamily(uuid: string, formData: FamilyFormData): void {
-    this.isLoading = true;
     this.crudHelper.handleUpdate(
-      this.familyService.update(uuid, formData),
-      'Familia actualizada exitosamente',
-      () => this.loadFamilies(),
-      () => this.isLoading = false
+      this.facade.updateFamily(uuid, formData),
+      'Familia actualizada exitosamente'
     );
   }
 
@@ -196,33 +196,21 @@ export class FamiliesPage implements OnInit {
 
   private performDeleteFamily(uuid: string): void {
     this.crudHelper.handleDelete(
-      this.familyService.delete(uuid),
-      'Familia eliminada exitosamente',
-      () => this.loadFamilies()
+      this.facade.deleteFamily(uuid),
+      'Familia eliminada exitosamente'
     );
   }
 
   toggleFamilyStatus(family: Family, event: Event): void {
-      event.stopPropagation();
-      const previousStatus = family.active;
-      family.active = !previousStatus;
-      const updatePayload: any = {
-        name: family.name,
-        active: family.active
-      };
-  
-      this.familyService.update(family.uuid, updatePayload).subscribe({
-        next: () => {
-          this.uiService.showSuccess(`Familia ${family.active ? 'activada' : 'desactivada'}`);        
-          
-          this.calculateStats();
-        },
-        error: (error) => {
-          console.error('Error al cambiar estado:', error);
-  
-          family.active = previousStatus;
-          this.uiService.showError('Error al cambiar el estado');
-        }
-      });
-    }
+    event.stopPropagation();
+    this.facade.toggleFamilyStatus(family.uuid).subscribe({
+      next: (updated) => {
+        this.uiService.showSuccess(`Familia ${updated.active ? 'activada' : 'desactivada'}`);
+      },
+      error: (error) => {
+        console.error('Error al cambiar estado:', error);
+        this.uiService.showError('Error al cambiar el estado');
+      }
+    });
+  }
 }

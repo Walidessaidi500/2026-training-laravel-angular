@@ -55,11 +55,12 @@ export class UsersFacade {
   updateUser(uuid: string, userData: Partial<User>): Observable<User> {
     this.loadingSubject.next(true);
     return this.userService.update(uuid, userData).pipe(
-      tap((updatedUser) => {
+      tap(() => {
         const current = this.usersSubject.getValue();
         const index = current.findIndex(u => u.uuid === uuid);
         if (index !== -1) {
-          current[index] = updatedUser;
+          // Patch locally since backend might not return the full updated user
+          current[index] = { ...current[index], ...userData } as User;
           this.usersSubject.next([...current]);
         }
       }),

@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -16,16 +16,19 @@ import {
   chevronBackOutline, chevronForwardOutline, infiniteOutline, listOutline
 } from 'ionicons/icons';
 
+// Facades
+import { InventoryFacade } from '@app/core/facades/inventory.facade';
+
+// Services
 import { AuthService } from '@services/auth/auth.service';
-import { ProductService } from '@services/domain/product.service';
-import { FamilyService } from '@services/domain/family.service';
-import { TaxService } from '@services/domain/tax.service';
 import { UiService } from '@app/core/services/ui/ui.service';
 import { FilterService } from '@app/core/services/helper/filter.service';
 import { UtilsService } from '@app/core/services/helper/utils.service';
-import { CrudHelperService } from '@app/core/services/helper/crud-helper.service';
+
+// Components
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 import { ProductFormComponent, ProductFormData } from '@components/product-form/product-form.component';
+import { PageHeaderComponent } from '@app/shared/ui/page-header/page-header.component';
 
 // Pipes
 import { PricePipe } from '@shared/pipes/price.pipe';
@@ -33,17 +36,9 @@ import { ActiveStatusPipe } from '@shared/pipes/active-status.pipe';
 import { StockStatusPipe } from '@shared/pipes/stock-status.pipe';
 import { FallbackPipe } from '@shared/pipes/fallback.pipe';
 
-export interface Product {
-  uuid: string;
-  name: string;
-  priceInCents: number;
-  stock: number;
-  active: boolean;
-  family_id: string;
-  tax_id: string;
-  family_name?: string; 
-  tax_name?: string;    
-}
+// Types
+import { Product } from '@services/domain/product.service';
+import { combineLatest, map, Observable, firstValueFrom, BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-products',
@@ -55,56 +50,53 @@ export interface Product {
     IonItem, IonLabel, IonSkeletonText, IonSearchbar,
     IonSelect, IonSelectOption, IonNote, IonInfiniteScroll,
     IonInfiniteScrollContent, IonSegment, IonSegmentButton,
-    AccessDeniedComponent,
+    AccessDeniedComponent, PageHeaderComponent,
     PricePipe, ActiveStatusPipe, StockStatusPipe, FallbackPipe
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ProductsPage implements OnInit {
-  currentUser: any = null;
-  isAdmin = false;
-  isSupervisor = false;
-  isLoading = true;
+  private readonly inventoryFacade = inject(InventoryFacade);
+  private readonly authService = inject(AuthService);
+  private readonly modalController = inject(ModalController);
+  private readonly uiService = inject(UiService);
+  private readonly filterService = inject(FilterService);
+  private readonly utilsService = inject(UtilsService);
 
-  // Datos base
-  products: Product[] = [];
-  families: any[] = [];
-  taxes: any[] = [];
+  // State Observables
+  public readonly products$ = this.inventoryFacade.products$;
+  public readonly families$ = this.inventoryFacade.families$;
+  public readonly taxes$ = this.inventoryFacade.taxes$;
+  public readonly isLoading$ = this.inventoryFacade.isLoading$;
 
+  // Combined State for the template
+  public filteredProducts$: Observable<any[]>;
+  public displayedProducts$: Observable<any[]>;
+  public productStats$: Observable<any>;
 
-  filteredProducts: Product[] = [];
+  // UI State
+  public currentUser: any = null;
+  public isAdmin = false;
+  public isSupervisor = false;
 
   // Filtros
-  searchTerm = '';
-  selectedFamily = 'all';
-  selectedTax = 'all';
-  selectedStatus = 'all';
-  selectedStock = 'all';
-  displayMode: 'scroll' | 'pagination' = 'scroll';
+  public searchTerm = '';
+  public selectedFamily = 'all';
+  public selectedTax = 'all';
+  public selectedStatus = 'all';
+  public selectedStock = 'all';
+  public displayMode: 'scroll' | 'pagination' = 'scroll';
 
-  productStats = {
-    total: 0,
-    active: 0,
-    outOfStock: 0
-  };
+  // Paginación local
+  public currentPage = 1;
+  public lastPage = 1;
+  public perPage = 10;
+  public isInfiniteDisabled = false;
+  
+  private filterTrigger = new BehaviorSubject<void>(undefined);
+  private paginationTrigger = new BehaviorSubject<number>(1);
 
-
-  currentPage = 1;
-  lastPage = 1;
-  perPage = 10;
-  isInfiniteDisabled = false;
-
-  constructor(
-    private authService: AuthService,
-    private productService: ProductService,
-    private familyService: FamilyService,
-    private taxService: TaxService,
-    private modalController: ModalController,
-    private uiService: UiService,
-    private filterService: FilterService,
-    private utilsService: UtilsService,
-    private crudHelper: CrudHelperService
-  ) {
+  constructor() {
     addIcons({
       'cube-outline': cubeOutline,
       'cube': cube,
@@ -122,136 +114,112 @@ export class ProductsPage implements OnInit {
       'infinite-outline': infiniteOutline,
       'list-outline': listOutline
     });
+
+    // Initialize filtered products stream
+    this.filteredProducts$ = combineLatest([
+      this.products$,
+      this.families$,
+      this.taxes$,
+      this.filterTrigger
+    ]).pipe(
+      map(([products, families, taxes]) => {
+        const mapped = products.map(p => ({
+          ...p,
+          family_name: families.find(f => f.uuid === p.family_id)?.name || 'Sin Familia',
+          tax_name: taxes.find(t => t.uuid === p.tax_id)?.name || 'Sin Impuesto'
+        }));
+        return this.applyFilters(mapped);
+      })
+    );
+
+    // Initialize displayed products (paginated) stream
+    this.displayedProducts$ = combineLatest([
+      this.filteredProducts$,
+      this.paginationTrigger
+    ]).pipe(
+      map(([filtered, page]) => {
+        this.lastPage = Math.ceil(filtered.length / this.perPage) || 1;
+        this.currentPage = page;
+        this.isInfiniteDisabled = this.currentPage >= this.lastPage;
+
+        if (this.displayMode === 'scroll') {
+          return filtered.slice(0, this.currentPage * this.perPage);
+        } else {
+          const start = (this.currentPage - 1) * this.perPage;
+          return filtered.slice(start, start + this.perPage);
+        }
+      })
+    );
+
+    // Initialize stats stream
+    this.productStats$ = this.products$.pipe(
+      map(products => {
+        const stats = this.utilsService.calculateStats(products, [
+          { label: 'active', filterFn: (p) => p.active },
+          { label: 'outOfStock', filterFn: (p) => p.stock <= 0 },
+        ]);
+        return {
+          total: stats['total'],
+          active: stats['active'],
+          outOfStock: stats['outOfStock'],
+        };
+      })
+    );
   }
 
   ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-
-    if (!this.currentUser || (!this.authService.hasRole('admin') && !this.authService.hasRole('supervisor'))) {
-      this.isAdmin = false;
-      this.isSupervisor = false;
-      this.isLoading = false;
-      return;
-    }
-
     this.isAdmin = this.authService.hasRole('admin');
     this.isSupervisor = this.authService.hasRole('supervisor');
-    this.loadInitialData();
-  }
 
-  private loadInitialData(): void {
-    this.isLoading = true;
-
-    this.familyService.list().subscribe((res: any) => {
-      this.families = res.data || res || [];
-      this.taxService.list().subscribe((taxRes: any) => {
-        this.taxes = taxRes.data || taxRes || [];
-        this.loadProducts();
-      });
-    });
+    if (this.isAdmin || this.isSupervisor) {
+      this.inventoryFacade.loadAll();
+    }
   }
 
   onDisplayModeChange(): void {
-    this.loadProducts();
+    this.paginationTrigger.next(1);
   }
 
   nextPage(): void {
     if (this.currentPage < this.lastPage) {
-      this.currentPage++;
-      this.loadProducts();
+      this.paginationTrigger.next(this.currentPage + 1);
     }
   }
 
   prevPage(): void {
     if (this.currentPage > 1) {
-      this.currentPage--;
-      this.loadProducts();
+      this.paginationTrigger.next(this.currentPage - 1);
     }
   }
 
-  private loadProducts(isAppend: boolean = false, event?: any): void {
-    if (!isAppend) {
-      this.isLoading = true;
-      this.currentPage = !isAppend && this.displayMode === 'scroll' ? 1 : this.currentPage;
-      this.isInfiniteDisabled = false;
-    }
-
-    this.productService.list(this.currentPage, this.perPage).subscribe({
-      next: (response: any) => {
-        const rawProducts = response.data || response || [];
-        this.lastPage = response.meta?.last_page || 1;
-
-        const mappedProducts = rawProducts.map((p: Product) => ({
-          ...p,
-          family_name: this.families.find(f => f.uuid === p.family_id)?.name || 'Sin Familia',
-          tax_name: this.taxes.find(t => t.uuid === p.tax_id)?.name || 'Sin Impuesto'
-        }));
-
-        if (isAppend) {
-          this.products = [...this.products, ...mappedProducts];
-        } else {
-          this.products = mappedProducts;
-        }
-
-        this.isInfiniteDisabled = this.currentPage >= this.lastPage;
-
-        this.calculateStats(response.meta?.aggregates);
-        this.applyFilters();
-        this.isLoading = false;
-
-        if (event) {
-          event.target.complete();
-        }
-      },
-      error: (error) => {
-        console.error('Error loading products:', error);
-        this.isLoading = false;
-        if (event) {
-          event.target.complete();
-        }
-      }
-    });
-  }
-
-  loadMore(event: any) {
+  loadMore(event: any): void {
     if (this.currentPage < this.lastPage) {
-      this.currentPage++;
-      this.loadProducts(true, event);
+      this.paginationTrigger.next(this.currentPage + 1);
     } else {
-      event.target.complete();
       this.isInfiniteDisabled = true;
     }
-  }
-
-  private calculateStats(aggregates?: any): void {
-    if (aggregates) {
-      this.productStats.total = aggregates.total;
-      this.productStats.active = aggregates.active;
-      this.productStats.outOfStock = aggregates.out_of_stock;
-    } else {
-      const stats = this.utilsService.calculateStats(this.products, [
-        { label: 'active', filterFn: (p) => p.active },
-        { label: 'outOfStock', filterFn: (p) => p.stock <= 0 },
-      ]);
-      this.productStats = {
-        total: stats['total'],
-        active: stats['active'],
-        outOfStock: stats['outOfStock'],
-      };
-    }
+    setTimeout(() => {
+      event.target.complete();
+    }, 100);
   }
 
   onFilterChange(): void {
-    this.applyFilters();
+    this.refreshFilters();
   }
 
   onSearchChange(event: any): void {
     this.searchTerm = event.detail.value || '';
-    this.applyFilters();
+    this.refreshFilters();
   }
 
-  private applyFilters(): void {
-    this.filteredProducts = this.filterService.applyFilters(this.products, {
+  private refreshFilters(): void {
+    this.paginationTrigger.next(1);
+    this.filterTrigger.next();
+  }
+
+  private applyFilters(products: any[]): any[] {
+    return this.filterService.applyFilters(products, {
       searchTerm: this.searchTerm,
       searchProperties: ['name'],
       status: this.selectedStatus,
@@ -272,106 +240,65 @@ export class ProductsPage implements OnInit {
   }
 
   async addNewProduct(): Promise<void> {
+    const families = await firstValueFrom(this.inventoryFacade.families$);
+    const taxes = await firstValueFrom(this.inventoryFacade.taxes$);
+
     const modal = await this.modalController.create({
       component: ProductFormComponent,
-      componentProps: {
-        product: null,
-        families: this.families,
-        taxes: this.taxes
-      },
+      componentProps: { product: null, families, taxes },
       cssClass: 'fullscreen-modal',
       backdropDismiss: false,
     });
 
     await modal.present();
     const { data } = await modal.onDidDismiss<ProductFormData>();
-    if (data) this.handleCreateProduct(data);
+    if (data) {
+      this.inventoryFacade.createProduct(data).subscribe({
+        next: () => this.uiService.showSuccess('Producto creado exitosamente'),
+        error: (err) => this.uiService.showError('Error al crear: ' + (err.error?.message || 'Error desconocido'))
+      });
+    }
   }
-
 
   async editProduct(product: Product): Promise<void> {
+    const families = await firstValueFrom(this.inventoryFacade.families$);
+    const taxes = await firstValueFrom(this.inventoryFacade.taxes$);
+
     const modal = await this.modalController.create({
       component: ProductFormComponent,
-      componentProps: {
-        product: product,
-        families: this.families,
-        taxes: this.taxes
-      },
+      componentProps: { product, families, taxes },
       cssClass: 'fullscreen-modal',
       backdropDismiss: false,
     });
 
     await modal.present();
     const { data } = await modal.onDidDismiss<ProductFormData>();
-    if (data) this.handleUpdateProduct(product.uuid, data);
+    if (data) {
+      this.inventoryFacade.updateProduct(product.uuid, data).subscribe({
+        next: () => this.uiService.showSuccess('Producto actualizado exitosamente'),
+        error: (err) => this.uiService.showError('Error al actualizar')
+      });
+    }
   }
-
-
-  private handleCreateProduct(formData: ProductFormData): void {
-    this.isLoading = true;
-    this.crudHelper.handleCreate(
-      this.productService.create(formData),
-      'Producto creado exitosamente',
-      () => this.loadProducts(),
-      () => this.isLoading = false
-    );
-  }
-
-  private handleUpdateProduct(uuid: string, formData: ProductFormData): void {
-    this.isLoading = true;
-    this.crudHelper.handleUpdate(
-      this.productService.update(uuid, formData),
-      'Producto actualizado exitosamente',
-      () => this.loadProducts(),
-      () => this.isLoading = false
-    );
-  }
-
-
 
   async deleteProduct(product: Product): Promise<void> {
     await this.uiService.confirmDelete(
       'Eliminar Producto',
-      '¿Estás seguro de que deseas eliminar ' + product.name + '? Esta acción no se puede deshacer.',
-      () => this.performDeleteProduct(product.uuid)
-    );
-  }
-
-  private performDeleteProduct(uuid: string): void {
-    this.isLoading = true;
-    this.crudHelper.handleDelete(
-      this.productService.delete(uuid),
-      'Producto eliminado exitosamente',
-      () => this.loadProducts(),
-      () => this.isLoading = false
+      `¿Estás seguro de que deseas eliminar ${product.name}?`,
+      () => {
+        this.inventoryFacade.deleteProduct(product.uuid).subscribe({
+          next: () => this.uiService.showSuccess('Producto eliminado'),
+          error: () => this.uiService.showError('Error al eliminar')
+        });
+      }
     );
   }
 
   toggleProductStatus(product: Product, event: Event): void {
     event.stopPropagation();
-    const previousStatus = product.active;
-    product.active = !previousStatus;
-    const updatePayload: any = {
-      name: product.name,
-      priceInCents: product.priceInCents,
-      stock: product.stock,
-      family_id: product.family_id,
-      tax_id: product.tax_id,
-      active: product.active
-    };
-
-    this.productService.update(product.uuid, updatePayload).subscribe({
-      next: () => {
-        this.uiService.showSuccess(`Producto ${product.active ? 'activado' : 'desactivado'}`);        
-
-        this.calculateStats();
-      },
-      error: (error) => {
-        console.error('Error al cambiar estado:', error);
-
-        product.active = previousStatus;
-        this.uiService.showError('Error al cambiar el estado');
-      }
+    this.inventoryFacade.toggleProductStatus(product.uuid).subscribe({
+      next: (updated) => this.uiService.showSuccess(`Producto ${updated.active ? 'activado' : 'desactivado'}`),
+      error: () => this.uiService.showError('Error al cambiar el estado')
     });
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, finalize, forkJoin, tap } from 'rxjs';
+import { BehaviorSubject, Observable, finalize, forkJoin, of, tap } from 'rxjs';
 import { ProductService, Product } from '../services/domain/product.service';
 import { FamilyService, Family } from '../services/domain/family.service';
 import { TaxService, Tax } from '../services/domain/tax.service';
@@ -62,11 +62,12 @@ export class InventoryFacade {
   updateProduct(uuid: string, data: any): Observable<Product> {
     this.loadingSubject.next(true);
     return this.productService.update(uuid, data).pipe(
-      tap((updatedProduct) => {
+      tap(() => {
         const current = this.productsSubject.getValue();
         const index = current.findIndex(p => p.uuid === uuid);
         if (index !== -1) {
-          current[index] = updatedProduct;
+          // Patch locally since backend might not return the full updated object
+          current[index] = { ...current[index], ...data } as Product;
           this.productsSubject.next([...current]);
         }
       }),
@@ -98,7 +99,100 @@ export class InventoryFacade {
     );
   }
 
-  // --- Helpers ---
+  // --- Helpers: Families ---
+
+  createFamily(data: any): Observable<Family> {
+    this.loadingSubject.next(true);
+    return this.familyService.create(data).pipe(
+      tap((newFamily) => {
+        const current = this.familiesSubject.getValue();
+        this.familiesSubject.next([...current, newFamily]);
+      }),
+      finalize(() => this.loadingSubject.next(false))
+    );
+  }
+
+  updateFamily(uuid: string, data: any): Observable<Family> {
+    this.loadingSubject.next(true);
+    return this.familyService.update(uuid, data).pipe(
+      tap(() => {
+        const current = this.familiesSubject.getValue();
+        const index = current.findIndex(f => f.uuid === uuid);
+        if (index !== -1) {
+          current[index] = { ...current[index], ...data } as Family;
+          this.familiesSubject.next([...current]);
+        }
+      }),
+      finalize(() => this.loadingSubject.next(false))
+    );
+  }
+
+  deleteFamily(uuid: string): Observable<void> {
+    this.loadingSubject.next(true);
+    return this.familyService.delete(uuid).pipe(
+      tap(() => {
+        const current = this.familiesSubject.getValue();
+        this.familiesSubject.next(current.filter(f => f.uuid !== uuid));
+      }),
+      finalize(() => this.loadingSubject.next(false))
+    );
+  }
+
+  toggleFamilyStatus(uuid: string): Observable<Family> {
+    const current = this.familiesSubject.getValue();
+    const family = current.find(f => f.uuid === uuid);
+    if (!family) return of(null as any);
+
+    const newStatus = !family.active;
+    return this.familyService.update(uuid, { ...family, active: newStatus }).pipe(
+      tap((updated) => {
+        const index = current.findIndex(f => f.uuid === uuid);
+        if (index !== -1) {
+          current[index] = updated;
+          this.familiesSubject.next([...current]);
+        }
+      })
+    );
+  }
+
+  // --- Helpers: Taxes ---
+
+  createTax(data: any): Observable<Tax> {
+    this.loadingSubject.next(true);
+    return this.taxService.create(data).pipe(
+      tap((newTax) => {
+        const current = this.taxesSubject.getValue();
+        this.taxesSubject.next([...current, newTax]);
+      }),
+      finalize(() => this.loadingSubject.next(false))
+    );
+  }
+
+  updateTax(uuid: string, data: any): Observable<Tax> {
+    this.loadingSubject.next(true);
+    return this.taxService.update(uuid, data).pipe(
+      tap(() => {
+        const current = this.taxesSubject.getValue();
+        const index = current.findIndex(t => t.uuid === uuid);
+        if (index !== -1) {
+          current[index] = { ...current[index], ...data } as Tax;
+          this.taxesSubject.next([...current]);
+        }
+      }),
+      finalize(() => this.loadingSubject.next(false))
+    );
+  }
+
+  deleteTax(uuid: string): Observable<void> {
+    this.loadingSubject.next(true);
+    return this.taxService.delete(uuid).pipe(
+      tap(() => {
+        const current = this.taxesSubject.getValue();
+        this.taxesSubject.next(current.filter(t => t.uuid !== uuid));
+      }),
+      finalize(() => this.loadingSubject.next(false))
+    );
+  }
 
   /**
    * Refreshes families list

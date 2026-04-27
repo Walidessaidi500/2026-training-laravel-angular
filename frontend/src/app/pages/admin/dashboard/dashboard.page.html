@@ -1,11 +1,12 @@
 <ion-content class="dashboard-background">
 
   <!-- Mensaje si no es admin -->
-  <app-access-denied *ngIf="!isAdmin && !isLoading" [user]="currentUser"
+  <app-access-denied *ngIf="!isAdmin && !(isLoading$ | async)" [user]="currentUser"
     message="Este dashboard solo está disponible para administradores.">
   </app-access-denied>
+  
   <!-- Loading -->
-  <div class="dashboard-grid" *ngIf="isLoading">
+  <div class="dashboard-grid" *ngIf="isLoading$ | async">
     <div class="main-column">
       <ion-skeleton-text animated style="height: 250px; border-radius: 16px; margin-bottom: 24px;"></ion-skeleton-text>
       <div class="micro-stats-grid">
@@ -19,156 +20,164 @@
   </div>
 
   <!-- Dashboard content - solo para admin -->
-  <div class="dashboard-grid" *ngIf="dashboardData && isAdmin">
+  <ng-container *ngIf="dashboardData$ | async as data">
+    <div class="dashboard-grid" *ngIf="isAdmin && !(isLoading$ | async)">
 
-    <div class="main-column">
+      <div class="main-column">
 
-      <div class="panel-card hero-card">
-        <div class="card-header">
-          <div class="title-group">
-            <div class="icon-box primary">
-              <ion-icon name="cash-outline"></ion-icon>
+        <div class="panel-card hero-card">
+          <div class="card-header">
+            <div class="title-group">
+              <div class="icon-box primary">
+                <ion-icon name="cash-outline"></ion-icon>
+              </div>
+              <div>
+                <span class="label">INGRESOS TOTALES</span>
+                <small class="restaurant-info">Restaurante #{{ restaurantId }}</small>
+              </div>
             </div>
+            <!-- Botón opcional, de momento a dashboard -->
+            <button class="btn-soft" (click)="navigateTo('/admin/dashboard')">Detalles <ion-icon name="chevron-forward"></ion-icon></button>
+          </div>
+
+          <div class="hero-content">
+            <div class="amount-large">{{ data.revenue.total | currency:'EUR':'symbol':'1.2-2' }}</div>
+
+            <div class="trend-badge"
+              [ngClass]="{'success': data.revenue.trendPercentage >= 0, 'danger': data.revenue.trendPercentage < 0}">
+              <ion-icon [name]="data.revenue.trendPercentage >= 0 ? 'arrow-up' : 'arrow-down'"></ion-icon>
+              {{ data.revenue.trendPercentage }}% <span>vs mes pasado</span>
+            </div>
+
+            <div class="sub-stats">
+              <div class="stat-item">
+                <span class="label">ESTA SEMANA</span>
+                <strong>{{ data.revenue.thisWeek | currency:'EUR':'symbol':'1.1-1' }}</strong>
+              </div>
+              <div class="stat-item">
+                <span class="label">VALOR MEDIO DEL PEDIDO</span>
+                <strong>{{ data.revenue.avgOrder | currency:'EUR':'symbol':'1.2-2' }}</strong>
+              </div>
+              <div class="stat-item">
+                <span class="label">INGRESOS RECURRENTES MENSUALES</span>
+                <strong>{{ data.revenue.mrr | currency:'EUR':'symbol':'1.1-1' }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="micro-stats-grid">
+          <app-micro-stat-card
+            icon="people"
+            iconColor="primary"
+            trendPercentage="+12.5"
+            trendType="success"
+            [value]="data.metrics.activeUsers | number"
+            label="USUARIOS ACTIVOS"
+            (click)="navigateTo('/admin/users')"
+            style="cursor: pointer;">
+          </app-micro-stat-card>
+
+          <app-micro-stat-card
+            icon="cart"
+            iconColor="primary"
+            trendPercentage="+8.2"
+            trendType="success"
+            [value]="data.metrics.ordersToday | number"
+            label="PEDIDOS HOY">
+          </app-micro-stat-card>
+
+          <app-micro-stat-card
+            icon="pie-chart"
+            iconColor="primary"
+            trendPercentage="-0.8"
+            trendType="danger"
+            [value]="data.metrics.conversionRate + '%'"
+            label="CONVERSIÓN">
+          </app-micro-stat-card>
+
+          <app-micro-stat-card
+            icon="cube"
+            iconColor="primary"
+            trendPercentage="+3"
+            trendType="success"
+            [value]="data.metrics.totalProducts | number"
+            label="PRODUCTOS"
+            (click)="navigateTo('/admin/products')"
+            style="cursor: pointer;">
+          </app-micro-stat-card>
+        </div>
+
+        <div class="panel-card chart-card">
+          <div class="card-header">
+            <span class="label">INGRESOS SEMANALES</span>
+            <div class="time-filters">
+              <button class="filter-btn">24h</button>
+              <button class="filter-btn active">7d</button>
+              <button class="filter-btn">30d</button>
+              <button class="filter-btn">90d</button>
+            </div>
+          </div>
+          <div class="chart-header-stats">
+            <div class="amount-medium">{{ data.revenue.thisWeek | currency:'EUR':'symbol':'1.0-0' }}</div>
+            <span class="trend-badge success"><ion-icon name="arrow-up"></ion-icon> 12.5%</span>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="card-header">
             <div>
-              <span class="label">INGRESOS TOTALES</span>
-              <small class="restaurant-info">Restaurante #{{ restaurantId }}</small>
+              <span class="label">PEDIDOS RECIENTES</span>
+              <h3>{{ data.recentOrders.length }} transacciones</h3>
             </div>
+            <!-- Botón a algún listado de pedidos si existiera, o desactivado -->
+            <button class="btn-soft" (click)="navigateTo('/admin/dashboard')">Ver todo <ion-icon name="arrow-forward-outline"></ion-icon></button>
           </div>
-          <button class="btn-soft">Detalles <ion-icon name="chevron-forward"></ion-icon></button>
+
+          <ion-list class="transaction-list">
+            <ion-item lines="none" class="transaction-item" *ngFor="let order of data.recentOrders">
+              <div slot="start" class="avatar-circle"
+                [style.background-color]="order.colorAvatar || 'var(--ion-color-primary)'">
+                {{ order.customerInitials }}
+              </div>
+              <ion-label>
+                <h2>{{ order.customerName }}</h2>
+                <p>#{{ order.id }} · {{ order.itemsCount }} items</p>
+              </ion-label>
+              <div slot="end" class="transaction-meta">
+                <strong>{{ order.total | currency:'EUR' }}</strong>
+                <div class="time-text">{{ order.date }}</div>
+              </div>
+              <div slot="end" class="status-wrapper">
+                <span class="status-badge" [ngClass]="order.status.toLowerCase()">
+                  <ion-icon name="checkmark-circle" *ngIf="order.status === 'Completed'"></ion-icon>
+                  <ion-icon name="time" *ngIf="order.status === 'Processing'"></ion-icon>
+                  <ion-icon name="close-circle" *ngIf="order.status === 'Cancelled'"></ion-icon>
+                  {{ order.status }}
+                </span>
+              </div>
+            </ion-item>
+          </ion-list>
         </div>
 
-        <div class="hero-content">
-          <div class="amount-large">{{ dashboardData.revenue.total | currency:'EUR':'symbol':'1.0-0' }}</div>
-
-          <div class="trend-badge"
-            [ngClass]="{'success': dashboardData.revenue.trendPercentage >= 0, 'danger': dashboardData.revenue.trendPercentage < 0}">
-            <ion-icon [name]="dashboardData.revenue.trendPercentage >= 0 ? 'arrow-up' : 'arrow-down'"></ion-icon>
-            {{ dashboardData.revenue.trendPercentage }}% <span>vs mes pasado</span>
-          </div>
-
-          <div class="sub-stats">
-            <div class="stat-item">
-              <span class="label">ESTA SEMANA</span>
-              <strong>{{ dashboardData.revenue.thisWeek | currency:'EUR':'symbol':'1.1-1' }}</strong>
-            </div>
-            <div class="stat-item">
-              <span class="label">VALOR MEDIO DEL PEDIDO</span>
-              <strong>{{ dashboardData.revenue.avgOrder | currency:'EUR':'symbol':'1.2-2' }}</strong>
-            </div>
-            <div class="stat-item">
-              <span class="label">INGRESOS RECURRENTES MENSUALES</span>
-              <strong>{{ dashboardData.revenue.mrr | currency:'EUR':'symbol':'1.1-1' }}</strong>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <div class="micro-stats-grid">
-        <app-micro-stat-card
-          icon="people"
-          iconColor="primary"
-          trendPercentage="+12.5"
-          trendType="success"
-          [value]="dashboardData.metrics.activeUsers | number"
-          label="USUARIOS ACTIVOS">
-        </app-micro-stat-card>
+      <div class="side-column">
 
-        <app-micro-stat-card
-          icon="cart"
-          iconColor="primary"
-          trendPercentage="+8.2"
-          trendType="success"
-          [value]="dashboardData.metrics.ordersToday | number"
-          label="PEDIDOS HOY">
-        </app-micro-stat-card>
+        <app-shortcut-list
+          [shortcuts]="dashboardShortcuts"
+          (shortcutClick)="handleShortcutClick($event)">
+        </app-shortcut-list>
 
-        <app-micro-stat-card
-          icon="pie-chart"
-          iconColor="primary"
-          trendPercentage="-0.8"
-          trendType="danger"
-          [value]="dashboardData.metrics.conversionRate + '%'"
-          label="CONVERSIÓN">
-        </app-micro-stat-card>
+        <app-alert-list
+          [alerts]="data.alerts">
+        </app-alert-list>
 
-        <app-micro-stat-card
-          icon="cube"
-          iconColor="primary"
-          trendPercentage="+3"
-          trendType="success"
-          [value]="dashboardData.metrics.totalProducts | number"
-          label="PRODUCTOS">
-        </app-micro-stat-card>
+        <app-timeline-list
+          [items]="data.activities">
+        </app-timeline-list>
+
       </div>
-
-      <div class="panel-card chart-card">
-        <div class="card-header">
-          <span class="label">INGRESOS SEMANALES</span>
-          <div class="time-filters">
-            <button class="filter-btn">24h</button>
-            <button class="filter-btn active">7d</button>
-            <button class="filter-btn">30d</button>
-            <button class="filter-btn">90d</button>
-          </div>
-        </div>
-        <div class="chart-header-stats">
-          <div class="amount-medium">{{ dashboardData.revenue.thisWeek | currency:'EUR':'symbol':'1.0-0' }}</div>
-          <span class="trend-badge success"><ion-icon name="arrow-up"></ion-icon> 12.5%</span>
-        </div>
-      </div>
-
-      <div class="panel-card">
-        <div class="card-header">
-          <div>
-            <span class="label">PEDIDOS RECIENTES</span>
-            <h3>{{ dashboardData.recentOrders.length }} transacciones</h3>
-          </div>
-          <button class="btn-soft">Ver todo <ion-icon name="arrow-forward-outline"></ion-icon></button>
-        </div>
-
-        <ion-list class="transaction-list">
-          <ion-item lines="none" class="transaction-item" *ngFor="let order of dashboardData.recentOrders">
-            <div slot="start" class="avatar-circle"
-              [style.background-color]="order.colorAvatar || 'var(--ion-color-primary)'">
-              {{ order.customerInitials }}
-            </div>
-            <ion-label>
-              <h2>{{ order.customerName }}</h2>
-              <p>#{{ order.id }} · {{ order.itemsCount }} items</p>
-            </ion-label>
-            <div slot="end" class="transaction-meta">
-              <strong>{{ order.total | currency }}</strong>
-              <div class="time-text">{{ order.date }}</div>
-            </div>
-            <div slot="end" class="status-wrapper">
-              <span class="status-badge" [ngClass]="order.status.toLowerCase()">
-                <ion-icon name="checkmark-circle" *ngIf="order.status === 'Completed'"></ion-icon>
-                <ion-icon name="time" *ngIf="order.status === 'Processing'"></ion-icon>
-                <ion-icon name="close-circle" *ngIf="order.status === 'Cancelled'"></ion-icon>
-                {{ order.status }}
-              </span>
-            </div>
-          </ion-item>
-        </ion-list>
-      </div>
-
     </div>
-
-    <div class="side-column">
-
-      <app-shortcut-list
-        [shortcuts]="dashboardShortcuts"
-        (shortcutClick)="handleShortcutClick($event)">
-      </app-shortcut-list>
-
-      <app-alert-list
-        [alerts]="dashboardData.alerts">
-      </app-alert-list>
-
-      <app-timeline-list
-        [items]="dashboardData.activities">
-      </app-timeline-list>
-
-    </div>
-  </div>
+  </ng-container>
 </ion-content>
