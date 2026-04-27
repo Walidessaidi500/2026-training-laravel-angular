@@ -113,6 +113,16 @@ class OrderLine implements \JsonSerializable
         return $this->taxPercentage;
     }
 
+    public function createdAt(): DomainDateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function updatedAt(): DomainDateTime
+    {
+        return $this->updatedAt;
+    }
+
     public function jsonSerialize(): array
     {
         return [

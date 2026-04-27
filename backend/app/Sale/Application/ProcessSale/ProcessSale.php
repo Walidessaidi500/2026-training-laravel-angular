@@ -29,16 +29,12 @@ class ProcessSale
         $userUuid = Uuid::create($request->userUuid);
 
         DB::transaction(function () use ($restaurantId, $tableUuid, $userUuid, $request) {
-            // 1. Get or Create Order
+            // 1. Get current order
             $order = $this->orderRepository->findByTable($tableUuid, 'open');
             
-            $oldQuantitiesByProduct = [];
-            if ($order) {
-                foreach ($order->lines() as $line) {
-                    $productUuid = $line->productId()->value();
-                    $oldQuantitiesByProduct[$productUuid] = ($oldQuantitiesByProduct[$productUuid] ?? 0) + $line->quantity();
-                }
-            } else {
+            if (!$order) {
+                // If no order exists, we create a temporary one to satisfy requirements,
+                // but normally we should have an order.
                 $orderId = Uuid::generate();
                 $order = Order::fromPersistence(
                     $orderId->value(),
@@ -50,86 +46,29 @@ class ProcessSale
                     $request->diners,
                     new \DateTimeImmutable(),
                     null,
-                    [], // Temporary empty lines
+                    [],
                     new \DateTimeImmutable(),
                     new \DateTimeImmutable()
                 );
             }
 
-            // Sync lines first to match what's in the cart
-            $newLines = array_map(function ($line) use ($restaurantId, $order, $userUuid) {
-                return OrderLine::fromPersistence(
-                    $line['uuid'] ?? Uuid::generate()->value(),
-                    $restaurantId->value(),
-                    $order->id()->value(),
-                    $line['product_uuid'],
-                    $userUuid->value(),
-                    $line['quantity'],
-                    $line['price'],
-                    $line['tax_percentage'],
-                    new \DateTimeImmutable(),
-                    new \DateTimeImmutable()
-                );
-            }, $request->lines);
-
-            $newQuantitiesByProduct = [];
-            foreach ($newLines as $line) {
-                $productUuid = $line->productId()->value();
-                $newQuantitiesByProduct[$productUuid] = ($newQuantitiesByProduct[$productUuid] ?? 0) + $line->quantity();
-            }
-
-            // Calculate deltas and update stock
-            $allProductUuids = array_unique(array_merge(array_keys($oldQuantitiesByProduct), array_keys($newQuantitiesByProduct)));
-
-            foreach ($allProductUuids as $productUuid) {
-                $oldQty = $oldQuantitiesByProduct[$productUuid] ?? 0;
-                $newQty = $newQuantitiesByProduct[$productUuid] ?? 0;
-                $delta = $newQty - $oldQty;
-
-                if ($delta !== 0) {
-                    $product = $this->productRepository->findById(Uuid::create($productUuid));
-                    if ($product) {
-                        if ($delta > 0) {
-                            $product->decrementStock($delta);
-                        } else {
-                            $product->incrementStock(abs($delta));
-                        }
-                        $this->productRepository->save($product);
-                    }
-                }
-            }
-
-            $order = Order::fromPersistence(
-                $order->id()->value(),
-                $order->restaurantId()->value(),
-                $order->status(),
-                $order->tableId()->value(),
-                $order->openedByUserId()->value(),
-                $order->closedByUserId()?->value(),
-                $request->diners,
-                $order->openedAt()->value(),
-                $order->closedAt()?->value(),
-                $newLines,
-                new \DateTimeImmutable(),
-                new \DateTimeImmutable()
-            );
-
-            $this->orderRepository->save($order);
-
-            // 2. Create Sale
+            // 2. Identify what is being sold in this transaction
+            $soldLinesData = $request->lines;
+            
+            // 3. Create Sale
             $saleId = Uuid::generate();
-            $saleLines = array_map(function ($orderLine) use ($restaurantId, $saleId, $userUuid) {
+            $saleLines = array_map(function ($line) use ($restaurantId, $saleId, $userUuid) {
                 return SaleLine::dddCreate(
                     $restaurantId,
                     $saleId,
-                    $orderLine->id(),
-                    $orderLine->productId(),
+                    Uuid::create($line['uuid'] ?? Uuid::generate()->value()),
+                    Uuid::create($line['product_uuid']),
                     $userUuid,
-                    $orderLine->quantity(),
-                    $orderLine->price(),
-                    $orderLine->taxPercentage()
+                    $line['quantity'],
+                    $line['price'],
+                    $line['tax_percentage']
                 );
-            }, $order->lines());
+            }, $soldLinesData);
 
             $sale = Sale::fromPersistence(
                 $saleId->value(),
@@ -144,20 +83,103 @@ class ProcessSale
                 new \DateTimeImmutable(),
                 new \DateTimeImmutable(),
                 new \DateTimeImmutable(),
-                0,
+                0, // total is calculated in entity if using dddCreate, but here we pass it desestructured
                 $saleLines,
                 new \DateTimeImmutable(),
-                new \DateTimeImmutable()
+                new \DateTimeImmutable(),
+                $request->paymentMethod,
+                $request->amountCash,
+                $request->amountCard
+            );
+
+            // Calculate total for sale if not using dddCreate directly
+            $saleTotal = array_reduce($saleLines, function ($carry, $line) {
+                return $carry + ($line->price() * $line->quantity());
+            }, 0);
+            
+            // We need to use a reflection or a setter if total is private and no way to set it in fromPersistence
+            // Actually fromPersistence has $total parameter.
+             $sale = Sale::fromPersistence(
+                $saleId->value(),
+                $restaurantId->value(),
+                $order->id()->value(),
+                $tableUuid->value(),
+                $userUuid->value(),
+                $userUuid->value(),
+                $userUuid->value(),
+                null,
+                $request->diners,
+                new \DateTimeImmutable(),
+                new \DateTimeImmutable(),
+                new \DateTimeImmutable(),
+                $saleTotal,
+                $saleLines,
+                new \DateTimeImmutable(),
+                new \DateTimeImmutable(),
+                $request->paymentMethod,
+                $request->amountCash,
+                $request->amountCard
             );
 
             // Assign a ticket number
             $lastTicketNumber = DB::table('sales')->where('restaurant_id', $restaurantId->value())->max('ticket_number') ?? 0;
             $sale->close($userUuid, $lastTicketNumber + 1);
-
             $this->saleRepository->save($sale);
 
-            // 3. Invoice Order
-            $order->invoice($userUuid);
+            // 4. Update Order: subtract sold quantities from the current order lines
+            $currentOrderLines = $order->lines();
+            $newOrderLines = [];
+            
+            foreach ($currentOrderLines as $orderLine) {
+                $soldQty = 0;
+                foreach ($soldLinesData as $soldLine) {
+                    if (($soldLine['uuid'] ?? null) === $orderLine->id()->value()) {
+                        $soldQty += $soldLine['quantity'];
+                    }
+                }
+                
+                $remainingQty = $orderLine->quantity() - $soldQty;
+                if ($remainingQty > 0) {
+                    $newOrderLines[] = OrderLine::fromPersistence(
+                        $orderLine->id()->value(),
+                        $orderLine->restaurantId()->value(),
+                        $orderLine->orderId()->value(),
+                        $orderLine->productId()->value(),
+                        $orderLine->userId()->value(),
+                        $remainingQty,
+                        $orderLine->price(),
+                        $orderLine->taxPercentage(),
+                        $orderLine->createdAt()->value(),
+                        new \DateTimeImmutable()
+                    );
+                }
+                
+                // If soldQty > 0, we also update stock (already decremented when sent to kitchen, 
+                // but here it's already sold, so no delta changes needed unless we logic differently.
+                // In current logic, sendOrder decrements stock. closeTicket should not decrement it again.
+            }
+
+            // Update order with remaining lines
+            $order = Order::fromPersistence(
+                $order->id()->value(),
+                $order->restaurantId()->value(),
+                $order->status(),
+                $order->tableId()->value(),
+                $order->openedByUserId()->value(),
+                $order->closedByUserId()?->value(),
+                $order->diners(),
+                $order->openedAt()->value(),
+                $order->closedAt()?->value(),
+                $newOrderLines,
+                $order->createdAt()->value(),
+                new \DateTimeImmutable()
+            );
+
+            // 5. If no lines remaining, close (invoice) the order
+            if (empty($newOrderLines)) {
+                $order->invoice($userUuid);
+            }
+            
             $this->orderRepository->save($order);
         });
     }

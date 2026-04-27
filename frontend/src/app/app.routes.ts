@@ -5,11 +5,6 @@ import { roleGuard } from '@guards/role.guard';
 
 export const routes: Routes = [
   {
-    path: 'home',
-    loadComponent: () => import('./pages/core/home/home.page').then((m) => m.HomePage),
-    canActivate: [guestGuard]
-  },
-  {
     path: 'login',
     loadComponent: () => import('./pages/core/login/login.page').then((m) => m.LoginPage),
     canActivate: [guestGuard]
@@ -31,7 +26,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'home',
+    redirectTo: 'login',
     pathMatch: 'full',
   },
 ];

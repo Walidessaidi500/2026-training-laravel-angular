@@ -129,6 +129,16 @@ class Order implements \JsonSerializable
         return $this->lines;
     }
 
+    public function createdAt(): DomainDateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function updatedAt(): DomainDateTime
+    {
+        return $this->updatedAt;
+    }
+
     public function invoice(Uuid $closedByUserId): void
     {
         $this->status = 'invoiced';

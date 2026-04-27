@@ -277,4 +277,451 @@
     </ng-template>
   </ion-modal>
 
+  <!-- Modal: Payment Selection -->
+  <ion-modal [isOpen]="showPaymentModal" (didDismiss)="showPaymentModal = false" class="payment-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Cobrar Mesa: {{ selectedTable?.name }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="showPaymentModal = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="payment-container">
+          <div class="payment-summary">
+            <div class="total-big">
+              <span class="label">Total a pagar ahora</span>
+              <span class="value">{{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+              <span class="sub-label" *ngIf="paymentType !== 'total'">De un total de {{ (total / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="payment-options">
+            <div class="option-group">
+              <h3>Tipo de Pago</h3>
+              <div class="btn-group">
+                <button [class.active]="paymentType === 'total'" (click)="setPaymentType('total')">Todo junto</button>
+                <button [class.active]="paymentType === 'split'" (click)="setPaymentType('split')">Pago dividido</button>
+              </div>
+            </div>
+
+            <!-- Pago Dividido Selection -->
+            <div class="option-group items-selection" *ngIf="paymentType === 'split'">
+              <h3>Selecciona qué se paga ahora</h3>
+              <div class="split-items-list">
+                <div *ngFor="let item of cart" class="split-item" [class.selected]="item.selected">
+                  <div class="item-main" (click)="toggleItemSelection(item)">
+                    <ion-icon [name]="item.selected ? 'checkbox-outline' : 'square-outline'"></ion-icon>
+                    <span class="name">{{ item.product.name }}</span>
+                    <span class="price">{{ (getPriceWithTax(item.product) / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+                  </div>
+                  <div class="item-qty-control" *ngIf="item.selected">
+                    <button (click)="updateSelectedQuantity(item, -1)"><ion-icon name="remove-outline"></ion-icon></button>
+                    <span class="qty">{{ item.selectedQuantity }} / {{ item.quantity }}</span>
+                    <button (click)="updateSelectedQuantity(item, 1)"><ion-icon name="add-outline"></ion-icon></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="option-group">
+              <h3>Forma de Pago</h3>
+              <div class="btn-group">
+                <button [class.active]="paymentMethod === 'cash'" (click)="setPaymentMethod('cash')">
+                  <ion-icon name="cash-outline"></ion-icon> Efectivo
+                </button>
+                <button [class.active]="paymentMethod === 'card'" (click)="setPaymentMethod('card')">
+                  <ion-icon name="card-outline"></ion-icon> Tarjeta
+                </button>
+                <button [class.active]="paymentMethod === 'mixed'" (click)="setPaymentMethod('mixed')">
+                   Mixto
+                </button>
+              </div>
+            </div>
+
+<ion-content [fullscreen]="true" class="tpv-background">
+  <div class="tpv-layout">
+
+    <!-- Header -->
+    <header class="tpv-header">
+      <div class="header-content">
+        <div class="header-left">
+          <button *ngIf="viewState === 'order'" class="back-btn" (click)="backToTables()">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+          </button>
+          <div class="header-title">
+            <h1>Terminal de Venta</h1>
+            <p>{{ viewState === 'tables' ? 'Selección de Mesa' : ('Mesa: ' + selectedTable?.name) }}</p>
+          </div>
+        </div>
+        <div class="header-right" *ngIf="currentUser">
+          <div class="user-chip" id="user-menu-trigger" style="cursor: pointer;">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            <span>{{ currentUser.name }}</span>
+            <ion-icon name="chevron-down-outline" style="margin-left: 5px;"></ion-icon>
+          </div>
+
+          <ion-popover trigger="user-menu-trigger" triggerAction="click" dismissOnSelect="true">
+            <ng-template>
+              <ion-content>
+                <ion-list lines="none">
+                  <ion-item button (click)="logout()" detail="false">
+                    <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+                    <ion-label color="danger">Cerrar Sesión</ion-label>
+                  </ion-item>
+                </ion-list>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+        </div>
+      </div>
+    </header>
+
+    <div class="tpv-body">
+
+      <!-- View 1: Table Selection -->
+      <ng-container *ngIf="viewState === 'tables'">
+        <!-- Sidebar for Zones -->
+        <aside class="zones-sidebar">
+          <button
+            *ngFor="let zone of zones"
+            class="zone-btn"
+            [class.active]="selectedZoneUuid === zone.uuid"
+            (click)="selectZone(zone.uuid)">
+            <ion-icon name="grid-outline"></ion-icon>
+            <span>{{ zone.name }}</span>
+          </button>
+        </aside>
+
+        <!-- Main Grid for Tables -->
+        <main class="tables-grid-container">
+          <div class="tables-grid">
+            <button
+              *ngFor="let table of filteredTables"
+              class="table-btn"
+              [class.free]="!isTableOccupied(table)"
+              [class.occupied]="isTableOccupied(table)"
+              (click)="onTableClick(table)">
+              <span class="table-name">{{ table.name }}</span>
+              <span class="table-status-text">{{ isTableOccupied(table) ? 'Ocupada' : 'Libre' }}</span>
+            </button>
+          </div>
+        </main>
+      </ng-container>
+
+      <!-- View 2: Order Management -->
+      <ng-container *ngIf="viewState === 'order'">
+        <!-- Sidebar for Categories (Families) -->
+        <aside class="families-sidebar">
+          <button
+            *ngFor="let family of families"
+            class="family-btn"
+            [class.active]="selectedFamilyUuid === family.uuid"
+            (click)="selectFamily(family.uuid)">
+            <ion-icon name="layers-outline"></ion-icon>
+            <span>{{ family.name }}</span>
+          </button>
+        </aside>
+
+        <!-- Main Area: Products and Cart -->
+        <main class="order-container">
+          <!-- Product Grid -->
+          <div class="products-section">
+            <div class="products-grid">
+              <button
+                *ngFor="let product of filteredProducts"
+                class="product-card"
+                (click)="addToCart(product)">
+                <div class="product-icon-box">
+                  <ion-icon name="fast-food-outline"></ion-icon>
+                </div>
+                <div class="product-info">
+                  <span class="product-name">{{ product.name }}</span>
+                  <span class="product-price">{{ (getPriceWithTax(product) / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Shopping Cart / Ticket -->
+          <aside class="cart-section">
+            <div class="cart-header">
+              <div class="header-icon">
+                <ion-icon name="receipt-outline"></ion-icon>
+              </div>
+              <h2>Detalle Pedido</h2>
+              <div class="header-actions">
+                 <button class="icon-btn" (click)="editDiners()">
+                  <ion-icon name="people-outline"></ion-icon>
+                  <span>{{ currentOrder?.diners || tempDiners }}</span>
+                </button>
+                <button class="icon-btn" (click)="printProvisional()">
+                  <ion-icon name="print-outline"></ion-icon>
+                </button>
+                <button class="clear-btn" (click)="clearCart()" *ngIf="cart.length > 0">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="cart-items">
+              <div *ngIf="cart.length === 0" class="empty-cart">
+                <ion-icon name="cart-outline"></ion-icon>
+                <p>El pedido está vacío</p>
+              </div>
+
+              <div *ngFor="let item of cart; let i = index" class="cart-item">
+                <div class="item-info">
+                  <span class="item-name">{{ item.product.name }}</span>
+                  <span class="item-price">{{ (getPriceWithTax(item.product) * item.quantity / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+                </div>
+                <div class="item-controls">
+                  <button (click)="removeFromCart(i)"><ion-icon name="remove-outline"></ion-icon></button>
+                  <span class="quantity">{{ item.quantity }}</span>
+                  <button (click)="addToCart(item.product)"><ion-icon name="add-outline"></ion-icon></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="cart-footer">
+              <div class="total-row">
+                <span class="total-label">Total a pagar</span>
+                <span class="total-value">{{ (total / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+              </div>
+              <div class="action-buttons">
+                <button class="btn-send" (click)="sendOrder()" [disabled]="cart.length === 0">
+                  <ion-icon name="cloud-upload-outline"></ion-icon>
+                  Enviar
+                </button>
+                <button class="btn-pay" (click)="closeTicket()" [disabled]="cart.length === 0">
+                  <ion-icon name="wallet-outline"></ion-icon>
+                  Cobrar
+                </button>
+              </div>
+            </div>
+          </aside>
+        </main>
+      </ng-container>
+
+    </div>
+  </div>
+
+  <!-- Modal: User Selection -->
+  <ion-modal [isOpen]="showUserSelection" (didDismiss)="showUserSelection = false" class="user-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>{{ userSelectionContext === 'opening' ? '¿Quién abre la mesa?' : '¿Quién cierra la venta?' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="showUserSelection = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="user-selection-grid">
+          <button *ngFor="let user of users" class="user-card" (click)="selectUser(user)">
+            <div class="user-avatar-placeholder">
+              <ion-icon name="person-circle-outline"></ion-icon>
+            </div>
+            <span class="user-name">{{ user.name }}</span>
+            <span class="user-role-badge" [class]="user.role">{{ user.role }}</span>
+          </button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal: PIN Entry -->
+  <ion-modal [isOpen]="showPinModal" (didDismiss)="showPinModal = false" class="pin-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Validar PIN - {{ selectedUserForPin?.name }}</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="pin-keypad-container">
+          <div class="pin-display">
+            <div class="pin-dots">
+              <div class="dot" [class.filled]="pinBuffer.length >= 1"></div>
+              <div class="dot" [class.filled]="pinBuffer.length >= 2"></div>
+              <div class="dot" [class.filled]="pinBuffer.length >= 3"></div>
+              <div class="dot" [class.filled]="pinBuffer.length >= 4"></div>
+              <div class="dot-more" *ngIf="pinBuffer.length > 4">...</div>
+            </div>
+          </div>
+
+          <div class="keypad">
+            <button (click)="addPinDigit('1')">1</button>
+            <button (click)="addPinDigit('2')">2</button>
+            <button (click)="addPinDigit('3')">3</button>
+            <button (click)="addPinDigit('4')">4</button>
+            <button (click)="addPinDigit('5')">5</button>
+            <button (click)="addPinDigit('6')">6</button>
+            <button (click)="addPinDigit('7')">7</button>
+            <button (click)="addPinDigit('8')">8</button>
+            <button (click)="addPinDigit('9')">9</button>
+            <button class="empty"></button>
+            <button (click)="addPinDigit('0')">0</button>
+            <button (click)="removePinDigit()">
+              <ion-icon name="backspace-outline"></ion-icon>
+            </button>
+          </div>
+
+          <div class="keypad-actions">
+            <button class="btn-cancel" (click)="showPinModal = false">Cancelar</button>
+            <button class="btn-confirm" (click)="onPinConfirm()">Aceptar</button>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal: Diners Selection (Keypad) -->
+  <ion-modal [isOpen]="showDinersSelection" (didDismiss)="showDinersSelection = false" class="diners-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Número de Comensales</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="diners-keypad-container">
+          <div class="diners-display">
+            <span>{{ tempDiners }}</span>
+            <ion-icon name="people-outline"></ion-icon>
+          </div>
+
+          <div class="keypad">
+            <button (click)="addDinerDigit('1')">1</button>
+            <button (click)="addDinerDigit('2')">2</button>
+            <button (click)="addDinerDigit('3')">3</button>
+            <button (click)="addDinerDigit('4')">4</button>
+            <button (click)="addDinerDigit('5')">5</button>
+            <button (click)="addDinerDigit('6')">6</button>
+            <button (click)="addDinerDigit('7')">7</button>
+            <button (click)="addDinerDigit('8')">8</button>
+            <button (click)="addDinerDigit('9')">9</button>
+            <button class="empty"></button>
+            <button (click)="addDinerDigit('0')">0</button>
+            <button (click)="removeDinerDigit()">
+              <ion-icon name="backspace-outline"></ion-icon>
+            </button>
+          </div>
+
+          <div class="keypad-actions">
+            <button class="btn-cancel" (click)="showDinersSelection = false">Cancelar</button>
+            <button class="btn-confirm" (click)="onDinersConfirm()">Aceptar</button>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal: Payment Selection -->
+  <ion-modal [isOpen]="showPaymentModal" (didDismiss)="showPaymentModal = false" class="payment-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Cobrar Mesa: {{ selectedTable?.name }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="showPaymentModal = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="payment-container">
+          <div class="payment-summary">
+            <div class="total-big">
+              <span class="label">Total a pagar ahora</span>
+              <span class="value">{{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+              <span class="sub-label" *ngIf="paymentType !== 'total'">De un total de {{ (total / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="payment-options">
+            <div class="option-group">
+              <h3>Tipo de Pago</h3>
+              <div class="btn-group">
+                <button [class.active]="paymentType === 'total'" (click)="setPaymentType('total')">Todo junto</button>
+                <button [class.active]="paymentType === 'split'" (click)="setPaymentType('split')">Pago dividido</button>
+              </div>
+            </div>
+
+            <!-- Pago Dividido Selection -->
+            <div class="option-group items-selection" *ngIf="paymentType === 'split'">
+              <h3>Selecciona qué se paga ahora</h3>
+              <div class="split-items-list">
+                <div *ngFor="let item of cart" class="split-item" [class.selected]="item.selected">
+                  <div class="item-main" (click)="toggleItemSelection(item)">
+                    <ion-icon [name]="item.selected ? 'checkbox-outline' : 'square-outline'"></ion-icon>
+                    <span class="name">{{ item.product.name }}</span>
+                    <span class="price">{{ (getPriceWithTax(item.product) / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+                  </div>
+                  <div class="item-qty-control" *ngIf="item.selected">
+                    <button (click)="updateSelectedQuantity(item, -1)"><ion-icon name="remove-outline"></ion-icon></button>
+                    <span class="qty">{{ item.selectedQuantity }} / {{ item.quantity }}</span>
+                    <button (click)="updateSelectedQuantity(item, 1)"><ion-icon name="add-outline"></ion-icon></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="option-group">
+              <h3>Forma de Pago</h3>
+              <div class="btn-group">
+                <button [class.active]="paymentMethod === 'cash'" (click)="setPaymentMethod('cash')">
+                  <ion-icon name="cash-outline"></ion-icon> Efectivo
+                </button>
+                <button [class.active]="paymentMethod === 'card'" (click)="setPaymentMethod('card')">
+                  <ion-icon name="card-outline"></ion-icon> Tarjeta
+                </button>
+                <button [class.active]="paymentMethod === 'mixed'" (click)="setPaymentMethod('mixed')">
+                   Mixto
+                </button>
+              </div>
+            </div>
+
+            <div class="option-group" *ngIf="paymentMethod === 'mixed'">
+              <h3>Cantidades (Mixto)</h3>
+              <div class="split-inputs">
+                <div class="input-item">
+                  <label>Efectivo (€)</label>
+                  <ion-input type="number" [(ngModel)]="amountCash" (ionChange)="onAmountChange()" class="custom-input"></ion-input>
+                </div>
+                <div class="input-item">
+                  <label>Tarjeta (€)</label>
+                  <ion-input type="number" [(ngModel)]="amountCard" readonly class="custom-input readonly"></ion-input>
+                </div>
+              </div>
+            </div>
+
+            <div class="option-group" *ngIf="paymentMethod === 'cash' || paymentMethod === 'mixed'">
+              <h3>Entregado (Efectivo)</h3>
+              <div class="split-inputs">
+                <div class="input-item">
+                  <label>Entregado (€)</label>
+                  <ion-input type="number" [(ngModel)]="amountGiven" class="custom-input"></ion-input>
+                </div>
+                <div class="input-item">
+                  <label>Cambio (€)</label>
+                  <div class="custom-input readonly change-value" [class.negative]="changeAmount < 0">{{ changeAmount | currency:'EUR':'symbol':'1.2-2' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="payment-actions">
+            <button class="btn-pay-confirm" (click)="confirmPayment()" [disabled]="selectedTotal <= 0">
+              Confirmar Pago de {{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2' }}
+            </button>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>
+

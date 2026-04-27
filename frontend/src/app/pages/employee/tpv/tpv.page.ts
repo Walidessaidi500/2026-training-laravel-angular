@@ -25,7 +25,11 @@ import {
   printOutline,
   backspaceOutline,
   checkmarkCircle,
-  alertCircle
+  alertCircle,
+  cashOutline,
+  cardOutline,
+  checkboxOutline,
+  squareOutline
 } from 'ionicons/icons';
 
 import { TableService, Table } from '@services/domain/table.service';
@@ -44,6 +48,8 @@ interface CartItem {
   uuid?: string;
   product: Product;
   quantity: number;
+  selected?: boolean; // For partial payment
+  selectedQuantity?: number; // How many of this item to pay now
 }
 
 @Component({
@@ -91,11 +97,24 @@ export class TpvPage implements OnInit {
   public showUserSelection = false;
   public showDinersSelection = false;
   public showPinModal = false;
+  public showPaymentModal = false;
   public userSelectionContext: 'opening' | 'closing' = 'opening';
   public selectedOpUser: User | null = null;
   public selectedUserForPin: User | null = null;
   public pinBuffer: string = '';
   public tempDiners: string = '1';
+
+  // Pago (Valores en Euros para la UI)
+  public paymentType: 'total' | 'split' = 'total';
+  public paymentMethod: 'cash' | 'card' | 'mixed' = 'cash';
+  public amountCash: number = 0;
+  public amountCard: number = 0;
+  public amountGiven: number = 0;
+  public paymentUser: User | null = null;
+
+  public get changeAmount(): number {
+    return this.amountGiven - this.amountCash;
+  }
 
   public currentUser = this.authService.getUser();
 
@@ -121,7 +140,11 @@ export class TpvPage implements OnInit {
       printOutline,
       backspaceOutline,
       checkmarkCircle,
-      alertCircle
+      alertCircle,
+      cashOutline,
+      cardOutline,
+      checkboxOutline,
+      squareOutline
     });
   }
 
@@ -233,7 +256,9 @@ export class TpvPage implements OnInit {
             return {
               uuid: line.uuid,
               product: product!,
-              quantity: line.quantity
+              quantity: line.quantity,
+              selected: false,
+              selectedQuantity: 0
             };
           });
         }
@@ -378,7 +403,7 @@ export class TpvPage implements OnInit {
     if (existingItem) {
       existingItem.quantity++;
     } else {
-      this.cart.push({ product, quantity: 1 });
+      this.cart.push({ product, quantity: 1, selected: false, selectedQuantity: 0 });
     }
   }
 
@@ -396,6 +421,60 @@ export class TpvPage implements OnInit {
 
   public get total(): number {
     return this.cart.reduce((sum, item) => sum + (this.getPriceWithTax(item.product) * item.quantity), 0);
+  }
+
+  public get selectedTotal(): number {
+    if (this.paymentType === 'total') return this.total;
+    return this.cart.reduce((sum, item) => sum + (item.selected ? (this.getPriceWithTax(item.product) * (item.selectedQuantity || 0)) : 0), 0);
+  }
+
+  public toggleItemSelection(item: CartItem) {
+    item.selected = !item.selected;
+    if (item.selected) {
+        item.selectedQuantity = item.quantity;
+    } else {
+        item.selectedQuantity = 0;
+    }
+    
+    if (this.paymentType === 'split') {
+        this.updateAmountsBasedOnTotal();
+    }
+  }
+
+  public updateSelectedQuantity(item: CartItem, delta: number) {
+    if (!item.selectedQuantity) item.selectedQuantity = 0;
+    const newVal = item.selectedQuantity + delta;
+    if (newVal >= 0 && newVal <= item.quantity) {
+        item.selectedQuantity = newVal;
+        item.selected = item.selectedQuantity > 0;
+        if (this.paymentType === 'split') {
+            this.updateAmountsBasedOnTotal();
+        }
+    }
+  }
+
+  private updateAmountsBasedOnTotal() {
+    const amountToPay = this.selectedTotal / 100;
+    if (this.paymentMethod === 'cash') {
+      this.amountCash = amountToPay;
+      this.amountCard = 0;
+      if (this.amountGiven < amountToPay) {
+        this.amountGiven = amountToPay;
+      }
+    } else if (this.paymentMethod === 'card') {
+      this.amountCash = 0;
+      this.amountCard = amountToPay;
+      this.amountGiven = 0;
+    } else if (this.paymentMethod === 'mixed') {
+      this.amountCard = Number((amountToPay - this.amountCash).toFixed(2));
+      if (this.amountCard < 0) {
+        this.amountCash = amountToPay;
+        this.amountCard = 0;
+      }
+      if (this.amountGiven < this.amountCash) {
+        this.amountGiven = this.amountCash;
+      }
+    }
   }
 
   public sendOrder() {
@@ -425,6 +504,7 @@ export class TpvPage implements OnInit {
         }
         this.uiService.showSuccess('Pedido mandado a cocina correctamente');
         this.refreshProducts(); // Refrescar stock tras enviar pedido
+        this.loadOrderForTable(this.selectedTable!); // Reload to get UUIDs and fresh data
       },
       error: (err) => {
         console.error('Error al mandar el pedido', err);
@@ -462,15 +542,77 @@ export class TpvPage implements OnInit {
   }
 
   private processClosing(user: User) {
-    if (!this.selectedTable) return;
+    this.paymentUser = user;
+    this.paymentType = 'total';
+    this.paymentMethod = 'cash';
+    this.amountCash = this.total / 100; // Convert cents to Euros
+    this.amountCard = 0;
+    this.showPaymentModal = true;
+  }
 
-    const saleData = {
+  public setPaymentType(type: 'total' | 'split') {
+    this.paymentType = type;
+    this.resetPaymentSelections();
+  }
+
+  private resetPaymentSelections() {
+    const amountToPay = this.selectedTotal / 100;
+    this.paymentMethod = 'cash';
+    this.amountCash = amountToPay;
+    this.amountCard = 0;
+    this.amountGiven = amountToPay;
+    
+    if (this.paymentType === 'total') {
+        this.cart.forEach(i => { i.selected = false; i.selectedQuantity = 0; });
+    }
+  }
+
+  public setPaymentMethod(method: 'cash' | 'card' | 'mixed') {
+    this.paymentMethod = method;
+    const amountToPay = this.selectedTotal / 100;
+    if (method === 'cash') {
+      this.amountCash = amountToPay;
+      this.amountCard = 0;
+      this.amountGiven = amountToPay;
+    } else if (method === 'card') {
+      this.amountCash = 0;
+      this.amountCard = amountToPay;
+      this.amountGiven = 0;
+    }
+  }
+
+  public onAmountChange() {
+    const amountToPay = this.selectedTotal / 100;
+    if (this.paymentMethod === 'mixed') {
+      if (this.amountCash > amountToPay) {
+        this.amountCash = amountToPay;
+      }
+      this.amountCard = Number((amountToPay - this.amountCash).toFixed(2));
+      if (this.amountGiven < this.amountCash) {
+        this.amountGiven = this.amountCash;
+      }
+    }
+  }
+
+  public confirmPayment() {
+    if (!this.selectedTable || !this.paymentUser) return;
+
+    if (this.paymentMethod === 'cash' || this.paymentMethod === 'mixed') {
+      if (this.amountGiven < this.amountCash) {
+        this.uiService.showError('El importe entregado debe ser mayor o igual al efectivo a cobrar.');
+        return;
+      }
+    }
+
+    // First sync the order to ensure all items have valid UUIDs in the database
+    const orderData = {
       table_uuid: this.selectedTable.uuid,
-      user_uuid: user.uuid, // Usuario que cierra
-      diners: this.currentOrder?.diners || 1,
+      diners: this.currentOrder?.diners || parseInt(this.tempDiners) || 1,
+      opened_by_user_uuid: this.currentOrder?.opened_by_user_uuid || this.paymentUser.uuid,
       lines: this.cart.map(item => {
         const tax = this.taxes.find(t => t.uuid === item.product.tax_id);
         return {
+          uuid: item.uuid,
           product_uuid: item.product.uuid,
           quantity: item.quantity,
           price: item.product.priceInCents,
@@ -479,11 +621,101 @@ export class TpvPage implements OnInit {
       })
     };
 
+    this.orderService.sync(orderData).subscribe({
+      next: () => {
+        // Fetch the updated order to get the correct UUIDs
+        this.orderService.getActiveOrderByTable(this.selectedTable!.uuid).subscribe({
+          next: (order) => {
+            if (order) {
+              this.currentOrder = order;
+              // Update cart UUIDs from the synchronized order
+              this.cart.forEach(item => {
+                const syncedLine = (order.lines || []).find((l: any) => l.product_uuid === item.product.uuid);
+                if (syncedLine) {
+                  item.uuid = syncedLine.uuid;
+                }
+              });
+            }
+            // Now proceed with the actual payment
+            this.processActualPayment();
+          },
+          error: (err) => {
+            console.error('Error al obtener el pedido tras sincronizar', err);
+            this.uiService.showError('Error al obtener el pedido tras sincronizar');
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error al sincronizar antes de cobrar', err);
+        this.uiService.showError('Error al sincronizar el pedido antes de cobrar');
+      }
+    });
+  }
+
+  private processActualPayment() {
+    let linesToSell: any[] = [];
+
+    if (this.paymentType === 'total') {
+        linesToSell = this.cart.map(item => ({
+            uuid: item.uuid,
+            product_uuid: item.product.uuid,
+            quantity: item.quantity,
+            price: item.product.priceInCents,
+            tax_percentage: this.taxes.find(t => t.uuid === item.product.tax_id)?.percentage || 0
+        }));
+    } else if (this.paymentType === 'split') {
+        linesToSell = this.cart
+            .filter(item => item.selected && (item.selectedQuantity || 0) > 0)
+            .map(item => ({
+                uuid: item.uuid,
+                product_uuid: item.product.uuid,
+                quantity: item.selectedQuantity,
+                price: item.product.priceInCents,
+                tax_percentage: this.taxes.find(t => t.uuid === item.product.tax_id)?.percentage || 0
+            }));
+    }
+
+    if (linesToSell.length === 0) {
+        this.uiService.showError('No hay artículos seleccionados para cobrar');
+        return;
+    }
+
+    const saleData = {
+      table_uuid: this.selectedTable!.uuid,
+      user_uuid: this.paymentUser!.uuid,
+      diners: this.currentOrder?.diners || 1,
+      payment_method: this.paymentMethod,
+      amount_cash: Math.round(this.amountCash * 100),
+      amount_card: Math.round(this.amountCard * 100),
+      lines: linesToSell
+    };
+
     this.saleService.process(saleData).subscribe({
       next: () => {
-        this.uiService.showSuccess('Ticket cerrado y cobrado correctamente');
-        this.refreshProducts(); // Importante refrescar stock al cobrar
-        this.backToTables();
+        this.uiService.showSuccess('Pago procesado correctamente');
+        this.refreshProducts();
+        
+        // Refresh local order state
+        this.orderService.getActiveOrderByTable(this.selectedTable!.uuid).subscribe(order => {
+            if (!order) {
+                this.showPaymentModal = false;
+                this.backToTables();
+            } else {
+                this.currentOrder = order;
+                this.cart = (order.lines || []).map(line => {
+                    const product = this.products.find(p => p.uuid === line.product_uuid);
+                    return {
+                        uuid: line.uuid,
+                        product: product!,
+                        quantity: line.quantity,
+                        selected: false,
+                        selectedQuantity: 0
+                    };
+                });
+                // Recalculate options
+                this.resetPaymentSelections();
+            }
+        });
       },
       error: (err) => {
         console.error('Error al procesar la venta', err);

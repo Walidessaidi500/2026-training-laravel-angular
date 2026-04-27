@@ -1,56 +1,48 @@
-
 <ion-content [fullscreen]="true" class="auth-content">
   <div class="auth-container">
-    <ion-card class="auth-card login-card">
-      <ion-card-header>
-        <ion-card-title>Bienvenido</ion-card-title>
-      </ion-card-header>
+    <div class="auth-card">
+      
+      <div class="brand-header">
+        <h1 class="brand-title">Yurest</h1>
+        <p class="subtitle">Gestión inteligente para tu negocio</p>
+      </div>
 
-      <ion-card-content>
-        <p class="subtitle">Accede con tus credenciales</p>
-
-        <!-- Error Message -->
-        <ion-text *ngIf="errorMessage" color="danger" class="error-message">
+      <div class="form-content">
+        <div *ngIf="errorMessage" class="error-banner">
+          <ion-icon name="alert-circle-outline"></ion-icon>
           <p>{{ errorMessage }}</p>
-        </ion-text>
+        </div>
 
-        <!-- Login Form -->
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-          <!-- Email Field -->
-          <ion-item class="form-item">
-            <ion-label position="floating">Email</ion-label>
-            <ion-input formControlName="email" type="email" placeholder="ejemplo@correo.com" [class.input-error]="email?.invalid && email?.touched">
-            </ion-input>
+          
+          <ion-item class="custom-input" lines="none" [class.has-error]="email?.invalid && email?.touched">
+            <ion-icon name="mail-outline" slot="start" color="medium"></ion-icon>
+            <ion-input formControlName="email" type="email" placeholder="Correo electrónico"></ion-input>
           </ion-item>
-          <ion-text *ngIf="email?.invalid && email?.touched" color="danger" class="error-text">
-            <p *ngIf="email?.errors?.['required']">El email es requerido</p>
-            <p *ngIf="email?.errors?.['email']">Email inválido</p>
-          </ion-text>
+          <div *ngIf="email?.invalid && email?.touched" class="error-text">
+            <span *ngIf="email?.errors?.['required']">El email es requerido</span>
+            <span *ngIf="email?.errors?.['email']">Email con formato inválido</span>
+          </div>
 
-          <!-- Password Field -->
-          <ion-item class="form-item">
-            <ion-label position="floating">Contraseña</ion-label>
-            <ion-input formControlName="password" type="password" placeholder="Mínimo 6 caracteres" [class.input-error]="password?.invalid && password?.touched">
-            </ion-input>
+          <ion-item class="custom-input" lines="none" [class.has-error]="password?.invalid && password?.touched">
+            <ion-icon name="lock-closed-outline" slot="start" color="medium"></ion-icon>
+            <ion-input formControlName="password" [type]="showPassword ? 'text' : 'password'" placeholder="Contraseña"></ion-input>
+            
+            <ion-button fill="clear" slot="end" class="eye-btn" (click)="togglePassword()" type="button">
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" slot="icon-only" color="medium"></ion-icon>
+            </ion-button>
           </ion-item>
-          <ion-text *ngIf="password?.invalid && password?.touched" color="danger" class="error-text">
-            <p *ngIf="password?.errors?.['required']">
-              La contraseña es requerida
-            </p>
-            <p *ngIf="password?.errors?.['minlength']">
-              Mínimo 6 caracteres
-            </p>
-          </ion-text>
+          <div *ngIf="password?.invalid && password?.touched" class="error-text">
+            <span *ngIf="password?.errors?.['required']">La contraseña es requerida</span>
+            <span *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</span>
+          </div>
 
-          <!-- Submit Button -->
-          <ion-button expand="block" color="primary" type="submit" [disabled]="loginForm.invalid || isLoading" class="submit-button">
-            <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
-            <span *ngIf="!isLoading">Iniciar Sesión</span>
+          <ion-button expand="block" type="submit" [disabled]="loginForm.invalid || isLoading" class="submit-button" color="primary">
+            <ion-spinner *ngIf="isLoading" name="dots"></ion-spinner>
+            <span *ngIf="!isLoading">Acceder al TPV</span>
           </ion-button>
         </form>
-
-
-      </ion-card-content>
-    </ion-card>
+      </div>
+    </div>
   </div>
 </ion-content>

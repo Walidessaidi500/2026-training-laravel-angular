@@ -25,6 +25,9 @@ class Sale implements \JsonSerializable
         private array $lines,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
+        private string $paymentMethod = 'cash',
+        private int $amountCash = 0,
+        private int $amountCard = 0,
     ) {
     }
 
@@ -36,6 +39,9 @@ class Sale implements \JsonSerializable
         Uuid $openedByUserId,
         int $diners,
         array $lines,
+        string $paymentMethod = 'cash',
+        int $amountCash = 0,
+        int $amountCard = 0,
     ): self {
         $now = DomainDateTime::now();
         
@@ -59,7 +65,10 @@ class Sale implements \JsonSerializable
             $total,
             $lines,
             $now,
-            $now
+            $now,
+            $paymentMethod,
+            $amountCash,
+            $amountCard
         );
     }
 
@@ -80,6 +89,9 @@ class Sale implements \JsonSerializable
         array $lines,
         \DateTimeImmutable $createdAt,
         \DateTimeImmutable $updatedAt,
+        string $paymentMethod = 'cash',
+        int $amountCash = 0,
+        int $amountCard = 0,
     ): self {
         return new self(
             Uuid::create($id),
@@ -97,7 +109,10 @@ class Sale implements \JsonSerializable
             $total,
             $lines,
             DomainDateTime::create($createdAt),
-            DomainDateTime::create($updatedAt)
+            DomainDateTime::create($updatedAt),
+            $paymentMethod,
+            $amountCash,
+            $amountCard
         );
     }
 
