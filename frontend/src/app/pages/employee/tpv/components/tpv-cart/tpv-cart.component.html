@@ -1,0 +1,56 @@
+<aside class="cart-section">
+  <div class="cart-header">
+    <div class="header-icon">
+      <ion-icon name="receipt-outline"></ion-icon>
+    </div>
+    <h2>Detalle Pedido</h2>
+    <div class="header-actions">
+       <button class="icon-btn" (click)="onEditDiners()">
+        <ion-icon name="people-outline"></ion-icon>
+        <span>{{ currentOrder?.diners || tempDiners }}</span>
+      </button>
+      <button class="icon-btn" (click)="onPrintProvisional()">
+        <ion-icon name="print-outline"></ion-icon>
+      </button>
+      <button class="clear-btn" (click)="onClearCart()" *ngIf="cart.length > 0">
+        <ion-icon name="trash-outline"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="cart-items">
+    <div *ngIf="cart.length === 0" class="empty-cart">
+      <ion-icon name="cart-outline"></ion-icon>
+      <p>El pedido está vacío</p>
+    </div>
+
+    <div *ngFor="let item of cart; let i = index" class="cart-item">
+      <div class="item-info">
+        <span class="item-name">{{ item.product.name }}</span>
+        <span class="item-price">{{ (getPriceWithTax(item.product) * item.quantity / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+      </div>
+      <div class="item-controls">
+        <button (click)="onRemoveItem(i)"><ion-icon name="remove-outline"></ion-icon></button>
+        <span class="quantity">{{ item.quantity }}</span>
+        <button (click)="onAddItem(item.product)"><ion-icon name="add-outline"></ion-icon></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cart-footer">
+    <div class="total-row">
+      <span class="total-label">Total a pagar</span>
+      <span class="total-value">{{ (total / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+    </div>
+    <div class="action-buttons">
+      <button class="btn-send" (click)="onSendOrder()" [disabled]="cart.length === 0">
+        <ion-icon name="cloud-upload-outline"></ion-icon>
+        Enviar
+      </button>
+      <button class="btn-pay" (click)="onCloseTicket()" [disabled]="cart.length === 0">
+        <ion-icon name="wallet-outline"></ion-icon>
+        Cobrar
+      </button>
+    </div>
+  </div>
+</aside>

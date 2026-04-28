@@ -1,0 +1,28 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="onClose()" class="diners-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Número de Comensales</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="diners-keypad-container">
+        <div class="diners-display">
+          <span>{{ tempDiners }}</span>
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+
+        <app-tpv-numeric-keypad 
+          [showEmptyButton]="false"
+          (digitClick)="onDigitClick($event)" 
+          (backspaceClick)="onBackspaceClick()">
+        </app-tpv-numeric-keypad>
+
+        <div class="keypad-actions">
+          <button class="btn-cancel" (click)="onClose()">Cancelar</button>
+          <button class="btn-confirm" (click)="onConfirm()">Aceptar</button>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

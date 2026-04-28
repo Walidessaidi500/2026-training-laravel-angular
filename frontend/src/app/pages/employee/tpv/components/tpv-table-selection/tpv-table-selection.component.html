@@ -1,0 +1,26 @@
+<!-- Sidebar for Zones -->
+<aside class="zones-sidebar">
+  <button
+    *ngFor="let zone of zones"
+    class="zone-btn"
+    [class.active]="selectedZoneUuid === zone.uuid"
+    (click)="selectZone(zone.uuid)">
+    <ion-icon name="grid-outline"></ion-icon>
+    <span>{{ zone.name }}</span>
+  </button>
+</aside>
+
+<!-- Main Grid for Tables -->
+<main class="tables-grid-container">
+  <div class="tables-grid">
+    <button
+      *ngFor="let table of filteredTables"
+      class="table-btn"
+      [class.free]="!isTableOccupied(table)"
+      [class.occupied]="isTableOccupied(table)"
+      (click)="onTableClick(table)">
+      <span class="table-name">{{ table.name }}</span>
+      <span class="table-status-text">{{ isTableOccupied(table) ? 'Ocupada' : 'Libre' }}</span>
+    </button>
+  </div>
+</main>

@@ -1,0 +1,23 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="onClose()" class="user-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>{{ context === 'opening' ? '¿Quién abre la mesa?' : '¿Quién cierra la venta?' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="onClose()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="user-selection-grid">
+        <button *ngFor="let user of users" class="user-card" (click)="onSelectUser(user)">
+          <div class="user-avatar-placeholder">
+            <ion-icon name="person-circle-outline"></ion-icon>
+          </div>
+          <span class="user-name">{{ user.name }}</span>
+          <span class="user-role-badge" [class]="user.role">{{ user.role }}</span>
+        </button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

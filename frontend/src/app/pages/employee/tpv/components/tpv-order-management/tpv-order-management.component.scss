@@ -1,0 +1,120 @@
+:host {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+}
+
+.families-sidebar {
+  width: 140px;
+  background: #fff;
+  border-right: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px;
+  gap: 16px;
+
+  .family-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 100px;
+    padding: 16px 12px;
+    background: var(--ion-color-light);
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 20px;
+    color: var(--ion-color-medium);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    ion-icon { font-size: 28px; }
+    span { 
+      font-size: 12px; 
+      font-weight: 700; 
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &.active {
+      background: var(--ion-color-primary);
+      color: white;
+      border-color: var(--ion-color-primary);
+      box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.3);
+      transform: translateY(-2px);
+    }
+
+    &:active:not(.active) {
+      transform: scale(0.95);
+      background: var(--ion-color-primary-light);
+    }
+  }
+}
+
+.products-section {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  background: var(--ion-background-color);
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: white;
+  border: 1px solid rgba(0,0,0,0.03);
+  border-radius: 22px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  width: 100%;
+
+  &:active { 
+    transform: scale(0.94); 
+    background: var(--ion-color-primary-light);
+    border-color: var(--ion-color-primary);
+  }
+
+  .product-icon-box {
+    width: 64px;
+    height: 64px;
+    background: var(--ion-color-primary-light);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    ion-icon { font-size: 32px; color: var(--ion-color-primary); }
+  }
+
+  .product-info {
+    text-align: center;
+    .product-name { 
+      display: block; 
+      font-weight: 700; 
+      color: var(--ion-color-secondary); 
+      font-size: 15px; 
+      margin-bottom: 4px;
+    }
+    .product-price { 
+      display: inline-block; 
+      font-weight: 800; 
+      color: var(--ion-color-primary); 
+      font-size: 18px; 
+      background: var(--ion-color-primary-light);
+      padding: 4px 12px;
+      border-radius: 10px;
+    }
+  }
+}

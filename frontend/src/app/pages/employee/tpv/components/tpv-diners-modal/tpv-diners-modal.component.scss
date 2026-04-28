@@ -1,0 +1,58 @@
+.diners-modal {
+  --height: 600px;
+  --width: 400px;
+  --border-radius: 24px;
+
+  .diners-keypad-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .diners-display {
+    width: 100%;
+    background: var(--ion-color-light);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    
+    span { font-size: 48px; font-weight: 900; color: var(--ion-color-secondary); }
+    ion-icon { font-size: 32px; color: var(--ion-color-primary); }
+  }
+
+  app-tpv-numeric-keypad {
+    width: 100%;
+  }
+
+  .keypad-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 4px;
+
+    button {
+      flex: 1;
+      height: 52px;
+      border-radius: 16px;
+      border: none;
+      font-weight: 800;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.btn-cancel { background: var(--ion-color-light); color: var(--ion-color-medium); }
+      &.btn-confirm { background: var(--ion-color-primary); color: white; box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.2); }
+
+      &:active { transform: translateY(2px); }
+    }
+  }
+}

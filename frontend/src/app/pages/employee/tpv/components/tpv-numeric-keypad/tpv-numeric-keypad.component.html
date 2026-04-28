@@ -1,0 +1,16 @@
+<div class="keypad">
+  <button (click)="onDigitClick('1')">1</button>
+  <button (click)="onDigitClick('2')">2</button>
+  <button (click)="onDigitClick('3')">3</button>
+  <button (click)="onDigitClick('4')">4</button>
+  <button (click)="onDigitClick('5')">5</button>
+  <button (click)="onDigitClick('6')">6</button>
+  <button (click)="onDigitClick('7')">7</button>
+  <button (click)="onDigitClick('8')">8</button>
+  <button (click)="onDigitClick('9')">9</button>
+  <button class="empty" *ngIf="showEmptyButton"></button>
+  <button (click)="onDigitClick('0')">0</button>
+  <button (click)="onBackspaceClick()">
+    <ion-icon name="backspace-outline"></ion-icon>
+  </button>
+</div>

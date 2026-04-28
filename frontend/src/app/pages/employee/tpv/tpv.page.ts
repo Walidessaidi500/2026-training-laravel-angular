@@ -52,12 +52,34 @@ interface CartItem {
   selectedQuantity?: number; // How many of this item to pay now
 }
 
+import { TpvHeaderComponent } from './components/tpv-header/tpv-header.component';
+import { TpvTableSelectionComponent } from './components/tpv-table-selection/tpv-table-selection.component';
+import { TpvOrderManagementComponent } from './components/tpv-order-management/tpv-order-management.component';
+import { TpvCartComponent } from './components/tpv-cart/tpv-cart.component';
+import { TpvUserSelectionModalComponent } from './components/tpv-user-selection-modal/tpv-user-selection-modal.component';
+import { TpvPinModalComponent } from './components/tpv-pin-modal/tpv-pin-modal.component';
+import { TpvDinersModalComponent } from './components/tpv-diners-modal/tpv-diners-modal.component';
+import { TpvPaymentModalComponent } from './components/tpv-payment-modal/tpv-payment-modal.component';
+
 @Component({
   selector: 'app-tpv',
   templateUrl: './tpv.page.html',
   styleUrls: ['./tpv.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, FormsModule, CurrencyPipe]
+  imports: [
+    CommonModule, 
+    IonicModule, 
+    FormsModule, 
+    CurrencyPipe,
+    TpvHeaderComponent,
+    TpvTableSelectionComponent,
+    TpvOrderManagementComponent,
+    TpvCartComponent,
+    TpvUserSelectionModalComponent,
+    TpvPinModalComponent,
+    TpvDinersModalComponent,
+    TpvPaymentModalComponent
+  ]
 })
 export class TpvPage implements OnInit {
   private readonly tableService = inject(TableService);

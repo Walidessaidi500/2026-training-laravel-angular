@@ -1,0 +1,29 @@
+<!-- Sidebar for Categories (Families) -->
+<aside class="families-sidebar">
+  <button
+    *ngFor="let family of families"
+    class="family-btn"
+    [class.active]="selectedFamilyUuid === family.uuid"
+    (click)="selectFamily(family.uuid)">
+    <ion-icon name="layers-outline"></ion-icon>
+    <span>{{ family.name }}</span>
+  </button>
+</aside>
+
+<!-- Product Grid -->
+<div class="products-section">
+  <div class="products-grid">
+    <button
+      *ngFor="let product of filteredProducts"
+      class="product-card"
+      (click)="addToCart(product)">
+      <div class="product-icon-box">
+        <ion-icon name="fast-food-outline"></ion-icon>
+      </div>
+      <div class="product-info">
+        <span class="product-name">{{ product.name }}</span>
+        <span class="product-price">{{ (getPriceWithTax(product) / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+      </div>
+    </button>
+  </div>
+</div>

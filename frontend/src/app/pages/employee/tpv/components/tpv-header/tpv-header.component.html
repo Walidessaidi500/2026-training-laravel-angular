@@ -1,0 +1,33 @@
+<header class="tpv-header">
+  <div class="header-content">
+    <div class="header-left">
+      <button *ngIf="viewState === 'order'" class="back-btn" (click)="onBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <div class="header-title">
+        <h1>Terminal de Venta</h1>
+        <p>{{ viewState === 'tables' ? 'Selección de Mesa' : ('Mesa: ' + selectedTable?.name) }}</p>
+      </div>
+    </div>
+    <div class="header-right" *ngIf="currentUser">
+      <div class="user-chip" id="user-menu-trigger" style="cursor: pointer;">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <span>{{ currentUser.name }}</span>
+        <ion-icon name="chevron-down-outline" style="margin-left: 5px;"></ion-icon>
+      </div>
+
+      <ion-popover trigger="user-menu-trigger" triggerAction="click" dismissOnSelect="true">
+        <ng-template>
+          <ion-content>
+            <ion-list lines="none">
+              <ion-item button (click)="onLogout()" detail="false">
+                <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+                <ion-label color="danger">Cerrar Sesión</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+    </div>
+  </div>
+</header>

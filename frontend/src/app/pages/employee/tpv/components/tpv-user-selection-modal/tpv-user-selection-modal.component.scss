@@ -1,0 +1,84 @@
+.user-modal {
+  --height: 80%;
+  --width: 90%;
+  --max-width: 800px;
+  --border-radius: 24px;
+
+  .user-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 24px;
+    padding: 32px;
+  }
+
+  .user-card {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 24px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+
+    .user-avatar-placeholder {
+      width: 72px;
+      height: 72px;
+      background: var(--ion-color-light);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      
+      ion-icon { 
+        font-size: 48px; 
+        color: var(--ion-color-medium); 
+      }
+    }
+
+    .user-name { 
+      font-weight: 800; 
+      color: var(--ion-color-secondary); 
+      font-size: 17px; 
+      text-align: center;
+    }
+
+    .user-role-badge {
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 4px 12px;
+      border-radius: 10px;
+      background: var(--ion-color-light);
+      color: var(--ion-color-medium);
+
+      &.supervisor {
+        background: var(--ion-color-warning-light);
+        color: var(--ion-color-warning-shade);
+      }
+      &.operator {
+        background: var(--ion-color-primary-light);
+        color: var(--ion-color-primary);
+      }
+    }
+
+    &:active {
+      transform: scale(0.94);
+      background: var(--ion-color-primary-light);
+      border-color: var(--ion-color-primary);
+
+      .user-avatar-placeholder {
+        background: white;
+        ion-icon { color: var(--ion-color-primary); }
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+
+  button {
+    height: 76px;
+    background: white;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 20px;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--ion-color-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+
+    &:active {
+      background: var(--ion-color-primary);
+      color: white;
+      transform: scale(0.92);
+      border-color: var(--ion-color-primary);
+      box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.3);
+    }
+
+    &.empty { background: transparent; border: none; box-shadow: none; cursor: default; }
+    
+    ion-icon { font-size: 32px; }
+  }
+}

@@ -1,0 +1,101 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="onClose()" class="payment-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Cobrar Mesa: {{ selectedTable?.name }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="onClose()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="payment-container">
+        <div class="payment-summary">
+          <div class="total-big">
+            <span class="label">Total a pagar ahora</span>
+            <span class="value">{{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+            <span class="sub-label" *ngIf="paymentType !== 'total'">De un total de {{ (total / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <div class="payment-options">
+          <div class="option-group">
+            <h3>Tipo de Pago</h3>
+            <div class="btn-group">
+              <button [class.active]="paymentType === 'total'" (click)="onSetPaymentType('total')">Todo junto</button>
+              <button [class.active]="paymentType === 'split'" (click)="onSetPaymentType('split')">Pago dividido</button>
+            </div>
+          </div>
+
+          <!-- Pago Dividido Selection -->
+          <div class="option-group items-selection" *ngIf="paymentType === 'split'">
+            <h3>Selecciona qué se paga ahora</h3>
+            <div class="split-items-list">
+              <div *ngFor="let item of cart" class="split-item" [class.selected]="item.selected">
+                <div class="item-main" (click)="onToggleItemSelection(item)">
+                  <ion-icon [name]="item.selected ? 'checkbox-outline' : 'square-outline'"></ion-icon>
+                  <span class="name">{{ item.product.name }}</span>
+                  <span class="price">{{ (getPriceWithTax(item.product) / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+                </div>
+                <div class="item-qty-control" *ngIf="item.selected">
+                  <button (click)="onUpdateSelectedQuantity(item, -1)"><ion-icon name="remove-outline"></ion-icon></button>
+                  <span class="qty">{{ item.selectedQuantity }} / {{ item.quantity }}</span>
+                  <button (click)="onUpdateSelectedQuantity(item, 1)"><ion-icon name="add-outline"></ion-icon></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="option-group">
+            <h3>Forma de Pago</h3>
+            <div class="btn-group">
+              <button [class.active]="paymentMethod === 'cash'" (click)="onSetPaymentMethod('cash')">
+                <ion-icon name="cash-outline"></ion-icon> Efectivo
+              </button>
+              <button [class.active]="paymentMethod === 'card'" (click)="onSetPaymentMethod('card')">
+                <ion-icon name="card-outline"></ion-icon> Tarjeta
+              </button>
+              <button [class.active]="paymentMethod === 'mixed'" (click)="onSetPaymentMethod('mixed')">
+                 Mixto
+              </button>
+            </div>
+          </div>
+
+          <div class="option-group" *ngIf="paymentMethod === 'mixed'">
+            <h3>Cantidades (Mixto)</h3>
+            <div class="split-inputs">
+              <div class="input-item">
+                <label>Efectivo (€)</label>
+                <ion-input type="number" [value]="amountCash" (ionChange)="onAmountCashChange($event)" class="custom-input"></ion-input>
+              </div>
+              <div class="input-item">
+                <label>Tarjeta (€)</label>
+                <ion-input type="number" [value]="amountCard" readonly class="custom-input readonly"></ion-input>
+              </div>
+            </div>
+          </div>
+
+          <div class="option-group" *ngIf="paymentMethod === 'cash' || paymentMethod === 'mixed'">
+            <h3>Entregado (Efectivo)</h3>
+            <div class="split-inputs">
+              <div class="input-item">
+                <label>Entregado (€)</label>
+                <ion-input type="number" [value]="amountGiven" (ionChange)="onAmountGivenChange($event)" class="custom-input"></ion-input>
+              </div>
+              <div class="input-item">
+                <label>Cambio (€)</label>
+                <div class="custom-input readonly change-value" [class.negative]="changeAmount < 0">{{ changeAmount | currency:'EUR':'symbol':'1.2-2' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="payment-actions">
+          <button class="btn-pay-confirm" (click)="onConfirmPayment()" [disabled]="selectedTotal <= 0">
+            Confirmar Pago de {{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2' }}
+          </button>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
