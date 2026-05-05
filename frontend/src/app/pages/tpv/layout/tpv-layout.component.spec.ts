@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { EmployeeLayoutComponent } from './employee-layout.component';
+import { TPVLayoutComponent } from './tpv-layout.component';
 
-describe('EmployeeLayoutComponent', () => {
-  let component: EmployeeLayoutComponent;
-  let fixture: ComponentFixture<EmployeeLayoutComponent>;
+describe('TPVLayoutComponent', () => {
+  let component: TPVLayoutComponent;
+  let fixture: ComponentFixture<TPVLayoutComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [EmployeeLayoutComponent],
+      declarations: [TPVLayoutComponent],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(EmployeeLayoutComponent);
+    fixture = TestBed.createComponent(TPVLayoutComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

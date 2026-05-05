@@ -3,13 +3,13 @@ import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-employee-layout',
-  templateUrl: './employee-layout.component.html',
-  styleUrls: ['./employee-layout.component.scss'],
+  selector: 'app-tpv-layout',
+  templateUrl: './tpv-layout.component.html',
+  styleUrls: ['./tpv-layout.component.scss'],
   standalone: true,
   imports: [IonicModule, RouterModule]
 })
-export class EmployeeLayoutComponent  implements OnInit {
+export class TPVLayoutComponent  implements OnInit {
 
   constructor() { }
 

@@ -79,7 +79,7 @@ export class LoginPage implements OnInit {
             break;
           default:
             // restaurant y otros roles van al TPV
-            this.router.navigate(['/employee/tpv']);
+            this.router.navigate(['/tpv']);
             break;
         }
       },

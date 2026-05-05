@@ -74,7 +74,8 @@ export class AuthFacade {
         this.router.navigate(['/supervisor']);
         break;
       case 'employee':
-        this.router.navigate(['/employee/tpv']);
+      case 'restaurant':
+        this.router.navigate(['/tpv']);
         break;
       default:
         this.router.navigate(['/']);

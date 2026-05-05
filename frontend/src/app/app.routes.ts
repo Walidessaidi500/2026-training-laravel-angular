@@ -20,9 +20,9 @@ export const routes: Routes = [
     loadChildren: () => import('./pages/supervisor/supervisor.routes').then((m) => m.SUPERVISOR_ROUTES),
   },
   {
-    path: 'employee',
-    canActivate: [authGuard, roleGuard(['operator', 'supervisor', 'restaurant'])],
-    loadChildren: () => import('./pages/employee/employee.routes').then((m) => m.EMPLOYEE_ROUTES),
+    path: 'tpv',
+    canActivate: [authGuard, roleGuard(['supervisor', 'restaurant'])],
+    loadChildren: () => import('./pages/tpv/tpv.routes').then((m) => m.TPV_ROUTES),
   },
   {
     path: '**',
