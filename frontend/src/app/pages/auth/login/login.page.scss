@@ -11,34 +11,10 @@
   padding: 24px;
 }
 
-/* Tarjeta Principal */
-.auth-card {
+.full-width-form {
   width: 100%;
-  max-width: 440px; /* Un poco más estrecho para que sea más elegante */
-  background: #ffffff;
-  border-radius: 24px; /* Bordes muy suaves y modernos */
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.06); /* Sombra elegante y difusa */
-  padding: 40px 32px;
-}
-
-/* Cabecera / Logo */
-.brand-header {
-  text-align: center;
-  margin-bottom: 32px;
-
-  .brand-title {
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--ion-color-primary, #f26849); /* Usa el color primario de Yurest */
-    margin: 0 0 8px 0;
-    letter-spacing: -0.5px;
-  }
-
-  .subtitle {
-    font-size: 15px;
-    color: #6b7280;
-    margin: 0;
-  }
+  display: flex;
+  justify-content: center;
 }
 
 /* Banner de Error */
@@ -110,11 +86,11 @@
   font-weight: 500;
 }
 
-/* Botón Principal */
+/* Botón Principal (específico del formulario de login) */
 .submit-button {
   --border-radius: 12px;
   --box-shadow: 0 8px 16px rgba(var(--ion-color-primary-rgb), 0.25);
-  margin: 0;
+  margin-top: 16px;
   height: 54px;
   font-size: 16px;
   font-weight: 700;

@@ -7,6 +7,7 @@ import {
   IonSpinner, IonIcon
 } from '@ionic/angular/standalone';
 import { AuthService, LoginRequest } from '@services/auth/auth.service';
+import { AuthCardComponent } from '../auth-card/auth-card.component';
 
 // Importación de iconos (Crucial para Ionic Standalone)
 import { addIcons } from 'ionicons';
@@ -18,7 +19,7 @@ import { mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline, alertCircleO
   styleUrls: ['./login.page.scss'],
   standalone: true,  
   imports: [ 
-    CommonModule, ReactiveFormsModule, 
+    CommonModule, ReactiveFormsModule, AuthCardComponent,
     IonContent, IonItem, IonInput, IonButton, IonSpinner, IonIcon
   ],
 })

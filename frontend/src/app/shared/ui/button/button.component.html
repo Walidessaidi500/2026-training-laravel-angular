@@ -1,8 +1,10 @@
 <ion-button
   [color]="color"
   [expand]="expand"
-  [disabled]="disabled"
+  [disabled]="disabled || isLoading"
+  [type]="type"
   (click)="onClick()"
 >
-  {{ label }}
+  <ion-spinner *ngIf="isLoading" name="dots"></ion-spinner>
+  <span *ngIf="!isLoading">{{ label }}</span>
 </ion-button>
