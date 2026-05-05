@@ -15,8 +15,7 @@ final readonly class UpdateUser
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private PasswordHasherInterface $passwordHasher,
-    ) {
-    }
+    ) {}
 
     public function __invoke(
         string $id,

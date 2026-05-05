@@ -14,7 +14,7 @@ class EloquentSaleRepository implements SaleRepositoryInterface
 {
     private function getInternalUserId(string $uuid): ?int
     {
-        return DB::table('users')->where('uuid', $uuid)->value('id') 
+        return DB::table('users')->where('uuid', $uuid)->value('id')
             ?? DB::table('restaurants')->where('uuid', $uuid)->value('id');
     }
 
@@ -47,7 +47,7 @@ class EloquentSaleRepository implements SaleRepositoryInterface
 
             // Sync lines
             $existingLineIds = $eloquentSale->lines()->pluck('uuid')->toArray();
-            $newLineIds = array_map(fn($line) => $line->id()->value(), $sale->lines());
+            $newLineIds = array_map(fn ($line) => $line->id()->value(), $sale->lines());
 
             // Delete lines not in the new set
             $linesToDelete = array_diff($existingLineIds, $newLineIds);
@@ -75,7 +75,7 @@ class EloquentSaleRepository implements SaleRepositoryInterface
     {
         $eloquentSale = EloquentSale::with(['lines'])->where('uuid', $uuid->value())->first();
 
-        if (!$eloquentSale) {
+        if (! $eloquentSale) {
             return null;
         }
 
@@ -98,13 +98,13 @@ class EloquentSaleRepository implements SaleRepositoryInterface
         $paginator = $query->paginate($perPage, ['*'], 'page', $page);
 
         return [
-            'data' => array_map(fn($item) => $this->toDomain($item), $paginator->items()),
+            'data' => array_map(fn ($item) => $this->toDomain($item), $paginator->items()),
             'meta' => [
                 'total' => $paginator->total(),
                 'per_page' => $paginator->perPage(),
                 'current_page' => $paginator->currentPage(),
                 'last_page' => $paginator->lastPage(),
-            ]
+            ],
         ];
     }
 

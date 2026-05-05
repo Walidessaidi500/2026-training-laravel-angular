@@ -11,9 +11,7 @@ class UpdateProductController
     public function __construct(
         private UpdateProduct $updateProduct,
 
-    ){
-
-    }
+    ) {}
 
     public function __invoke(Request $request, string $uuid): JsonResponse
     {

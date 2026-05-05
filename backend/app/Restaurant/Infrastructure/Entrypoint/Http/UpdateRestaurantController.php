@@ -3,16 +3,17 @@
 namespace App\Restaurant\Infrastructure\Entrypoint\Http;
 
 use App\Restaurant\Application\UpdateRestaurant\UpdateRestaurant;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class UpdateRestaurantController
 {
     public function __construct(
         private UpdateRestaurant $updateRestaurant
-    ){}
+    ) {}
 
-    public function __invoke(Request $request, string $uuid):JsonResponse{
+    public function __invoke(Request $request, string $uuid): JsonResponse
+    {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'legal_name' => ['required', 'string', 'max:255'],

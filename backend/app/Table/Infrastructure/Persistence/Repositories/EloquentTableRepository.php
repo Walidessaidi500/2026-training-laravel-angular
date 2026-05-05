@@ -21,6 +21,7 @@ class EloquentTableRepository implements TableRepositoryInterface
                 'restaurant_id' => $table->restaurantId(),
                 'zone_id' => $this->resolveZoneId($table->zoneId()),
                 'name' => $table->name(),
+                'joined_to_uuid' => $table->joinedToUuid()?->value(),
                 'created_at' => $table->createdAt()->value(),
                 'updated_at' => $table->updatedAt()->value(),
             ],
@@ -37,7 +38,6 @@ class EloquentTableRepository implements TableRepositoryInterface
         return $model ? $this->toDomainEntity($model) : null;
     }
 
-    
     public function findAll(): array
     {
         return $this->model->newQuery()
@@ -67,7 +67,7 @@ class EloquentTableRepository implements TableRepositoryInterface
     {
         $this->model->newQuery()->where('uuid', $id->value())->delete();
     }
-    
+
     public function deleteByZoneUuid(Uuid $zoneUuid): void
     {
         $zoneId = $this->resolveZoneId($zoneUuid);
@@ -81,6 +81,7 @@ class EloquentTableRepository implements TableRepositoryInterface
             (int) $model->restaurant_id,
             $model->zone->uuid,
             $model->name,
+            $model->joined_to_uuid ?? null,
             $model->created_at->toDateTimeImmutable(),
             $model->updated_at->toDateTimeImmutable(),
         );

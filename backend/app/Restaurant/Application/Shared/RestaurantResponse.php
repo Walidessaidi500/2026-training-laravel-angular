@@ -29,7 +29,6 @@ class RestaurantResponse
         );
     }
 
-    
     public function toArray(): array
     {
         return [

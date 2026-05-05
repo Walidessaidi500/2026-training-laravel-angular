@@ -22,7 +22,6 @@ class PostController
             'pin' => ['nullable', 'string', 'max:10'],
         ]);
 
-        
         $authenticatedUser = $request->user();
 
         if (! $authenticatedUser || ! $authenticatedUser->restaurant_id) {

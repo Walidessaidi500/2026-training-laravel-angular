@@ -11,8 +11,8 @@ use App\Shared\Domain\ValueObject\Uuid;
 
 class Product implements \JsonSerializable
 {
-    //constructor privado garantiza que solo pueda nacer a traves de metodos controlados
-    //usa VOs para asegurar que el producto siempre este en estado valido
+    // constructor privado garantiza que solo pueda nacer a traves de metodos controlados
+    // usa VOs para asegurar que el producto siempre este en estado valido
     private function __construct(
         private Uuid $id,
         private ?Uuid $familyId,
@@ -25,8 +25,7 @@ class Product implements \JsonSerializable
         private ?string $imageSrc,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
-    ) {
-    }
+    ) {}
 
     public static function dddCreate(
         ?Uuid $familyId,
@@ -161,7 +160,7 @@ class Product implements \JsonSerializable
 
     public function toggleActive(): void
     {
-        $this->active = !$this->active;
+        $this->active = ! $this->active;
         $this->updatedAt = DomainDateTime::now();
     }
 
@@ -174,7 +173,8 @@ class Product implements \JsonSerializable
     {
         return $this->updatedAt;
     }
-// Serializa la informacion hacia fuera en JSON
+
+    // Serializa la informacion hacia fuera en JSON
     public function jsonSerialize(): array
     {
         return [

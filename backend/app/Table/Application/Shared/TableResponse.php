@@ -10,6 +10,7 @@ class TableResponse
         public readonly string $uuid,
         public readonly string $zoneId,
         public readonly string $name,
+        public readonly ?string $joinedToUuid,
         public readonly string $createdAt,
         public readonly string $updatedAt,
     ) {}
@@ -20,18 +21,19 @@ class TableResponse
             $table->id()->value(),
             $table->zoneId()->value(),
             $table->name(),
+            $table->joinedToUuid()?->value(),
             $table->createdAt()->format('Y-m-d\TH:i:s'),
             $table->updatedAt()->format('Y-m-d\TH:i:s'),
         );
     }
 
-    
     public function toArray(): array
     {
         return [
             'uuid' => $this->uuid,
             'zone_id' => $this->zoneId,
             'name' => $this->name,
+            'joined_to_uuid' => $this->joinedToUuid,
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
         ];

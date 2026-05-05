@@ -9,7 +9,6 @@ class ListTables
 {
     public function __construct(private TableRepositoryInterface $tableRepository) {}
 
-    
     public function __invoke(): array
     {
         return array_map(

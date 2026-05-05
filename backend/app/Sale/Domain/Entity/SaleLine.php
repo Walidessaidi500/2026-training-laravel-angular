@@ -2,9 +2,9 @@
 
 namespace App\Sale\Domain\Entity;
 
-use App\Shared\Domain\ValueObject\Uuid;
-use App\Shared\Domain\ValueObject\RestaurantId;
 use App\Shared\Domain\ValueObject\DomainDateTime;
+use App\Shared\Domain\ValueObject\RestaurantId;
+use App\Shared\Domain\ValueObject\Uuid;
 
 class SaleLine implements \JsonSerializable
 {
@@ -20,8 +20,7 @@ class SaleLine implements \JsonSerializable
         private int $taxPercentage,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
-    ) {
-    }
+    ) {}
 
     public static function dddCreate(
         RestaurantId $restaurantId,

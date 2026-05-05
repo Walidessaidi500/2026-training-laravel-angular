@@ -2,6 +2,7 @@
 
 namespace App\Sale\Infrastructure\Persistence\Models;
 
+use App\Order\Infrastructure\Persistence\Models\EloquentOrderLine;
 use App\Product\Infrastructure\Persistence\Models\EloquentProduct;
 use App\User\Infrastructure\Persistence\Models\EloquentUser;
 use Database\Factories\SaleLineFactory;
@@ -37,7 +38,7 @@ class EloquentSaleLine extends Model
 
     public function orderLine(): BelongsTo
     {
-        return $this->belongsTo(\App\Order\Infrastructure\Persistence\Models\EloquentOrderLine::class, 'order_line_id');
+        return $this->belongsTo(EloquentOrderLine::class, 'order_line_id');
     }
 
     protected function casts(): array

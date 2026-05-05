@@ -10,8 +10,7 @@ class ActiveOrderController
 {
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
-    ) {
-    }
+    ) {}
 
     public function __invoke(string $tableUuid): JsonResponse
     {

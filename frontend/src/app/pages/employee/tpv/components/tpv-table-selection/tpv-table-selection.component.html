@@ -14,12 +14,16 @@
 <main class="tables-grid-container">
   <div class="tables-grid">
     <button
-      *ngFor="let table of filteredTables"
-      class="table-btn"
-      [class.free]="!isTableOccupied(table)"
-      [class.occupied]="isTableOccupied(table)"
-      (click)="onTableClick(table)">
-      <span class="table-name">{{ table.name }}</span>
+     *ngFor="let table of displayTables; trackBy: trackByTable"
+    class="table-btn"
+    [class.free]="!isTableOccupied(table)"
+    [class.occupied]="isTableOccupied(table)"
+    [class.is-joined]="hasJoinedTables(table)"
+    (pointerdown)="onPointerDown(table, $event)"
+    (pointerup)="onPointerUp(table, $event)"
+    (pointerleave)="onPointerLeave($event)">
+      <ion-icon *ngIf="hasJoinedTables(table)" name="layers-outline" class="joined-icon"></ion-icon>
+      <span class="table-name">{{ getTableName(table) }}</span>
       <span class="table-status-text">{{ isTableOccupied(table) ? 'Ocupada' : 'Libre' }}</span>
     </button>
   </div>

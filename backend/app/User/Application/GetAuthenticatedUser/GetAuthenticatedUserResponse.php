@@ -22,7 +22,6 @@ class GetAuthenticatedUserResponse
         return new self($uuid, $name, $email, $role, $restaurantId);
     }
 
-    
     public function toArray(): array
     {
         return [

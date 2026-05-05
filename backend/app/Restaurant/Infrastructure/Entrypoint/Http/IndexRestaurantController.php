@@ -9,9 +9,9 @@ class IndexRestaurantController
 {
     public function __construct(
         private ListRestaurants $listRestaurants
-    ){}
+    ) {}
 
-    public function __invoke():JsonResponse
+    public function __invoke(): JsonResponse
     {
         $restaurants = ($this->listRestaurants)();
 

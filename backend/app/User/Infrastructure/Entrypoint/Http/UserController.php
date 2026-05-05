@@ -6,7 +6,6 @@ use App\User\Infrastructure\Persistence\Models\EloquentUser;
 use App\User\Infrastructure\Persistence\Repositories\EloquentUserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class UserController
 {
@@ -56,8 +55,6 @@ class UserController
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        
-        
         return response()->json($user);
     }
 }

@@ -9,10 +9,9 @@ class DeleteFamilyController
 {
     public function __construct(
         private DeleteFamily $deleteFamily
-    ) {
-    }
+    ) {}
 
-    public function __invoke(string $uuid):JsonResponse
+    public function __invoke(string $uuid): JsonResponse
     {
         try {
             ($this->deleteFamily)($uuid);

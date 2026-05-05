@@ -13,6 +13,7 @@ class Table implements \JsonSerializable
         private int $restaurantId,
         private Uuid $zoneId,
         private TableName $name,
+        private ?Uuid $joinedToUuid,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
     ) {}
@@ -24,12 +25,13 @@ class Table implements \JsonSerializable
             'restaurant_id' => $this->restaurantId,
             'zone_id' => $this->zoneId->value(),
             'name' => $this->name->value(),
+            'joined_to_uuid' => $this->joinedToUuid?->value(),
             'created_at' => $this->createdAt->value()->format('Y-m-d\TH:i:s.u\Z'),
             'updated_at' => $this->updatedAt->value()->format('Y-m-d\TH:i:s.u\Z'),
         ];
     }
 
-    public static function dddCreate(Uuid $zoneId, TableName $name, int $restaurantId): self
+    public static function dddCreate(Uuid $zoneId, TableName $name, int $restaurantId, ?Uuid $joinedToUuid = null): self
     {
         $now = DomainDateTime::now();
 
@@ -38,6 +40,7 @@ class Table implements \JsonSerializable
             $restaurantId,
             $zoneId,
             $name,
+            $joinedToUuid,
             $now,
             $now,
         );
@@ -48,6 +51,7 @@ class Table implements \JsonSerializable
         int $restaurantId,
         string $zoneId,
         string $name,
+        ?string $joinedToUuid,
         \DateTimeImmutable $createdAt,
         \DateTimeImmutable $updatedAt,
     ): self {
@@ -56,6 +60,7 @@ class Table implements \JsonSerializable
             $restaurantId,
             Uuid::create($zoneId),
             TableName::create($name),
+            $joinedToUuid ? Uuid::create($joinedToUuid) : null,
             DomainDateTime::create($createdAt),
             DomainDateTime::create($updatedAt),
         );
@@ -81,10 +86,16 @@ class Table implements \JsonSerializable
         return $this->name->value();
     }
 
-    public function update(Uuid $zoneId, TableName $name): void
+    public function joinedToUuid(): ?Uuid
+    {
+        return $this->joinedToUuid;
+    }
+
+    public function update(Uuid $zoneId, TableName $name, ?Uuid $joinedToUuid = null): void
     {
         $this->zoneId = $zoneId;
         $this->name = $name;
+        $this->joinedToUuid = $joinedToUuid;
         $this->updatedAt = DomainDateTime::now();
     }
 

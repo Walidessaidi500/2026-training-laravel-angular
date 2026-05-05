@@ -10,8 +10,7 @@ class CreateOrderResponse
         public string $uuid,
         public string $status,
         public array $lines,
-    ) {
-    }
+    ) {}
 
     public static function create(Order $order): self
     {

@@ -36,15 +36,15 @@ class LoginUser
 
             // Necesitamos el UUID del restaurante para el usuario
             // El User domain entity tiene restaurantId() que es un ValueObject de int ID
-            // Pero el frontend prefiere el UUID. 
+            // Pero el frontend prefiere el UUID.
             // Por simplicidad, si es un usuario, buscaremos el UUID del restaurante si es necesario
             // o simplemente devolvemos el role.
-            
+
             // Para encontrar el UUID del restaurante, necesitaríamos inyectar un RestaurantRepository o similar
             // Pero el User entity parece que solo guarda el ID entero de la BD (Legacy? o DDD decision)
             // Vamos a ver si el User domain entity tiene el uuid del restaurante.
             // No, tiene RestaurantId que parece ser un int.
-            
+
             return LoginUserResponse::create(
                 $token,
                 $user->name(),

@@ -5,6 +5,7 @@ namespace App\Restaurant\Infrastructure\Persistence\Repositories;
 use App\Restaurant\Domain\Entity\Restaurant;
 use App\Restaurant\Domain\Interfaces\RestaurantRepositoryInterface;
 use App\Restaurant\Infrastructure\Persistence\Models\EloquentRestaurant;
+use App\Shared\Domain\ValueObject\Email;
 use App\Shared\Domain\ValueObject\Uuid;
 
 class EloquentRestaurantRepository implements RestaurantRepositoryInterface
@@ -43,7 +44,7 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
         );
     }
 
-    public function findByEmail(\App\Shared\Domain\ValueObject\Email $email): ?Restaurant
+    public function findByEmail(Email $email): ?Restaurant
     {
         $eloquent = EloquentRestaurant::where('email', $email->value())->first();
 

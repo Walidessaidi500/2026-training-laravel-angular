@@ -19,8 +19,7 @@ class ProcessSale
         private SaleRepositoryInterface $saleRepository,
         private OrderRepositoryInterface $orderRepository,
         private ProductRepositoryInterface $productRepository,
-    ) {
-    }
+    ) {}
 
     public function execute(ProcessSaleRequest $request): void
     {
@@ -31,8 +30,8 @@ class ProcessSale
         DB::transaction(function () use ($restaurantId, $tableUuid, $userUuid, $request) {
             // 1. Get current order
             $order = $this->orderRepository->findByTable($tableUuid, 'open');
-            
-            if (!$order) {
+
+            if (! $order) {
                 // If no order exists, we create a temporary one to satisfy requirements,
                 // but normally we should have an order.
                 $orderId = Uuid::generate();
@@ -44,17 +43,17 @@ class ProcessSale
                     $userUuid->value(),
                     null,
                     $request->diners,
-                    new \DateTimeImmutable(),
+                    new \DateTimeImmutable,
                     null,
                     [],
-                    new \DateTimeImmutable(),
-                    new \DateTimeImmutable()
+                    new \DateTimeImmutable,
+                    new \DateTimeImmutable
                 );
             }
 
             // 2. Identify what is being sold in this transaction
             $soldLinesData = $request->lines;
-            
+
             // 3. Create Sale
             $saleId = Uuid::generate();
             $saleLines = array_map(function ($line) use ($restaurantId, $saleId, $userUuid) {
@@ -80,13 +79,13 @@ class ProcessSale
                 $userUuid->value(),
                 null,
                 $request->diners,
-                new \DateTimeImmutable(),
-                new \DateTimeImmutable(),
-                new \DateTimeImmutable(),
+                new \DateTimeImmutable,
+                new \DateTimeImmutable,
+                new \DateTimeImmutable,
                 0, // total is calculated in entity if using dddCreate, but here we pass it desestructured
                 $saleLines,
-                new \DateTimeImmutable(),
-                new \DateTimeImmutable(),
+                new \DateTimeImmutable,
+                new \DateTimeImmutable,
                 $request->paymentMethod,
                 $request->amountCash,
                 $request->amountCard
@@ -96,10 +95,10 @@ class ProcessSale
             $saleTotal = array_reduce($saleLines, function ($carry, $line) {
                 return $carry + ($line->price() * $line->quantity());
             }, 0);
-            
+
             // We need to use a reflection or a setter if total is private and no way to set it in fromPersistence
             // Actually fromPersistence has $total parameter.
-             $sale = Sale::fromPersistence(
+            $sale = Sale::fromPersistence(
                 $saleId->value(),
                 $restaurantId->value(),
                 $order->id()->value(),
@@ -109,13 +108,13 @@ class ProcessSale
                 $userUuid->value(),
                 null,
                 $request->diners,
-                new \DateTimeImmutable(),
-                new \DateTimeImmutable(),
-                new \DateTimeImmutable(),
+                new \DateTimeImmutable,
+                new \DateTimeImmutable,
+                new \DateTimeImmutable,
                 $saleTotal,
                 $saleLines,
-                new \DateTimeImmutable(),
-                new \DateTimeImmutable(),
+                new \DateTimeImmutable,
+                new \DateTimeImmutable,
                 $request->paymentMethod,
                 $request->amountCash,
                 $request->amountCard
@@ -129,7 +128,7 @@ class ProcessSale
             // 4. Update Order: subtract sold quantities from the current order lines
             $currentOrderLines = $order->lines();
             $newOrderLines = [];
-            
+
             foreach ($currentOrderLines as $orderLine) {
                 $soldQty = 0;
                 foreach ($soldLinesData as $soldLine) {
@@ -137,7 +136,7 @@ class ProcessSale
                         $soldQty += $soldLine['quantity'];
                     }
                 }
-                
+
                 $remainingQty = $orderLine->quantity() - $soldQty;
                 if ($remainingQty > 0) {
                     $newOrderLines[] = OrderLine::fromPersistence(
@@ -150,11 +149,11 @@ class ProcessSale
                         $orderLine->price(),
                         $orderLine->taxPercentage(),
                         $orderLine->createdAt()->value(),
-                        new \DateTimeImmutable()
+                        new \DateTimeImmutable
                     );
                 }
-                
-                // If soldQty > 0, we also update stock (already decremented when sent to kitchen, 
+
+                // If soldQty > 0, we also update stock (already decremented when sent to kitchen,
                 // but here it's already sold, so no delta changes needed unless we logic differently.
                 // In current logic, sendOrder decrements stock. closeTicket should not decrement it again.
             }
@@ -172,14 +171,14 @@ class ProcessSale
                 $order->closedAt()?->value(),
                 $newOrderLines,
                 $order->createdAt()->value(),
-                new \DateTimeImmutable()
+                new \DateTimeImmutable
             );
 
             // 5. If no lines remaining, close (invoice) the order
             if (empty($newOrderLines)) {
                 $order->invoice($userUuid);
             }
-            
+
             $this->orderRepository->save($order);
         });
     }

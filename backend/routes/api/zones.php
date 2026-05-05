@@ -1,8 +1,8 @@
 <?php
 
-use App\Zone\Infrastructure\Entrypoint\Http\IndexZoneController;
 use App\Zone\Infrastructure\Entrypoint\Http\DeleteZoneController;
 use App\Zone\Infrastructure\Entrypoint\Http\GetZoneController;
+use App\Zone\Infrastructure\Entrypoint\Http\IndexZoneController;
 use App\Zone\Infrastructure\Entrypoint\Http\StoreZoneController;
 use App\Zone\Infrastructure\Entrypoint\Http\UpdateZoneController;
 use Illuminate\Support\Facades\Route;

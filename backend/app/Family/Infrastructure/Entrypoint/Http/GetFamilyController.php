@@ -5,13 +5,13 @@ namespace App\Family\Infrastructure\Entrypoint\Http;
 use App\Family\Application\GetFamily\GetFamily;
 use Illuminate\Http\JsonResponse;
 
-class GetFamilyController{
+class GetFamilyController
+{
     public function __construct(
         private GetFamily $getFamily
-    ) {
-    }
+    ) {}
 
-    public function __invoke(string $uuid):JsonResponse
+    public function __invoke(string $uuid): JsonResponse
     {
         try {
             $response = ($this->getFamily)($uuid);

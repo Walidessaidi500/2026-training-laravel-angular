@@ -9,8 +9,7 @@ class CreateSaleResponse
     private function __construct(
         public string $uuid,
         public int $restaurantId,
-    ) {
-    }
+    ) {}
 
     public static function create(Sale $sale): self
     {

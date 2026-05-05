@@ -15,12 +15,11 @@ class SyncOrder
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
         private ProductRepositoryInterface $productRepository,
-    ) {
-    }
+    ) {}
 
-    public function execute(SyncOrderRequest $request): void
+    public function execute(SyncOrderRequest $request): Order
     {
-        DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request) {
             $restaurantId = RestaurantId::create($request->restaurantId);
             $tableUuid = Uuid::create($request->tableUuid);
             $userUuid = Uuid::create($request->userUuid);
@@ -52,8 +51,8 @@ class SyncOrder
                     $line['quantity'],
                     $line['price'],
                     $line['tax_percentage'],
-                    new \DateTimeImmutable(),
-                    new \DateTimeImmutable()
+                    new \DateTimeImmutable,
+                    new \DateTimeImmutable
                 );
             }, $request->lines);
 
@@ -95,11 +94,13 @@ class SyncOrder
                 $order->openedAt()->value(),
                 $order->closedAt()?->value(),
                 $newLines,
-                new \DateTimeImmutable(),
-                new \DateTimeImmutable()
+                new \DateTimeImmutable,
+                new \DateTimeImmutable
             );
 
             $this->orderRepository->save($updatedOrder);
+            
+            return $updatedOrder;
         });
     }
 }

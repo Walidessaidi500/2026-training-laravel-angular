@@ -8,6 +8,7 @@ export interface Table {
   uuid: string;
   zone_id: string;
   name: string;
+  joined_to_uuid?: string;
   created_at: string;
 }
 

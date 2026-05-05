@@ -10,8 +10,7 @@ class IndexSaleController
 {
     public function __construct(
         private SaleRepositoryInterface $saleRepository
-    ) {
-    }
+    ) {}
 
     public function __invoke(Request $request): JsonResponse
     {

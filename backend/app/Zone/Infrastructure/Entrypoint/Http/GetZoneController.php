@@ -3,8 +3,8 @@
 namespace App\Zone\Infrastructure\Entrypoint\Http;
 
 use App\Zone\Application\GetZone\GetZone;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class GetZoneController
 {

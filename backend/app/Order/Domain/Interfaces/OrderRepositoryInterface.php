@@ -10,7 +10,7 @@ interface OrderRepositoryInterface
     public function save(Order $order): void;
 
     public function find(Uuid $uuid): ?Order;
-    
+
     public function findByTable(Uuid $tableUuid, string $status): ?Order;
 
     public function delete(Uuid $uuid): void;

@@ -10,9 +10,7 @@ class StoreProductController
 {
     public function __construct(
         private CreateProduct $createProduct,
-    ) {
-
-    }
+    ) {}
 
     public function __invoke(Request $request): JsonResponse
     {
@@ -36,6 +34,7 @@ class StoreProductController
             (bool) $validated['active'],
             $validated['image_src'] ?? null,
         );
+
         return new JsonResponse($responde->toArray(), 201);
     }
 }

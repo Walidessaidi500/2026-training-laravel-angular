@@ -1,9 +1,9 @@
-<ion-content [fullscreen]="true" class="tpv-background">
+<ion-content [fullscreen]="true" class="tpv-background" *ngIf="stateService.state$ | async as state">
   <div class="tpv-layout">
 
     <app-tpv-header
-      [viewState]="viewState"
-      [selectedTable]="selectedTable"
+      [viewState]="state.viewState"
+      [selectedTable]="state.selectedTable"
       [currentUser]="currentUser"
       (back)="backToTables()"
       (logout)="logout()">
@@ -12,38 +12,41 @@
     <div class="tpv-body">
       <!-- View 1: Table Selection -->
       <app-tpv-table-selection
-        *ngIf="viewState === 'tables'"
-        [zones]="zones"
-        [selectedZoneUuid]="selectedZoneUuid"
-        [filteredTables]="filteredTables"
-        [tableOrders]="tableOrders"
-        (zoneSelect)="selectZone($event)"
-        (tableClick)="onTableClick($event)">
+        *ngIf="state.viewState === 'tables'"
+        [zones]="state.zones"
+        [selectedZoneUuid]="state.selectedZoneUuid"
+        [filteredTables]="state.filteredTables"
+        [allTables]="state.tables"
+        [tableOrders]="state.tableOrders"
+        (zoneSelect)="stateService.selectZone($event)"
+        (tableClick)="onTableClick($event)"
+        (tableLongPress)="onTableLongPress($event)">
       </app-tpv-table-selection>
 
       <!-- View 2: Order Management -->
-      <ng-container *ngIf="viewState === 'order'">
+      <ng-container *ngIf="state.viewState === 'order'">
         <main class="order-container">
           <app-tpv-order-management
-            [families]="families"
-            [selectedFamilyUuid]="selectedFamilyUuid"
-            [filteredProducts]="filteredProducts"
-            [taxes]="taxes"
-            (familySelect)="selectFamily($event)"
-            (productSelect)="addToCart($event)">
+            [families]="state.families"
+            [selectedFamilyUuid]="state.selectedFamilyUuid"
+            [filteredProducts]="state.filteredProducts"
+            [taxes]="state.taxes"
+            (familySelect)="stateService.selectFamily($event)"
+            (productSelect)="cartService.addToCart($event)">
           </app-tpv-order-management>
 
           <app-tpv-cart
+            *ngIf="cartService.cart$ | async as cart"
             [cart]="cart"
-            [currentOrder]="currentOrder"
-            [tempDiners]="tempDiners"
-            [taxes]="taxes"
-            [total]="total"
-            (editDiners)="editDiners()"
-            (printProvisional)="printProvisional()"
-            (clearCart)="clearCart()"
-            (removeItem)="removeFromCart($event)"
-            (addItem)="addToCart($event)"
+            [currentOrder]="cartService.currentOrder$ | async"
+            [tempDiners]="(cartService.tempDiners$ | async) || '1'"
+            [taxes]="state.taxes"
+            [total]="cartService.getTotal()"
+            (editDiners)="stateService.setShowDinersSelection(true)"
+            (printProvisional)="uiService.showSuccess('Imprimiendo...')"
+            (clearCart)="cartService.clearCart()"
+            (removeItem)="cartService.removeFromCart($event)"
+            (addItem)="cartService.addToCart($event)"
             (sendOrder)="sendOrder()"
             (closeTicket)="closeTicket()">
           </app-tpv-cart>
@@ -54,50 +57,51 @@
 
   <!-- Modals -->
   <app-tpv-user-selection-modal
-    [isOpen]="showUserSelection"
-    [users]="users"
-    [context]="userSelectionContext"
-    (close)="showUserSelection = false"
+    [isOpen]="state.showUserSelection"
+    [users]="state.users"
+    [context]="state.userSelectionContext"
+    (close)="stateService.setShowUserSelection(false)"
     (selectUser)="selectUser($event)">
   </app-tpv-user-selection-modal>
 
   <app-tpv-pin-modal
-    [isOpen]="showPinModal"
-    [selectedUser]="selectedUserForPin"
-    [pinBuffer]="pinBuffer"
-    (close)="showPinModal = false"
+    [isOpen]="state.showPinModal"
+    [selectedUser]="state.selectedUserForPin"
+    [pinBuffer]="state.pinBuffer"
+    (close)="stateService.setShowPinModal(false)"
     (confirm)="onPinConfirm()"
-    (digitClick)="addPinDigit($event)"
-    (backspaceClick)="removePinDigit()">
+    (digitClick)="stateService.addPinDigit($event)"
+    (backspaceClick)="stateService.removePinDigit()">
   </app-tpv-pin-modal>
 
   <app-tpv-diners-modal
-    [isOpen]="showDinersSelection"
-    [tempDiners]="tempDiners"
-    (close)="showDinersSelection = false"
+    [isOpen]="state.showDinersSelection"
+    [tempDiners]="(cartService.tempDiners$ | async) || '1'"
+    (close)="stateService.setShowDinersSelection(false)"
     (confirm)="onDinersConfirm()"
-    (digitClick)="addDinerDigit($event)"
-    (backspaceClick)="removeDinerDigit()">
+    (digitClick)="cartService.addDinerDigit($event)"
+    (backspaceClick)="cartService.removeDinerDigit()">
   </app-tpv-diners-modal>
 
   <app-tpv-payment-modal
-    [isOpen]="showPaymentModal"
-    [selectedTable]="selectedTable"
-    [total]="total"
-    [selectedTotal]="selectedTotal"
+    *ngIf="cartService.cart$ | async as cart"
+    [isOpen]="state.showPaymentModal"
+    [selectedTable]="state.selectedTable"
+    [total]="cartService.getTotal()"
+    [selectedTotal]="cartService.getSelectedTotal(paymentType)"
     [cart]="cart"
-    [taxes]="taxes"
+    [taxes]="state.taxes"
     [paymentType]="paymentType"
     [paymentMethod]="paymentMethod"
     [amountCash]="amountCash"
     [amountCard]="amountCard"
     [amountGiven]="amountGiven"
     [changeAmount]="changeAmount"
-    (close)="showPaymentModal = false"
+    (close)="stateService.setShowPaymentModal(false)"
     (setPaymentType)="setPaymentType($event)"
     (setPaymentMethod)="setPaymentMethod($event)"
-    (toggleItemSelection)="toggleItemSelection($event)"
-    (updateSelectedQuantity)="updateSelectedQuantity($event.item, $event.delta)"
+    (toggleItemSelection)="cartService.toggleItemSelection($event)"
+    (updateSelectedQuantity)="cartService.updateSelectedQuantity($event.item, $event.delta)"
     (amountCashChange)="amountCash = $event; onAmountChange()"
     (amountGivenChange)="amountGiven = $event"
     (confirmPayment)="confirmPayment()">

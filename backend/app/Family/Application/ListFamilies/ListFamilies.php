@@ -11,7 +11,6 @@ class ListFamilies
         private FamilyRepositoryInterface $familyRepository,
     ) {}
 
-    
     public function __invoke(): array
     {
         $families = $this->familyRepository->findAll();

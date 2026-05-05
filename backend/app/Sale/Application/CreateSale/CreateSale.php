@@ -14,8 +14,7 @@ class CreateSale
     public function __construct(
         private SaleRepositoryInterface $saleRepository,
         private OrderRepositoryInterface $orderRepository,
-    ) {
-    }
+    ) {}
 
     public function execute(CreateSaleRequest $request): CreateSaleResponse
     {
@@ -25,7 +24,7 @@ class CreateSale
         $openedByUserUuid = Uuid::create($request->openedByUserUuid);
 
         $order = $this->orderRepository->find($orderUuid);
-        if (!$order) {
+        if (! $order) {
             throw new \Exception('Order not found');
         }
 
@@ -53,17 +52,17 @@ class CreateSale
             null, // closed_by_user_id
             null, // ticket_number
             $order->diners(),
-            new \DateTimeImmutable(), // opened_at
+            new \DateTimeImmutable, // opened_at
             null, // closed_at
-            new \DateTimeImmutable(), // value_date
+            new \DateTimeImmutable, // value_date
             0, // total - will be calculated in save or dddCreate
             $lines,
-            new \DateTimeImmutable(), // created_at
-            new \DateTimeImmutable() // updated_at
+            new \DateTimeImmutable, // created_at
+            new \DateTimeImmutable // updated_at
         );
-        
+
         $this->saleRepository->save($sale);
-        
+
         // After saving the sale, the order should be invoiced
         $order->invoice($userUuid);
         $this->orderRepository->save($order);

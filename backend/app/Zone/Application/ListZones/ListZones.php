@@ -9,7 +9,6 @@ class ListZones
 {
     public function __construct(private ZoneRepositoryInterface $zoneRepository) {}
 
-    
     public function __invoke(): array
     {
         return array_map(

@@ -3,8 +3,8 @@
 use App\Tax\Infrastructure\Entrypoint\Http\DeleteTaxController;
 use App\Tax\Infrastructure\Entrypoint\Http\GetTaxController;
 use App\Tax\Infrastructure\Entrypoint\Http\IndexTaxController;
-use App\Tax\Infrastructure\Entrypoint\Http\UpdateTaxController;
 use App\Tax\Infrastructure\Entrypoint\Http\StoreTaxController;
+use App\Tax\Infrastructure\Entrypoint\Http\UpdateTaxController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/taxes', IndexTaxController::class);

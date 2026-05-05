@@ -3,6 +3,7 @@
 namespace App\Restaurant\Domain\Interfaces;
 
 use App\Restaurant\Domain\Entity\Restaurant;
+use App\Shared\Domain\ValueObject\Email;
 use App\Shared\Domain\ValueObject\Uuid;
 
 interface RestaurantRepositoryInterface
@@ -11,10 +12,9 @@ interface RestaurantRepositoryInterface
 
     public function search(Uuid $id): ?Restaurant;
 
-    public function findByEmail(\App\Shared\Domain\ValueObject\Email $email): ?Restaurant;
+    public function findByEmail(Email $email): ?Restaurant;
 
     public function delete(Uuid $id): void;
 
-    
     public function all(): array;
 }

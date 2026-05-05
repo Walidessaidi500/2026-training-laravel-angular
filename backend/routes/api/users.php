@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\User\Infrastructure\Entrypoint\Http\UserController;
+use App\User\Infrastructure\Entrypoint\Http\DeleteController;
 use App\User\Infrastructure\Entrypoint\Http\PostController;
 use App\User\Infrastructure\Entrypoint\Http\PutController;
-use App\User\Infrastructure\Entrypoint\Http\DeleteController;
+use App\User\Infrastructure\Entrypoint\Http\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('role:admin,supervisor,restaurant')->group(function () {
     Route::get('/users', [UserController::class, 'index']);

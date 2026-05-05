@@ -6,14 +6,13 @@ use App\Restaurant\Application\CreateRestaurant\CreateRestaurant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-
 class StoreRestaurantController
 {
     public function __construct(
         private CreateRestaurant $createRestaurant
-    ){}
+    ) {}
 
-    public function __invoke(Request $request):JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],

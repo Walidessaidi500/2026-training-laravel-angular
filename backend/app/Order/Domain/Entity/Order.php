@@ -21,8 +21,7 @@ class Order implements \JsonSerializable
         private array $lines,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
-    ) {
-    }
+    ) {}
 
     public static function dddCreate(
         RestaurantId $restaurantId,

@@ -17,8 +17,7 @@ class ProductResponse
         public readonly ?string $imageSrc,
         public readonly string $createdAt,
         public readonly string $updatedAt,
-    ) {
-    }
+    ) {}
 
     public static function create(Product $product): self
     {
@@ -36,7 +35,6 @@ class ProductResponse
         );
     }
 
-    
     public function toArray(): array
     {
         return [

@@ -11,7 +11,6 @@ class ListTaxes
         private TaxRepositoryInterface $taxRepository,
     ) {}
 
-    
     public function __invoke(): array
     {
         $taxes = $this->taxRepository->findAll();

@@ -11,8 +11,7 @@ class ProcessSaleController
 {
     public function __construct(
         private ProcessSale $processSale
-    ) {
-    }
+    ) {}
 
     public function __invoke(Request $request): JsonResponse
     {
@@ -45,6 +44,4 @@ class ProcessSaleController
 
         return response()->json(['message' => 'Sale processed successfully'], 201);
     }
-
-
 }

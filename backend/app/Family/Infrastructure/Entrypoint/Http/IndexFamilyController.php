@@ -10,10 +10,9 @@ class IndexFamilyController
 {
     public function __construct(
         private FamilyRepositoryInterface $familyRepository
-        ) {
-    }
+    ) {}
 
-    public function __invoke(Request $request):JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         $perPage = $request->query('per_page', 15);
         $page = $request->query('page', 1);

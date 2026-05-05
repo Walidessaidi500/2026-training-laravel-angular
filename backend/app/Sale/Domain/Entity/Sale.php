@@ -28,8 +28,7 @@ class Sale implements \JsonSerializable
         private string $paymentMethod = 'cash',
         private int $amountCash = 0,
         private int $amountCard = 0,
-    ) {
-    }
+    ) {}
 
     public static function dddCreate(
         RestaurantId $restaurantId,
@@ -44,7 +43,7 @@ class Sale implements \JsonSerializable
         int $amountCard = 0,
     ): self {
         $now = DomainDateTime::now();
-        
+
         $total = array_reduce($lines, function (int $carry, SaleLine $line) {
             return $carry + ($line->price() * $line->quantity());
         }, 0);

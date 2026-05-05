@@ -10,8 +10,7 @@ class GetSaleController
 {
     public function __construct(
         private SaleRepositoryInterface $saleRepository
-    ) {
-    }
+    ) {}
 
     public function __invoke(string $uuid): JsonResponse
     {

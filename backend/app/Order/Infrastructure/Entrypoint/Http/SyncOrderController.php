@@ -11,8 +11,7 @@ class SyncOrderController
 {
     public function __construct(
         private SyncOrder $syncOrder
-    ) {
-    }
+    ) {}
 
     public function __invoke(Request $request): JsonResponse
     {
@@ -35,8 +34,8 @@ class SyncOrderController
             $validated['lines']
         );
 
-        $this->syncOrder->execute($syncOrderRequest);
+        $order = $this->syncOrder->execute($syncOrderRequest);
 
-        return new JsonResponse(['message' => 'Order synced successfully'], 200);
+        return new JsonResponse($order, 200);
     }
 }

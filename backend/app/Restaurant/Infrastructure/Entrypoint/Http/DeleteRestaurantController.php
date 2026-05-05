@@ -9,9 +9,10 @@ class DeleteRestaurantController
 {
     public function __construct(
         private DeleteRestaurant $deleteRestaurant
-    ){}
+    ) {}
 
-    public function __invoke(string $uuid):JsonResponse{
+    public function __invoke(string $uuid): JsonResponse
+    {
         try {
             ($this->deleteRestaurant)($uuid);
 

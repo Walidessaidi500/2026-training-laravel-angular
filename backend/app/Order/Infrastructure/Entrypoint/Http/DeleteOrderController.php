@@ -10,8 +10,7 @@ class DeleteOrderController
 {
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
-    ) {
-    }
+    ) {}
 
     public function __invoke(string $uuid): JsonResponse
     {

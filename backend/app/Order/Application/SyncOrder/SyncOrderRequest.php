@@ -10,6 +10,5 @@ class SyncOrderRequest
         public string $userUuid,
         public int $diners,
         public array $lines, // each line: [uuid (optional), product_uuid, quantity, price, tax_percentage]
-    ) {
-    }
+    ) {}
 }

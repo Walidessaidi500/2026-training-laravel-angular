@@ -27,7 +27,6 @@ class TaxResponse
         );
     }
 
-    
     public function toArray(): array
     {
         return [

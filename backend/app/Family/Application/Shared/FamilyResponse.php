@@ -27,7 +27,6 @@ class FamilyResponse
         );
     }
 
-    
     public function toArray(): array
     {
         return [

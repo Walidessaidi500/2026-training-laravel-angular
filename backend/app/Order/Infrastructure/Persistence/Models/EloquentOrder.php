@@ -3,8 +3,8 @@
 namespace App\Order\Infrastructure\Persistence\Models;
 
 use App\Restaurant\Infrastructure\Persistence\Models\EloquentRestaurant;
-use App\User\Infrastructure\Persistence\Models\EloquentUser;
 use App\Table\Infrastructure\Persistence\Models\EloquentTable;
+use App\User\Infrastructure\Persistence\Models\EloquentUser;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

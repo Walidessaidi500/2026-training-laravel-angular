@@ -11,7 +11,4 @@ Route::get('/sales/{uuid}', GetSaleController::class);
 Route::post('/sales/process', ProcessSaleController::class);
 Route::delete('/sales/{uuid}', DeleteSaleController::class);
 
-
-
-
-//Acabar de hacer rutas con su middlewar
+// Acabar de hacer rutas con su middlewar

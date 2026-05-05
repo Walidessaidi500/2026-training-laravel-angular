@@ -29,7 +29,6 @@ final readonly class CreateUserResponse
         );
     }
 
-    
     public function toArray(): array
     {
         return [

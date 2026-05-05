@@ -5,7 +5,6 @@ namespace App\Tax\Infrastructure\Entrypoint\Http;
 use App\Tax\Application\GetTax\GetTax;
 use Illuminate\Http\JsonResponse;
 
-
 class GetTaxController
 {
     public function __construct(

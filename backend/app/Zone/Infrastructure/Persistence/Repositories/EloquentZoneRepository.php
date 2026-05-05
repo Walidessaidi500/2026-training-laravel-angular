@@ -35,7 +35,6 @@ class EloquentZoneRepository implements ZoneRepositoryInterface
         return $model ? $this->toDomainEntity($model) : null;
     }
 
-    
     public function findAll(): array
     {
         return $this->model->newQuery()

@@ -23,7 +23,7 @@ class UpdateFamily
         }
 
         $family->updateName(FamilyName::create($name));
-        
+
         if ($family->isActive() !== $active) {
             $family->toggleActive();
         }

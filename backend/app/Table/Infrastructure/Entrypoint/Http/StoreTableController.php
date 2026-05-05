@@ -3,8 +3,8 @@
 namespace App\Table\Infrastructure\Entrypoint\Http;
 
 use App\Table\Application\CreateTable\CreateTable;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class StoreTableController
 {

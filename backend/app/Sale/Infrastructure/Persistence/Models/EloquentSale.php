@@ -2,8 +2,9 @@
 
 namespace App\Sale\Infrastructure\Persistence\Models;
 
-use App\User\Infrastructure\Persistence\Models\EloquentUser;
+use App\Order\Infrastructure\Persistence\Models\EloquentOrder;
 use App\Table\Infrastructure\Persistence\Models\EloquentTable;
+use App\User\Infrastructure\Persistence\Models\EloquentUser;
 use Database\Factories\SaleFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -54,7 +55,7 @@ class EloquentSale extends Model
 
     public function order(): BelongsTo
     {
-        return $this->belongsTo(\App\Order\Infrastructure\Persistence\Models\EloquentOrder::class, 'order_id');
+        return $this->belongsTo(EloquentOrder::class, 'order_id');
     }
 
     public function table(): BelongsTo

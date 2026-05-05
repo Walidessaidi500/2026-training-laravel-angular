@@ -13,6 +13,5 @@ class ProcessSaleRequest
         public string $paymentMethod = 'cash',
         public int $amountCash = 0,
         public int $amountCard = 0,
-    ) {
-    }
+    ) {}
 }

@@ -12,8 +12,7 @@ class CreateOrder
 {
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
-    ) {
-    }
+    ) {}
 
     public function execute(CreateOrderRequest $request): CreateOrderResponse
     {
@@ -50,11 +49,11 @@ class CreateOrder
             $openedByUserUuid->value(),
             null,
             $request->diners,
-            new \DateTimeImmutable(),
+            new \DateTimeImmutable,
             null,
             $lines,
-            new \DateTimeImmutable(),
-            new \DateTimeImmutable()
+            new \DateTimeImmutable,
+            new \DateTimeImmutable
         );
 
         $this->orderRepository->save($order);

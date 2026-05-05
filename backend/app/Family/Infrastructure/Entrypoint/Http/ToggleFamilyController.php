@@ -5,12 +5,14 @@ namespace App\Family\Infrastructure\Entrypoint\Http;
 use App\Family\Application\ToggleFamilyActive\ToggleFamilyActive;
 use Illuminate\Http\JsonResponse;
 
-class ToggleFamilyController {
+class ToggleFamilyController
+{
     public function __construct(
         private ToggleFamilyActive $toggleFamilyActive
-    ){}
+    ) {}
 
-    public function __invoke(string $uuid):JsonResponse{
+    public function __invoke(string $uuid): JsonResponse
+    {
         try {
             $resoponse = ($this->toggleFamilyActive)($uuid);
 

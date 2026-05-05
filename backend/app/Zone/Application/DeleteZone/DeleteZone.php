@@ -11,8 +11,7 @@ class DeleteZone
     public function __construct(
         private ZoneRepositoryInterface $zoneRepository,
         private TableRepositoryInterface $tableRepository
-    ) {
-    }
+    ) {}
 
     public function __invoke(string $id, int $restaurantId): void
     {

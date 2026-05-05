@@ -10,8 +10,7 @@ class IndexOrderController
 {
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
-    ) {
-    }
+    ) {}
 
     public function __invoke(Request $request): JsonResponse
     {

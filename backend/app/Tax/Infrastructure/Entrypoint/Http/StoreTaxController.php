@@ -3,8 +3,8 @@
 namespace App\Tax\Infrastructure\Entrypoint\Http;
 
 use App\Tax\Application\CreateTax\CreateTax;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class StoreTaxController
 {

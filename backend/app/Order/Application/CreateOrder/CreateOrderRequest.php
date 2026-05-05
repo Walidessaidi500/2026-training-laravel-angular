@@ -10,6 +10,5 @@ class CreateOrderRequest
         public string $openedByUserUuid,
         public int $diners,
         public array $lines, // each line: [product_uuid, user_uuid, quantity, price, tax_percentage]
-    ) {
-    }
+    ) {}
 }

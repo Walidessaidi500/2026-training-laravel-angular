@@ -14,13 +14,13 @@ class EloquentOrderRepository implements OrderRepositoryInterface
 {
     private function getInternalUserId(string $uuid): ?int
     {
-        return DB::table('users')->where('uuid', $uuid)->value('id') 
+        return DB::table('users')->where('uuid', $uuid)->value('id')
             ?? DB::table('restaurants')->where('uuid', $uuid)->value('id');
     }
 
     private function getUuidFromInternalId(int $id): ?string
     {
-        // Nota: Esto es un poco ambiguo si hay IDs duplicados en ambas tablas, 
+        // Nota: Esto es un poco ambiguo si hay IDs duplicados en ambas tablas,
         // pero en este sistema restaurant_id y user_id suelen estar claros por contexto.
         // Como la FK apunta a 'users', primero buscamos en users.
         return DB::table('users')->where('id', $id)->value('uuid')
@@ -46,7 +46,7 @@ class EloquentOrderRepository implements OrderRepositoryInterface
 
             // Sync lines
             $existingLineIds = $eloquentOrder->orderLines()->pluck('uuid')->toArray();
-            $newLineIds = array_map(fn($line) => $line->id()->value(), $order->lines());
+            $newLineIds = array_map(fn ($line) => $line->id()->value(), $order->lines());
 
             $linesToDelete = array_diff($existingLineIds, $newLineIds);
             EloquentOrderLine::whereIn('uuid', $linesToDelete)->delete();
@@ -72,7 +72,7 @@ class EloquentOrderRepository implements OrderRepositoryInterface
     {
         $eloquentOrder = EloquentOrder::with(['orderLines'])->where('uuid', $uuid->value())->first();
 
-        if (!$eloquentOrder) {
+        if (! $eloquentOrder) {
             return null;
         }
 
@@ -82,13 +82,13 @@ class EloquentOrderRepository implements OrderRepositoryInterface
     public function findByTable(Uuid $tableUuid, string $status): ?Order
     {
         $tableId = DB::table('tables')->where('uuid', $tableUuid->value())->value('id');
-        
+
         $eloquentOrder = EloquentOrder::with(['orderLines'])
             ->where('table_id', $tableId)
             ->where('status', $status)
             ->first();
 
-        if (!$eloquentOrder) {
+        if (! $eloquentOrder) {
             return null;
         }
 
@@ -111,13 +111,13 @@ class EloquentOrderRepository implements OrderRepositoryInterface
         $paginator = $query->paginate($perPage, ['*'], 'page', $page);
 
         return [
-            'data' => array_map(fn($item) => $this->toDomain($item), $paginator->items()),
+            'data' => array_map(fn ($item) => $this->toDomain($item), $paginator->items()),
             'meta' => [
                 'total' => $paginator->total(),
                 'per_page' => $paginator->perPage(),
                 'current_page' => $paginator->currentPage(),
                 'last_page' => $paginator->lastPage(),
-            ]
+            ],
         ];
     }
 

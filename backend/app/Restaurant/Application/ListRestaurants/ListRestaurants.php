@@ -11,7 +11,6 @@ class ListRestaurants
         private RestaurantRepositoryInterface $restaurantRepository,
     ) {}
 
-    
     public function __invoke(): array
     {
         $restaurants = $this->restaurantRepository->all();

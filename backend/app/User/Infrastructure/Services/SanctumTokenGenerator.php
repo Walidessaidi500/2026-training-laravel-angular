@@ -2,10 +2,10 @@
 
 namespace App\User\Infrastructure\Services;
 
+use App\Restaurant\Infrastructure\Persistence\Models\EloquentRestaurant;
 use App\Shared\Domain\ValueObject\Uuid;
 use App\User\Domain\Interfaces\TokenGeneratorInterface;
 use App\User\Infrastructure\Persistence\Models\EloquentUser;
-use App\Restaurant\Infrastructure\Persistence\Models\EloquentRestaurant;
 
 class SanctumTokenGenerator implements TokenGeneratorInterface
 {

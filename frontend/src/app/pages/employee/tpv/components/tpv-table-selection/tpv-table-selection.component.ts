@@ -4,7 +4,7 @@ import { IonicModule } from '@ionic/angular';
 import { Zone } from '@services/domain/zone.service';
 import { Table } from '@services/domain/table.service';
 import { addIcons } from 'ionicons';
-import { gridOutline } from 'ionicons/icons';
+import { gridOutline, layersOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tpv-table-selection',
@@ -17,21 +17,65 @@ export class TpvTableSelectionComponent {
   @Input() zones: Zone[] = [];
   @Input() selectedZoneUuid: string | null = null;
   @Input() filteredTables: Table[] = [];
+  @Input() allTables: Table[] = [];
   @Input() tableOrders: { [tableUuid: string]: boolean } = {};
 
   @Output() zoneSelect = new EventEmitter<string>();
   @Output() tableClick = new EventEmitter<Table>();
+  @Output() tableLongPress = new EventEmitter<Table>();
+
+  private pressTimeout: any;
+  private isLongPress = false;
 
   constructor() {
-    addIcons({ gridOutline });
+    addIcons({ gridOutline, layersOutline });
+  }
+
+  get displayTables(): Table[] {
+    return this.filteredTables.filter(t => !t.joined_to_uuid);
+  }
+
+  getTableName(table: Table): string {
+    const joinedTables = this.allTables.filter(t => t.joined_to_uuid === table.uuid);
+    if (joinedTables.length === 0) return table.name;
+    return `${table.name} + ${joinedTables.map(t => t.name).join(' + ')}`;
+  }
+
+  hasJoinedTables(table: Table): boolean {
+    return this.allTables.some(t => t.joined_to_uuid === table.uuid);
+  }
+
+  trackByTable(index: number, table: Table): string {
+    return table.uuid;
   }
 
   selectZone(uuid: string) {
     this.zoneSelect.emit(uuid);
   }
 
-  onTableClick(table: Table) {
-    this.tableClick.emit(table);
+  onPointerDown(table: Table, event: any) {
+    this.isLongPress = false;
+    this.pressTimeout = setTimeout(() => {
+      this.isLongPress = true;
+      this.tableLongPress.emit(table);
+    }, 250); // Reducido a 250ms para mayor rapidez
+  }
+
+  onPointerUp(table: Table, event: any) {
+    if (this.pressTimeout) {
+      clearTimeout(this.pressTimeout);
+      this.pressTimeout = null;
+    }
+    if (!this.isLongPress) {
+      this.tableClick.emit(table);
+    }
+  }
+
+  onPointerLeave(event: any) {
+    if (this.pressTimeout) {
+      clearTimeout(this.pressTimeout);
+      this.pressTimeout = null;
+    }
   }
 
   isTableOccupied(table: Table): boolean {

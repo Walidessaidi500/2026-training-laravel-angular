@@ -6,7 +6,6 @@ use App\Product\Application\Shared\ProductResponse;
 use App\Product\Domain\Interfaces\ProductRepositoryInterface;
 use App\Product\Domain\ValueObject\Price;
 use App\Product\Domain\ValueObject\ProductName;
-use App\Product\Domain\ValueObject\RestaurantId;
 use App\Product\Domain\ValueObject\Stock;
 use App\Shared\Domain\ValueObject\Uuid;
 
