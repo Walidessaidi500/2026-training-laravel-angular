@@ -74,15 +74,15 @@ export class UsersPage implements OnInit {
   private readonly filterService = inject(FilterService);
   private readonly utilsService = inject(UtilsService);
 
-  // State Observables
+  // Estados Observables
   public readonly users$ = this.usersFacade.users$;
   public readonly isLoading$ = this.usersFacade.isLoading$;
   
-  // Combined State
+  // Estados derivados
   public filteredUsers$: Observable<User[]>;
   public userStats$: Observable<any>;
 
-  // UI State
+  // Estados locales
   public currentUser: any = null;
   public isAdmin = false;
   public isSupervisor = false;
@@ -110,7 +110,7 @@ export class UsersPage implements OnInit {
       'person-outline': personOutline,
     });
 
-    // Initialize filtered users stream
+    // Inicializa el filtrado de usuarios
     this.filteredUsers$ = this.users$.pipe(
       map(users => {
         let allUsers = [...users];
@@ -121,7 +121,7 @@ export class UsersPage implements OnInit {
       })
     );
 
-    // Initialize stats stream
+    // Inicializa las estadisticas de usuarios
     this.userStats$ = this.users$.pipe(
       map(users => {
         const stats = this.utilsService.calculateStats(users, [

@@ -16,11 +16,11 @@
 }
 
 .panel-card {
-  background: #ffffff;
+  background: var(--ion-card-background, #ffffff);
   border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 20px rgba(var(--ion-color-secondary-rgb), 0.02), 0 1px 3px rgba(var(--ion-color-secondary-rgb), 0.04);
+  border: 1px solid rgba(var(--ion-color-secondary-rgb), 0.03);
   margin-bottom: 24px;
 
   &:last-child {
@@ -64,7 +64,7 @@
 }
 
 .btn-soft {
-  background: rgba(255, 83, 48, 0.08);
+  background: var(--ion-color-primary-light);
   color: var(--ion-color-primary);
   border: none;
   border-radius: 8px;
@@ -78,7 +78,7 @@
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(255, 83, 48, 0.15);
+    background: rgba(var(--ion-color-primary-rgb), 0.15);
   }
 }
 
@@ -93,21 +93,21 @@
 
   &.primary {
     background: var(--ion-color-primary);
-    color: white;
+    color: var(--ion-color-primary-contrast);
   }
 
   &.primary-light {
-    background: rgba(255, 83, 48, 0.1);
+    background: var(--ion-color-primary-light);
     color: var(--ion-color-primary);
   }
   
   &.warning-light {
-    background: rgba(255, 196, 9, 0.1);
+    background: var(--ion-color-warning-light);
     color: var(--ion-color-warning);
   }
   
   &.success-light {
-    background: rgba(45, 211, 111, 0.1);
+    background: var(--ion-color-success-light);
     color: var(--ion-color-success);
   }
 }
@@ -127,12 +127,12 @@
   }
 
   &.success {
-    background: rgba(45, 211, 111, 0.15);
+    background: var(--ion-color-success-light);
     color: var(--ion-color-success-shade);
   }
 
   &.danger {
-    background: rgba(235, 68, 90, 0.1);
+    background: var(--ion-color-danger-light);
     color: var(--ion-color-danger);
   }
 
@@ -145,7 +145,7 @@
 }
 
 .badge-count {
-  background: rgba(235, 68, 90, 0.1);
+  background: var(--ion-color-danger-light);
   color: var(--ion-color-danger);
   padding: 2px 8px;
   border-radius: 12px;
@@ -172,7 +172,7 @@
     gap: 48px;
     margin-top: 32px;
     padding-top: 24px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid rgba(var(--ion-color-secondary-rgb), 0.06);
 
     .stat-item {
       display: flex;
@@ -246,7 +246,7 @@
 
   .chart-placeholder {
     height: 240px;
-    background: linear-gradient(to bottom, rgba(255, 83, 48, 0.03), transparent);
+    background: linear-gradient(to bottom, rgba(var(--ion-color-primary-rgb), 0.03), transparent);
     border-radius: 12px;
     position: relative;
     overflow: hidden;
@@ -280,7 +280,7 @@
   padding: 4px;
   border-radius: 12px;
   gap: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(var(--ion-color-secondary-rgb), 0.03);
 
   .filter-btn {
     border: none;
@@ -296,13 +296,13 @@
 
     &:hover {
       color: var(--ion-color-primary);
-      background: rgba(255, 83, 48, 0.08);
+      background: var(--ion-color-primary-light);
     }
 
     &.active {
       background: var(--ion-color-primary);
-      color: white;
-      box-shadow: 0 4px 15px rgba(255, 83, 48, 0.25);
+      color: var(--ion-color-primary-contrast);
+      box-shadow: 0 4px 15px rgba(var(--ion-color-primary-rgb), 0.25);
       transform: translateY(-1px);
     }
 
@@ -325,7 +325,7 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      color: white;
+      color: var(--ion-color-primary-contrast);
       font-weight: 700;
       font-size: 14px;
       display: flex;
@@ -376,17 +376,17 @@
       font-weight: 700;
 
       &.completed {
-        background: rgba(45, 211, 111, 0.1);
+        background: var(--ion-color-success-light);
         color: var(--ion-color-success-shade);
       }
 
       &.processing {
-        background: rgba(255, 196, 9, 0.1);
+        background: var(--ion-color-warning-light);
         color: var(--ion-color-warning-shade);
       }
 
       &.cancelled {
-        background: rgba(235, 68, 90, 0.1);
+        background: var(--ion-color-danger-light);
         color: var(--ion-color-danger);
       }
     }
@@ -471,7 +471,7 @@
       top: 35px;
       bottom: -20px;
       width: 2px;
-      background: rgba(0, 0, 0, 0.05);
+      background: rgba(var(--ion-color-secondary-rgb), 0.05);
       z-index: 0;
     }
 
@@ -488,12 +488,12 @@
 
       &.user_registered {
         color: var(--ion-color-primary);
-        background: rgba(255, 83, 48, 0.1);
+        background: var(--ion-color-primary-light);
       }
 
       &.order_completed {
         color: var(--ion-color-success);
-        background: rgba(45, 211, 111, 0.1);
+        background: var(--ion-color-success-light);
       }
     }
 

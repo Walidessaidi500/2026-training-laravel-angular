@@ -6,11 +6,11 @@
 }
 
 .tpv-header {
-  background-color: #ffffff;
+  background-color: var(--ion-card-background, #ffffff);
   color: var(--ion-color-secondary);
   padding: 16px 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(var(--ion-color-secondary-rgb), 0.05);
+  border-bottom: 1px solid rgba(var(--ion-color-secondary-rgb), 0.05);
 
   .header-content {
     display: flex;
@@ -42,7 +42,7 @@
     &:active { 
       transform: scale(0.9);
       background: var(--ion-color-primary);
-      color: white;
+      color: var(--ion-color-primary-contrast);
     }
   }
 
@@ -71,7 +71,7 @@
     font-size: 14px;
     font-weight: 700;
     color: var(--ion-color-secondary);
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(var(--ion-color-secondary-rgb), 0.05);
     
     ion-icon { 
       font-size: 20px;

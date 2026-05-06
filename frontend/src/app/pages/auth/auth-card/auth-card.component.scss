@@ -1,9 +1,9 @@
 .auth-card {
   width: 100%;
   max-width: 440px;
-  background: #ffffff;
+  background: var(--ion-card-background, #ffffff);
   border-radius: 24px;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 24px 48px rgba(var(--ion-color-secondary-rgb), 0.06);
   padding: 40px 32px;
 }
 
@@ -14,14 +14,14 @@
   .brand-title {
     font-size: 32px;
     font-weight: 800;
-    color: var(--ion-color-primary, #f26849);
+    color: var(--ion-color-primary);
     margin: 0 0 8px 0;
     letter-spacing: -0.5px;
   }
 
   .subtitle {
     font-size: 15px;
-    color: #6b7280;
+    color: var(--ion-color-medium);
     margin: 0;
   }
 }

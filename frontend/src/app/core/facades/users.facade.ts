@@ -8,18 +8,18 @@ import { UserService, User } from '../services/domain/user.service';
 export class UsersFacade {
   private readonly userService = inject(UserService);
 
-  // State
+  // Estados internos
   private readonly usersSubject = new BehaviorSubject<User[]>([]);
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
   private readonly totalUsersSubject = new BehaviorSubject<number>(0);
 
-  // Exposed Observables
+  // Observables publicos
   public readonly users$ = this.usersSubject.asObservable();
   public readonly isLoading$ = this.loadingSubject.asObservable();
   public readonly totalUsers$ = this.totalUsersSubject.asObservable();
 
   /**
-   * Load users with pagination
+   * Carga la lista de usuarios con paginación
    */
   loadUsers(page: number = 1, perPage: number = 10): void {
     this.loadingSubject.next(true);
@@ -35,7 +35,7 @@ export class UsersFacade {
   }
 
   /**
-   * Create a new user and update local state
+   * Crear un nuevo usuario y actualizar el estado
    */
   createUser(userData: Partial<User>): Observable<User> {
     this.loadingSubject.next(true);
@@ -50,7 +50,7 @@ export class UsersFacade {
   }
 
   /**
-   * Update an existing user
+   * Actualizar un usuario existente
    */
   updateUser(uuid: string, userData: Partial<User>): Observable<User> {
     this.loadingSubject.next(true);
@@ -59,7 +59,7 @@ export class UsersFacade {
         const current = this.usersSubject.getValue();
         const index = current.findIndex(u => u.uuid === uuid);
         if (index !== -1) {
-          // Patch locally since backend might not return the full updated user
+          // Actualiza el usuario en la lista
           current[index] = { ...current[index], ...userData } as User;
           this.usersSubject.next([...current]);
         }
@@ -69,7 +69,7 @@ export class UsersFacade {
   }
 
   /**
-   * Delete a user and update local state
+   * Elimina un usuario
    */
   deleteUser(uuid: string): Observable<void> {
     this.loadingSubject.next(true);
@@ -84,7 +84,7 @@ export class UsersFacade {
   }
 
   /**
-   * Toggle user active status
+   * Toggle el estado activo de un usuario
    */
   toggleUserStatus(uuid: string): Observable<User> {
     return this.userService.toggleActive(uuid).pipe(

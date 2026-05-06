@@ -10,7 +10,7 @@ export class AuthFacade {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  // State
+  // Estados para manejar la carga y errores
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
   private readonly errorSubject = new BehaviorSubject<string | null>(null);
 
@@ -20,9 +20,8 @@ export class AuthFacade {
   public readonly isLoading$ = this.loadingSubject.asObservable();
   public readonly error$ = this.errorSubject.asObservable();
 
-  /**
-   * Performs login and redirects based on user role
-   */
+
+  // Login y redirección basada en el rol del usuario
   login(credentials: LoginRequest): void {
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
@@ -40,31 +39,27 @@ export class AuthFacade {
     });
   }
 
-  /**
-   * Logs out the user and redirects to login page
-   */
+
+  // Cierra la sesión del usuario y redirige a la página de inicio de sesión
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-  /**
-   * Helper to check if current user has a specific role
-   */
+
+  // Helper para verificar si el usuario tiene un rol específico
   hasRole(role: string): boolean {
     return this.authService.hasRole(role);
   }
 
-  /**
-   * Returns current user snapshot
-   */
+
+  // Devuelve el usuario actual o null si no hay ninguno autenticado
   getCurrentUser(): User | null {
     return this.authService.getUser();
   }
 
-  /**
-   * Logic to redirect users after login
-   */
+
+  // Logica para redirigir a los usuarios después de iniciar sesión
   private redirectByUserRole(role: string): void {
     switch (role) {
       case 'admin':
@@ -83,9 +78,8 @@ export class AuthFacade {
     }
   }
 
-  /**
-   * Clears any active error message
-   */
+
+  // Limpia el mensaje de error actual
   clearError(): void {
     this.errorSubject.next(null);
   }

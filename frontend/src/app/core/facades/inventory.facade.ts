@@ -12,20 +12,20 @@ export class InventoryFacade {
   private readonly familyService = inject(FamilyService);
   private readonly taxService = inject(TaxService);
 
-  // State (Subjects)
+  // Estados internos
   private readonly productsSubject = new BehaviorSubject<Product[]>([]);
   private readonly familiesSubject = new BehaviorSubject<Family[]>([]);
   private readonly taxesSubject = new BehaviorSubject<Tax[]>([]);
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
 
-  // Observables (Exposed to components)
+  // Observables publicos
   public readonly products$ = this.productsSubject.asObservable();
   public readonly families$ = this.familiesSubject.asObservable();
   public readonly taxes$ = this.taxesSubject.asObservable();
   public readonly isLoading$ = this.loadingSubject.asObservable();
 
   /**
-   * Initial load of all necessary data for Inventory management
+   * Carga inicial de productos, familias y taxes
    */
   loadAll(): void {
     this.loadingSubject.next(true);
@@ -46,7 +46,7 @@ export class InventoryFacade {
     });
   }
 
-  // --- Product Operations ---
+  // Helpers: Productos
 
   createProduct(data: any): Observable<Product> {
     this.loadingSubject.next(true);
@@ -99,7 +99,7 @@ export class InventoryFacade {
     );
   }
 
-  // --- Helpers: Families ---
+  // Helpers: Familias
 
   createFamily(data: any): Observable<Family> {
     this.loadingSubject.next(true);
@@ -155,7 +155,7 @@ export class InventoryFacade {
     );
   }
 
-  // --- Helpers: Taxes ---
+  // Helpers: Taxes
 
   createTax(data: any): Observable<Tax> {
     this.loadingSubject.next(true);
@@ -195,14 +195,14 @@ export class InventoryFacade {
   }
 
   /**
-   * Refreshes families list
+   * Actualiza la lista de familias
    */
   refreshFamilies(): void {
     this.familyService.list().subscribe(res => this.familiesSubject.next(res.data));
   }
 
   /**
-   * Refreshes taxes list
+   * Actualiza la lista de taxes
    */
   refreshTaxes(): void {
     this.taxService.list().subscribe(res => this.taxesSubject.next(res.data));

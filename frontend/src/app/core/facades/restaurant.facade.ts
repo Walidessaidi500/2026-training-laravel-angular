@@ -8,18 +8,18 @@ import { RestaurantService, Restaurant } from '../services/domain/restaurant.ser
 export class RestaurantFacade {
   private readonly restaurantService = inject(RestaurantService);
 
-  // --- State ---
+  // Estados internos
   private readonly restaurantsSubject = new BehaviorSubject<Restaurant[]>([]);
   private readonly selectedRestaurantSubject = new BehaviorSubject<Restaurant | null>(null);
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
 
-  // --- Exposed Observables ---
+  // Observables publicos
   public readonly restaurants$ = this.restaurantsSubject.asObservable();
   public readonly selectedRestaurant$ = this.selectedRestaurantSubject.asObservable();
   public readonly isLoading$ = this.loadingSubject.asObservable();
 
   /**
-   * Load all restaurants (for superadmin or multi-restaurant management)
+   * Carga todos los restaurantes (para superadmin o gestion multi-restaurante)
    */
   loadRestaurants(): void {
     this.loadingSubject.next(true);
@@ -32,7 +32,7 @@ export class RestaurantFacade {
   }
 
   /**
-   * Load a specific restaurant and set it as selected
+   * Carga un restaurante específico y lo establece como seleccionado
    */
   loadRestaurant(uuid: string): void {
     this.loadingSubject.next(true);
@@ -45,7 +45,7 @@ export class RestaurantFacade {
   }
 
   /**
-   * Create a new restaurant
+   * Crea un nuevo restaurante
    */
   createRestaurant(data: Partial<Restaurant>): Observable<Restaurant> {
     this.loadingSubject.next(true);
@@ -59,20 +59,20 @@ export class RestaurantFacade {
   }
 
   /**
-   * Update restaurant details
+   * Actualiza los datos de un restaurante
    */
   updateRestaurant(uuid: string, data: Partial<Restaurant>): Observable<Restaurant> {
     this.loadingSubject.next(true);
     return this.restaurantService.update(uuid, data).pipe(
       tap((updatedRestaurant) => {
-        // Update in list
+        // Actualiza la lista de restaurantes
         const current = this.restaurantsSubject.getValue();
         const index = current.findIndex(r => r.uuid === uuid);
         if (index !== -1) {
           current[index] = updatedRestaurant;
           this.restaurantsSubject.next([...current]);
         }
-        // Update selected if applicable
+        // Actualiza la selección si el restaurante editado es el seleccionado
         const selected = this.selectedRestaurantSubject.getValue();
         if (selected?.uuid === uuid) {
           this.selectedRestaurantSubject.next(updatedRestaurant);
@@ -83,7 +83,7 @@ export class RestaurantFacade {
   }
 
   /**
-   * Delete a restaurant
+   * Elimina un restaurante y actualiza el estado
    */
   deleteRestaurant(uuid: string): Observable<void> {
     this.loadingSubject.next(true);
@@ -101,14 +101,14 @@ export class RestaurantFacade {
   }
 
   /**
-   * Manual selection of a restaurant from the state
+   * Seleccion manual de un restaurante
    */
   selectRestaurant(restaurant: Restaurant): void {
     this.selectedRestaurantSubject.next(restaurant);
   }
 
   /**
-   * Clear selection
+   * Limpiar la seleccion actual
    */
   clearSelection(): void {
     this.selectedRestaurantSubject.next(null);

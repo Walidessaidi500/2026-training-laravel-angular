@@ -9,7 +9,6 @@ import {
   IonLabel,
   IonSkeletonText,
   ModalController,
-  ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -27,6 +26,7 @@ import { UsersFacade } from '@app/core/facades/users.facade';
 // Services
 import { AuthService } from '@services/auth/auth.service';
 import { TableService } from '@services/domain/table.service';
+import { UiService } from '@services/ui/ui.service';
 
 // Components
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
@@ -74,7 +74,7 @@ export class DashboardPage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly tableService = inject(TableService);
   private readonly modalController = inject(ModalController);
-  private readonly toastController = inject(ToastController);
+  private readonly uiService = inject(UiService);
   private readonly router = inject(Router);
 
   public readonly dashboardData$: Observable<DashboardData> = this.facade.dashboardData$;
@@ -157,7 +157,7 @@ export class DashboardPage implements OnInit {
     if (data) {
       this.inventoryFacade.createProduct(data).subscribe({
         next: async (res) => {
-          this.showSuccessToast('Producto creado correctamente');
+          this.uiService.showSuccess('Producto creado correctamente');
           this.facade.addActivity({
             type: 'info',
             icon: 'cube',
@@ -167,7 +167,7 @@ export class DashboardPage implements OnInit {
           });
           this.facade.loadStatistics();
         },
-        error: (err) => this.showErrorToast(err)
+        error: (err) => this.uiService.showError('Error: ' + (err.error?.message || 'Operación fallida'))
       });
     }
   }
@@ -184,7 +184,7 @@ export class DashboardPage implements OnInit {
     if (data) {
       this.inventoryFacade.createFamily(data).subscribe({
         next: async (res) => {
-          this.showSuccessToast('Familia creada con éxito');
+          this.uiService.showSuccess('Familia creada con éxito');
           this.facade.addActivity({
             type: 'info',
             icon: 'folder',
@@ -194,7 +194,7 @@ export class DashboardPage implements OnInit {
           });
           this.facade.loadStatistics();
         },
-        error: (err) => this.showErrorToast(err)
+        error: (err) => this.uiService.showError('Error: ' + (err.error?.message || 'Operación fallida'))
       });
     }
   }
@@ -211,10 +211,10 @@ export class DashboardPage implements OnInit {
     if (data) {
       this.inventoryFacade.createTax(data).subscribe({
         next: async (res) => {
-          this.showSuccessToast('Impuesto configurado');
+          this.uiService.showSuccess('Impuesto configurado');
           this.facade.loadStatistics();
         },
-        error: (err) => this.showErrorToast(err)
+        error: (err) => this.uiService.showError('Error: ' + (err.error?.message || 'Operación fallida'))
       });
     }
   }
@@ -231,10 +231,10 @@ export class DashboardPage implements OnInit {
     if (data) {
       this.usersFacade.createUser(data).subscribe({
         next: () => {
-          this.showSuccessToast('Usuario creado con éxito');
+          this.uiService.showSuccess('Usuario creado con éxito');
           this.facade.loadStatistics();
         },
-        error: (err) => this.showErrorToast(err)
+        error: (err) => this.uiService.showError('Error: ' + (err.error?.message || 'Operación fallida'))
       });
     }
   }
@@ -254,31 +254,11 @@ export class DashboardPage implements OnInit {
     if (data) {
       this.tableService.create(data).subscribe({
         next: () => {
-          this.showSuccessToast('Mesa creada con éxito');
+          this.uiService.showSuccess('Mesa creada con éxito');
           this.facade.loadStatistics();
         },
-        error: (err) => this.showErrorToast(err)
+        error: (err) => this.uiService.showError('Error: ' + (err.error?.message || 'Operación fallida'))
       });
     }
-  }
-
-  private async showSuccessToast(message: string): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
-  }
-
-  private async showErrorToast(error: any): Promise<void> {
-    const toast = await this.toastController.create({
-      message: 'Error: ' + (error.error?.message || 'Operación fallida'),
-      duration: 3000,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
   }
 }

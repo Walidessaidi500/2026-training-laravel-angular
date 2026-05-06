@@ -1,6 +1,6 @@
 
 .custom-form-content {
-    --background: #ffffff;
+    --background: var(--ion-card-background, #ffffff);
 }
 
 .yurest-form {

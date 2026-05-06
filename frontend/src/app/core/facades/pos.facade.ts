@@ -22,7 +22,7 @@ export class POSFacade {
   private readonly taxService = inject(TaxService);
   private readonly saleService = inject(SaleService);
 
-  // --- State ---
+  // Estados internos
   private readonly zonesSubject = new BehaviorSubject<Zone[]>([]);
   private readonly tablesSubject = new BehaviorSubject<Table[]>([]);
   private readonly productsSubject = new BehaviorSubject<Product[]>([]);
@@ -37,7 +37,7 @@ export class POSFacade {
   
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
 
-  // --- Exposed Observables ---
+  // Observables publicos
   public readonly zones$ = this.zonesSubject.asObservable();
   public readonly tables$ = this.tablesSubject.asObservable();
   public readonly products$ = this.productsSubject.asObservable();
@@ -52,9 +52,8 @@ export class POSFacade {
   
   public readonly isLoading$ = this.loadingSubject.asObservable();
 
-  /**
-   * Initial load for POS: Zones, Tables, Products, Families, Taxes, Orders and Users
-   */
+
+  // Carga inicial para el POS: Zonas, Mesas, Productos, Familias, Taxes, Pedidos y Usuarios
   initializePOS(): void {
     this.loadingSubject.next(true);
     
@@ -81,7 +80,7 @@ export class POSFacade {
         this.ordersSubject.next(orders.data);
         this.usersSubject.next(users);
         
-        // Auto-select first zone if available
+        // Autoseleccionado primera zona si existe
         if (zones.data.length > 0) {
           this.selectZone(zones.data[0]);
         }
@@ -91,14 +90,14 @@ export class POSFacade {
   }
 
   /**
-   * Select a zone
+  // Seleccion de una zona
    */
   selectZone(zone: Zone): void {
     this.selectedZoneSubject.next(zone);
   }
 
   /**
-   * Select a table and automatically load its active order if exists
+  // Seleccion de una mesa y carga automática de su pedido activo si existe
    */
   selectTable(table: Table): void {
     this.selectedTableSubject.next(table);
@@ -112,9 +111,8 @@ export class POSFacade {
     });
   }
 
-  /**
-   * Syncs current order lines with the backend
-   */
+
+  // Sincroniza el pedido actual con el backend
   syncOrder(orderData: any): Observable<any> {
     this.loadingSubject.next(true);
     return this.orderService.sync(orderData).pipe(
@@ -127,9 +125,8 @@ export class POSFacade {
     );
   }
 
-  /**
-   * Processes a sale (closes ticket)
-   */
+
+  // Procesa la venta y cierra el pedido
   processSale(saleData: any): Observable<any> {
     this.loadingSubject.next(true);
     return this.saleService.process(saleData).pipe(
@@ -142,34 +139,30 @@ export class POSFacade {
     );
   }
 
-  /**
-   * Clears selection
-   */
+
+  // Limpia la seleccion actual
   clearSelection(): void {
     this.selectedTableSubject.next(null);
     this.activeOrderSubject.next(null);
   }
 
-  /**
-   * Refresh products (usually after a sale to update stock)
-   */
+
+  // Actualiza la lista de productos 
   refreshProducts(): void {
     this.productService.list(1, 1000, true).subscribe(res => {
       this.productsSubject.next(res.data);
     });
   }
 
-  /**
-   * Refresh all orders
-   */
+  
+  // Actualiza la lista de pedidos
   refreshOrders(): void {
     this.orderService.list(1, 1000).subscribe(res => {
       this.ordersSubject.next(res.data);
     });
   }
 
-  // --- Derived State Helpers ---
-
+  // Helper: Obtiene las mesas filtradas por la zona seleccionada
   getTablesBySelectedZone(): Observable<Table[]> {
     return forkJoin({
       tables: this.tables$,

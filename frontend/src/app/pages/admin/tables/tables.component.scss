@@ -20,8 +20,8 @@ ion-content {
     }
 
     .pill-btn {
-        background: #ffffff;
-        border: 1px solid rgba(0, 0, 0, 0.05);
+        background: var(--ion-card-background, #ffffff);
+        border: 1px solid rgba(var(--ion-color-secondary-rgb), 0.05);
         padding: 10px 20px;
         border-radius: 24px;
         font-size: 13px;
@@ -33,10 +33,10 @@ ion-content {
         cursor: pointer;
         white-space: nowrap;
         transition: all 0.2s;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        box-shadow: 0 2px 8px rgba(var(--ion-color-secondary-rgb), 0.02);
 
         .badge {
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(var(--ion-color-secondary-rgb), 0.05);
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 11px;
@@ -48,7 +48,7 @@ ion-content {
             border-color: transparent;
 
             .badge {
-                background: white;
+                background: var(--ion-card-background, #ffffff);
                 color: var(--ion-color-primary);
             }
         }
@@ -125,7 +125,7 @@ ion-content {
             &:hover {
                 border-color: rgba(var(--ion-color-success-rgb), 0.3);
                 transform: translateY(-4px);
-                box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+                box-shadow: 0 8px 24px rgba(var(--ion-color-secondary-rgb), 0.06);
             }
         }
 
@@ -190,13 +190,13 @@ ion-content {
                     &.edit {
                         background: var(--ion-color-primary-light);
                         color: var(--ion-color-primary);
-                        &:hover { transform: scale(1.1); background: var(--ion-color-primary); color: white; }
+                        &:hover { transform: scale(1.1); background: var(--ion-color-primary); color: var(--ion-color-primary-contrast); }
                     }
 
                     &.delete {
                         background: var(--ion-color-danger-light);
                         color: var(--ion-color-danger);
-                        &:hover { transform: scale(1.1); background: var(--ion-color-danger); color: white; }
+                        &:hover { transform: scale(1.1); background: var(--ion-color-danger); color: var(--ion-color-primary-contrast); }
                     }
                 }
             }
@@ -249,8 +249,8 @@ ion-content {
 .empty-zone-msg {
     grid-column: 1 / -1;
     text-align: center;
-    background: rgba(0, 0, 0, 0.02);
-    border: 1px dashed rgba(0, 0, 0, 0.05);
+    background: rgba(var(--ion-color-secondary-rgb), 0.02);
+    border: 1px dashed rgba(var(--ion-color-secondary-rgb), 0.05);
     padding: 32px;
     border-radius: 12px;
     color: var(--ion-color-medium);

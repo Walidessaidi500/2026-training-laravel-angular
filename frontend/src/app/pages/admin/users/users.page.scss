@@ -15,8 +15,9 @@
             margin-bottom: 12px;
             padding: 16px;
             border-radius: 12px;
-            background: var(--ion-color-light);
+            background: var(--ion-item-background, #ffffff);
             transition: all 0.2s;
+            box-shadow: 0 2px 12px rgba(var(--ion-color-secondary-rgb), 0.02);
 
             &:hover {
                 background: var(--ion-color-primary-light);
@@ -35,7 +36,7 @@
                 font-size: 15px;
                 margin-right: 16px;
                 flex-shrink: 0;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+                box-shadow: 0 2px 8px rgba(var(--ion-color-secondary-rgb), 0.04);
             }
 
             .user-info {

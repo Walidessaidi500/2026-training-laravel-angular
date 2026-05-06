@@ -43,7 +43,7 @@ export class AdminDashboardFacade {
   private readonly saleService = inject(SaleService);
   private readonly tableService = inject(TableService);
 
-  // State
+  // Estados
   private readonly dashboardDataSubject = new BehaviorSubject<DashboardData>({
     revenue: { total: 0, trendPercentage: 0, thisWeek: 0, avgOrder: 0, mrr: 0 },
     metrics: { activeUsers: 0, ordersToday: 0, conversionRate: 0, totalProducts: 0 },
@@ -53,12 +53,12 @@ export class AdminDashboardFacade {
   });
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
 
-  // Exposed Observables
+  // Observables para que los componentes se suscriban
   public readonly dashboardData$ = this.dashboardDataSubject.asObservable();
   public readonly isLoading$ = this.loadingSubject.asObservable();
 
   /**
-   * Loads all statistics for the dashboard
+   * Carga las estadisticas para el dashboard
    */
   loadStatistics(): void {
     const currentUser = this.authService.getUser();
@@ -76,7 +76,7 @@ export class AdminDashboardFacade {
 
     this.loadingSubject.next(true);
 
-    // Initial welcome alerts/activities if state is empty
+    // Agregar la alerta de bienvenida
     if (this.dashboardDataSubject.getValue().activities.length === 0) {
       this.addAlert({
         type: 'success',
@@ -108,7 +108,7 @@ export class AdminDashboardFacade {
       next: (results) => {
         const currentData = this.dashboardDataSubject.getValue();
         
-        // Calculate total revenue from orders to match recent orders display
+        // Calcula el total de ingresos sumando el total de cada orden
         const totalRevenueCents = results.orders.data.reduce((acc, order) => {
           let orderTotal = 0;
           if (order.lines && Array.isArray(order.lines)) {
@@ -130,13 +130,13 @@ export class AdminDashboardFacade {
           revenue: {
             ...currentData.revenue,
             total: totalRevenue,
-            thisWeek: totalRevenue, // Mocked for now
+            thisWeek: totalRevenue, // Se podria calcular solo por semana
             avgOrder: results.orders.data.length > 0 ? totalRevenue / results.orders.data.length : 0,
           },
           metrics: {
             activeUsers: results.users.meta ? results.users.meta.total : results.users.data.length,
             ordersToday: results.orders.meta ? results.orders.meta.total : results.orders.data.length,
-            conversionRate: 15.4, // Mocked
+            conversionRate: 15.4, 
             totalProducts: results.products.meta ? results.products.meta.total : results.products.data.length,
           },
           recentOrders: this.mapRecentOrders(results.orders.data)
@@ -197,7 +197,7 @@ export class AdminDashboardFacade {
     });
   }
 
-  // --- Common Lists for Forms ---
+  // Servicios para obtener los datos
   
   getFamilies(): Observable<any[]> {
     return this.familyService.list().pipe(map(res => res.data));

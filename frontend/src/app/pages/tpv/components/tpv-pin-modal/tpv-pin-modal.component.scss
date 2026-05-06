@@ -2,7 +2,7 @@
   --height: 640px;
   --width: 440px;
   --border-radius: 28px;
-  --box-shadow: 0 28px 48px rgba(0,0,0,0.25);
+  --box-shadow: 0 28px 48px rgba(var(--ion-color-secondary-rgb), 0.25);
 
   .pin-keypad-container {
     padding: 24px;
@@ -11,7 +11,7 @@
     align-items: stretch;
     gap: 20px;
     height: 100%;
-    background: white;
+    background: var(--ion-card-background, #ffffff);
     overflow: hidden;
   }
 
@@ -23,7 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(0,0,0,0.03);
+    border: 1px solid rgba(var(--ion-color-secondary-rgb), 0.03);
 
     .pin-dots {
       display: flex;
@@ -34,7 +34,7 @@
         width: 18px;
         height: 18px;
         border-radius: 50%;
-        background: rgba(0,0,0,0.1);
+        background: rgba(var(--ion-color-secondary-rgb), 0.1);
         transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border: 2px solid transparent;
 
@@ -78,11 +78,11 @@
       &.btn-cancel { 
         background: var(--ion-color-light); 
         color: var(--ion-color-medium); 
-        &:active { background: #e0e0e0; }
+        &:active { background: var(--ion-color-light); opacity: 0.8; }
       }
       &.btn-confirm { 
         background: var(--ion-color-success); 
-        color: white; 
+        color: var(--ion-color-primary-contrast); 
         box-shadow: 0 8px 25px rgba(var(--ion-color-success-rgb), 0.25);
         &:active { transform: translateY(2px); box-shadow: none; }
       }

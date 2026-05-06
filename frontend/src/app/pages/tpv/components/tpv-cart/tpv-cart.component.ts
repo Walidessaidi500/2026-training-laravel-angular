@@ -46,7 +46,7 @@ export class TpvCartComponent {
   }
 
   onEditDiners() { this.editDiners.emit(); }
-  onPrintProvisional() { this.printProvisional.emit(); }
+  onPrintProvisional() { window.print(); }
   onClearCart() { this.clearCart.emit(); }
   onRemoveItem(index: number) { this.removeItem.emit(index); }
   onAddItem(product: Product) { this.addItem.emit(product); }

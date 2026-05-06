@@ -1,6 +1,6 @@
 /* Fondo general */
 .auth-content {
-  --background: #f4f6f9; /* Un gris muy sutil, casi blanco */
+  --background: var(--ion-color-light); /* Un gris muy sutil, casi blanco */
 }
 
 .auth-container {
@@ -22,12 +22,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #fef2f2;
-  color: #ef4444;
+  background-color: var(--ion-color-danger-light);
+  color: var(--ion-color-danger);
   padding: 12px 16px;
   border-radius: 12px;
   margin-bottom: 24px;
-  border: 1px solid #fecaca;
+  border: 1px solid var(--ion-color-danger-light);
 
   ion-icon {
     font-size: 20px;
@@ -42,23 +42,23 @@
 
 /* Inputs Modernos (Estilo "Caja" sin líneas) */
 .custom-input {
-  --background: #f9fafb;
+  --background: var(--ion-color-light);
   --padding-start: 16px;
   --inner-padding-end: 8px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--ion-color-light);
   margin-bottom: 8px; /* Espacio para el texto de error debajo */
   transition: all 0.2s ease;
 
   &:focus-within {
     border-color: var(--ion-color-primary);
-    --background: #ffffff;
+    --background: var(--ion-card-background, #ffffff);
     box-shadow: 0 0 0 4px rgba(var(--ion-color-primary-rgb), 0.1);
   }
 
   &.has-error {
-    border-color: #ef4444;
-    --background: #fef2f2;
+    border-color: var(--ion-color-danger);
+    --background: var(--ion-color-danger-light);
   }
 
   ion-input {
@@ -81,7 +81,7 @@
 /* Texto de validación */
 .error-text {
   font-size: 13px;
-  color: #ef4444;
+  color: var(--ion-color-danger);
   margin: 0 0 16px 12px;
   font-weight: 500;
 }

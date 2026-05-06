@@ -50,7 +50,7 @@
       transition: all 0.2s;
 
       &.btn-cancel { background: var(--ion-color-light); color: var(--ion-color-medium); }
-      &.btn-confirm { background: var(--ion-color-primary); color: white; box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.2); }
+      &.btn-confirm { background: var(--ion-color-primary); color: var(--ion-color-primary-contrast); box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.2); }
 
       &:active { transform: translateY(2px); }
     }

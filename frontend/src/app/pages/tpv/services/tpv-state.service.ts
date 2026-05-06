@@ -28,7 +28,7 @@ interface TpvState {
   users: User[];
   selectedTable: Table | null;
   
-  // Modals
+  
   showUserSelection: boolean;
   showDinersSelection: boolean;
   showPinModal: boolean;
@@ -210,7 +210,7 @@ export class TpvStateService {
     this.updateState({ selectedOpUser: user });
   }
 
-  // --- Table Operations ---
+  // Logica de union de mesas
 
   public confirmJoin(slaveTable: Table, masterTable: Table) {
     this.updateTableInState(slaveTable.uuid, masterTable.uuid);
@@ -231,6 +231,7 @@ export class TpvStateService {
     });
   }
 
+  // Logica de separacion de mesas
   public confirmUnjoin(table: Table, joinedTables: Table[]) {
     if (joinedTables.length > 0) {
       joinedTables.forEach(t => {
@@ -267,6 +268,7 @@ export class TpvStateService {
     }
   }
 
+  // Actualizar el estado de la mesa
   private updateTableInState(tableUuid: string, joinedToUuid: string | undefined) {
     const tables = [...this.state.tables];
     const table = tables.find(t => t.uuid === tableUuid);
@@ -278,7 +280,7 @@ export class TpvStateService {
       this.updateState({ tables, filteredTables });
     }
   }
-
+  // Sincronizar la mesa actualizada sin recargar todos los datos
   private syncTableQuietly(updatedTable: Table) {
     const tables = [...this.state.tables];
     const idx = tables.findIndex(t => t.uuid === updatedTable.uuid);

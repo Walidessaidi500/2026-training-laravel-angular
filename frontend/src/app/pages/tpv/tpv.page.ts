@@ -53,7 +53,7 @@ export class TpvPage implements OnInit {
   private readonly saleService = inject(SaleService);
   private readonly actionSheetCtrl = inject(ActionSheetController);
 
-  // Local UI state for Payment
+  // Estado local para el manejo de datos
   public paymentType: 'total' | 'split' = 'total';
   public paymentMethod: 'cash' | 'card' | 'mixed' = 'cash';
   public amountCash: number = 0;
@@ -83,7 +83,7 @@ export class TpvPage implements OnInit {
     });
   }
 
-  // --- Table Actions ---
+  // Acciones sobre las mesas
 
   public onTableClick(table: Table) {
     const effectiveTable = table.joined_to_uuid 
@@ -173,7 +173,7 @@ export class TpvPage implements OnInit {
     this.stateService.refreshTableStatus();
   }
 
-  // --- User/Pin Actions ---
+  // Acciones sobre usuarios y apertura/cierre de mesa
 
   public selectUser(user: User) {
     this.stateService.setShowUserSelection(false);
@@ -201,7 +201,7 @@ export class TpvPage implements OnInit {
     }
   }
 
-  // --- Diners Actions ---
+  // Acciones sobre comanda y comensales
 
   public onDinersConfirm() {
     const dinersCount = parseInt(this.cartService.tempDinersValue) || 1;
@@ -217,7 +217,7 @@ export class TpvPage implements OnInit {
     }
   }
 
-  // --- Cart Actions ---
+  // Acciones sobre el carrito
 
   public sendOrder() {
     const table = this.stateService.state.selectedTable;
@@ -247,7 +247,7 @@ export class TpvPage implements OnInit {
     this.stateService.setShowPaymentModal(true);
   }
 
-  // --- Payment Actions ---
+  // Acciones sobre el cobro
 
   public setPaymentType(type: 'total' | 'split') {
     this.paymentType = type;
@@ -352,14 +352,18 @@ export class TpvPage implements OnInit {
       next: () => {
         this.uiService.showSuccess('Pago procesado');
         
-        // Optimistic refresh
+        // Recargar estado para reflejar cambios en mesas, órdenes y productos
         this.stateService.loadInitialData().subscribe();
         
         if (this.paymentType === 'total') {
           this.stateService.setShowPaymentModal(false);
           this.backToTables();
         } else {
-          // Check if order still has lines after partial payment
+          /**
+           * Comprobar si quedan articulos por cobrar en la orden
+           * en caso de que no, cerrar la comanda y volver a la vista de las 
+           * mesas
+           */
           this.cartService.loadOrderForTable(saleData.table_uuid, this.stateService.state.products).subscribe(remainingOrder => {
             if (!remainingOrder || !remainingOrder.lines || remainingOrder.lines.length === 0) {
               this.stateService.setShowPaymentModal(false);

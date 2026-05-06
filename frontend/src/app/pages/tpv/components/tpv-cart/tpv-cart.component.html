@@ -1,4 +1,4 @@
-<aside class="cart-section">
+<aside class="cart-section" id="zona-ticket">
   <div class="cart-header">
     <div class="header-icon">
       <ion-icon name="receipt-outline"></ion-icon>
@@ -24,9 +24,10 @@
       <p>El pedido está vacío</p>
     </div>
 
+    <!-- Items list for Screen and Print -->
     <div *ngFor="let item of cart; let i = index" class="cart-item">
       <div class="item-info">
-        <span class="item-name">{{ item.product.name }}</span>
+        <span class="item-name"><span class="print-only">{{ item.quantity }}x </span>{{ item.product.name }}</span>
         <span class="item-price">{{ (getPriceWithTax(item.product) * item.quantity / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
       </div>
       <div class="item-controls">

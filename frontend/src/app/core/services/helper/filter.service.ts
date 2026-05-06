@@ -3,11 +3,11 @@ import { Injectable } from '@angular/core';
 export interface FilterCriteria<T> {
   searchTerm?: string;
   searchProperties?: (keyof T)[];
-  status?: string; // 'active', 'inactive', 'all'
+  status?: string;
   propertyFilters?: {
     property: keyof T;
     value: any;
-    treatAsNone?: any; // Valor que se tratará como "ninguno" (ej. 'none', null, undefined)
+    treatAsNone?: any;
   }[];
   customFilters?: ((item: T) => boolean)[];
 }
@@ -17,7 +17,7 @@ export interface FilterCriteria<T> {
 })
 export class FilterService {
   /**
-   * Aplica múltiples filtros a una lista de objetos según los criterios especificados
+   * Aplica multiples filtros a una lista de objetos según los criterios especificados
    */
   applyFilters<T>(items: T[], criteria: FilterCriteria<T>): T[] {
     if (!items || !items.length) {
@@ -26,7 +26,7 @@ export class FilterService {
 
     let filtered = [...items];
 
-    // 1. Search term filter
+    // Buscar por termino en propiedades específicas
     if (criteria.searchTerm && criteria.searchProperties?.length) {
       filtered = this.filterBySearchTerm(
         filtered,
@@ -35,12 +35,12 @@ export class FilterService {
       );
     }
 
-    // 2. Estado activo/inactivo
+    // Estado activo/inactivo
     if (criteria.status && criteria.status !== 'all') {
       filtered = this.filterByStatus(filtered as any, criteria.status) as any;
     }
 
-    // 3. Filtros por propiedad específica
+    // Filtros por propiedad específica
     if (criteria.propertyFilters?.length) {
       criteria.propertyFilters.forEach((filter) => {
         filtered = this.filterByProperty(
@@ -52,7 +52,7 @@ export class FilterService {
       });
     }
 
-    // 4. Filtros personalizados
+    // Filtros personalizados
     if (criteria.customFilters?.length) {
       criteria.customFilters.forEach((filterFn) => {
         filtered = filtered.filter(filterFn);
@@ -63,7 +63,7 @@ export class FilterService {
   }
 
   /**
-   * Filtra una lista de objetos por un término de búsqueda en una o varias propiedades
+   * Filtra una lista de objetos por un termino de busqueda en una o varias propiedades
    */
   filterBySearchTerm<T>(
     items: T[],
@@ -102,7 +102,7 @@ export class FilterService {
   }
 
   /**
-   * Filtra por una propiedad específica y un valor
+   * Filtra por una propiedad especifica y un valor
    */
   filterByProperty<T>(
     items: T[],

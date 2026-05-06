@@ -115,7 +115,7 @@ export class ProductsPage implements OnInit {
       'list-outline': listOutline
     });
 
-    // Initialize filtered products stream
+    // Inicializa el stream de productos filtrados
     this.filteredProducts$ = combineLatest([
       this.products$,
       this.families$,
@@ -132,7 +132,7 @@ export class ProductsPage implements OnInit {
       })
     );
 
-    // Initialize displayed products (paginated) stream
+    // Inicializa el stream de profuctos a mostrar dependiendo del modo de vista(scroll o paginacion)
     this.displayedProducts$ = combineLatest([
       this.filteredProducts$,
       this.paginationTrigger
@@ -151,7 +151,7 @@ export class ProductsPage implements OnInit {
       })
     );
 
-    // Initialize stats stream
+    // Inicializa el stream de estadisticas de productos
     this.productStats$ = this.products$.pipe(
       map(products => {
         const stats = this.utilsService.calculateStats(products, [

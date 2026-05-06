@@ -18,7 +18,7 @@
     ion-segment-button {
       --indicator-color: var(--ion-color-primary);
       --color: var(--ion-color-medium);
-      --color-checked: white;
+      --color-checked: var(--ion-color-primary-contrast);
       --border-radius: 10px;
       min-height: 40px;
       font-size: 13px;
@@ -52,7 +52,7 @@
   align-items: center;
   gap: 24px;
   padding: 24px 16px;
-  border-top: 1px solid rgba(0,0,0,0.05);
+  border-top: 1px solid rgba(var(--ion-color-secondary-rgb), 0.05);
   margin-top: 16px;
 
   .pagination-btn {
@@ -61,7 +61,7 @@
     gap: 8px;
     padding: 10px 20px;
     border-radius: 12px;
-    background: white;
+    background: var(--ion-item-background, #ffffff);
     color: var(--ion-color-primary);
     border: 1px solid var(--ion-color-primary);
     font-weight: 600;
@@ -71,9 +71,9 @@
 
     &:hover:not(:disabled) {
       background: var(--ion-color-primary);
-      color: white;
+      color: var(--ion-color-primary-contrast);
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px var(--ion-color-primary-transparent);
+      box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.2);
     }
 
     &:disabled {
@@ -107,9 +107,10 @@
       margin-bottom: 12px;
       padding: 16px;
       border-radius: 12px;
-      background: var(--ion-color-light);
+      background: var(--ion-item-background, #ffffff);
       align-items: center;
       transition: all 0.2s;
+      box-shadow: 0 2px 12px rgba(var(--ion-color-secondary-rgb), 0.02);
 
       &:hover {
         background: var(--ion-color-primary-light);
@@ -120,14 +121,14 @@
         width: 44px;
         height: 44px;
         border-radius: 12px;
-        background: white;
+        background: var(--ion-item-background, #ffffff);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 22px;
         margin-right: 16px;
         flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        box-shadow: 0 2px 8px rgba(var(--ion-color-secondary-rgb), 0.04);
         color: var(--ion-color-primary);
       }
 
@@ -186,7 +187,7 @@
       --border-radius: 12px;
       --padding-start: 12px;
       --min-height: 52px;
-      border: 1px solid rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(var(--ion-color-secondary-rgb), 0.05);
 
       ion-select { width: 100%; }
     }

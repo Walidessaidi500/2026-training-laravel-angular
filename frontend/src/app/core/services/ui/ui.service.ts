@@ -10,9 +10,7 @@ export class UiService {
     private alertController: AlertController
   ) {}
 
-  /**
-   * toast de éxito
-   */
+  // toast de exito
   async showSuccess(message: string): Promise<void> {
     const toast = await this.toastController.create({
       message,
@@ -24,9 +22,7 @@ export class UiService {
     await toast.present();
   }
 
-  /**
-   *toast de error
-   */
+  // toast de error
   async showError(message: string): Promise<void> {
     const toast = await this.toastController.create({
       message,
@@ -38,9 +34,7 @@ export class UiService {
     await toast.present();
   }
 
-  /**
-   *toast de advertencia
-   */
+  // toast de advertencia
   async showWarning(message: string): Promise<void> {
     const toast = await this.toastController.create({
       message,
@@ -52,9 +46,7 @@ export class UiService {
     await toast.present();
   }
 
-  /**
-   * Confirmar delete
-   */
+  // Confirmar eliminacion
   async confirmDelete(
     header: string,
     message: string,
@@ -82,9 +74,7 @@ export class UiService {
     await alert.present();
   }
 
-  /**
-   *Confirmar accion generica
-   */
+  // Accion de confirmar
   async confirm(
     header: string,
     message: string,
