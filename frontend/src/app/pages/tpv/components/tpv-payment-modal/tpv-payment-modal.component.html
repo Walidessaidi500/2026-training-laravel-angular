@@ -13,8 +13,8 @@
         <div class="payment-summary">
           <div class="total-big">
             <span class="label">Total a pagar ahora</span>
-            <span class="value">{{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
-            <span class="sub-label" *ngIf="paymentType !== 'total'">De un total de {{ (total / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+            <span class="value">{{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</span>
+            <span class="sub-label" *ngIf="paymentType !== 'total'">De un total de {{ (total / 100) | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</span>
           </div>
         </div>
 
@@ -35,7 +35,7 @@
                 <div class="item-main" (click)="onToggleItemSelection(item)">
                   <ion-icon [name]="item.selected ? 'checkbox-outline' : 'square-outline'"></ion-icon>
                   <span class="name">{{ item.product.name }}</span>
-                  <span class="price">{{ (getPriceWithTax(item.product) / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+                  <span class="price">{{ (getPriceWithTax(item.product) / 100) | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</span>
                 </div>
                 <div class="item-qty-control" *ngIf="item.selected">
                   <button (click)="onUpdateSelectedQuantity(item, -1)"><ion-icon name="remove-outline"></ion-icon></button>
@@ -84,7 +84,7 @@
               </div>
               <div class="input-item">
                 <label>Cambio (€)</label>
-                <div class="custom-input readonly change-value" [class.negative]="changeAmount < 0">{{ changeAmount | currency:'EUR':'symbol':'1.2-2' }}</div>
+                <div class="custom-input readonly change-value" [class.negative]="changeAmount < 0">{{ changeAmount | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</div>
               </div>
             </div>
           </div>
@@ -92,7 +92,7 @@
 
         <div class="payment-actions">
           <button class="btn-pay-confirm" (click)="onConfirmPayment()" [disabled]="selectedTotal <= 0">
-            Confirmar Pago de {{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2' }}
+            Confirmar Pago de {{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2':'es-ES' }}
           </button>
         </div>
       </div>

@@ -28,7 +28,7 @@
     <div *ngFor="let item of cart; let i = index" class="cart-item">
       <div class="item-info">
         <span class="item-name"><span class="print-only">{{ item.quantity }}x </span>{{ item.product.name }}</span>
-        <span class="item-price">{{ (getPriceWithTax(item.product) * item.quantity / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+        <span class="item-price">{{ (getPriceWithTax(item.product) * item.quantity / 100) | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</span>
       </div>
       <div class="item-controls">
         <button (click)="onRemoveItem(i)"><ion-icon name="remove-outline"></ion-icon></button>
@@ -41,7 +41,7 @@
   <div class="cart-footer">
     <div class="total-row">
       <span class="total-label">Total a pagar</span>
-      <span class="total-value">{{ (total / 100) | currency:'EUR':'symbol':'1.2-2' }}</span>
+      <span class="total-value">{{ (total / 100) | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</span>
     </div>
     <div class="action-buttons">
       <button class="btn-send" (click)="onSendOrder()" [disabled]="cart.length === 0">

@@ -31,7 +31,6 @@ import { ProductFormComponent, ProductFormData } from '@components/product-form/
 import { PageHeaderComponent } from '@app/shared/ui/page-header/page-header.component';
 
 // Pipes
-import { PricePipe } from '@shared/pipes/price.pipe';
 import { ActiveStatusPipe } from '@shared/pipes/active-status.pipe';
 import { StockStatusPipe } from '@shared/pipes/stock-status.pipe';
 import { FallbackPipe } from '@shared/pipes/fallback.pipe';
@@ -51,7 +50,7 @@ import { combineLatest, map, Observable, firstValueFrom, BehaviorSubject } from 
     IonSelect, IonSelectOption, IonNote, IonInfiniteScroll,
     IonInfiniteScrollContent, IonSegment, IonSegmentButton,
     AccessDeniedComponent, PageHeaderComponent,
-    PricePipe, ActiveStatusPipe, StockStatusPipe, FallbackPipe
+    ActiveStatusPipe, StockStatusPipe, FallbackPipe
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

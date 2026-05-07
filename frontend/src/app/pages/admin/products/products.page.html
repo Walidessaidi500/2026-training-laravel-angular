@@ -157,7 +157,7 @@
           <ion-label class="product-info">
             <div class="title-row">
               <h2>{{ product.name }}</h2>
-              <span class="price-tag">{{ product.priceInCents | price }}</span>
+              <span class="price-tag">{{ product.priceInCents/100 | currency: 'EUR':'symbol':'1.2-2':'es-ES' }}</span>
             </div>
 
             <div class="product-meta">
