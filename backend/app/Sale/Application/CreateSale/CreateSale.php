@@ -49,21 +49,20 @@ class CreateSale
             $order->tableId()->value(),
             $userUuid->value(),
             $openedByUserUuid->value(),
-            null, // closed_by_user_id
-            null, // ticket_number
+            null, 
+            null,
             $order->diners(),
-            new \DateTimeImmutable, // opened_at
-            null, // closed_at
-            new \DateTimeImmutable, // value_date
-            0, // total - will be calculated in save or dddCreate
+            new \DateTimeImmutable,
+            null,
+            new \DateTimeImmutable,
+            0,
             $lines,
-            new \DateTimeImmutable, // created_at
-            new \DateTimeImmutable // updated_at
+            new \DateTimeImmutable,
+            new \DateTimeImmutable
         );
 
         $this->saleRepository->save($sale);
 
-        // After saving the sale, the order should be invoiced
         $order->invoice($userUuid);
         $this->orderRepository->save($order);
 

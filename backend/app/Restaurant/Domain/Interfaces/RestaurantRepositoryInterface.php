@@ -12,6 +12,8 @@ interface RestaurantRepositoryInterface
 
     public function search(Uuid $id): ?Restaurant;
 
+    public function searchByInternalId(int $id): ?Restaurant;
+
     public function findByEmail(Email $email): ?Restaurant;
 
     public function delete(Uuid $id): void;

@@ -2,59 +2,38 @@
 
 namespace App\User\Infrastructure\Entrypoint\Http;
 
-use App\User\Infrastructure\Persistence\Models\EloquentUser;
-use App\User\Infrastructure\Persistence\Repositories\EloquentUserRepository;
+use App\User\Application\GetUser\GetUser;
+use App\User\Application\ListUsers\ListUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 
 class UserController
 {
-    public function __construct(private EloquentUserRepository $userRepository) {}
+    public function __construct(
+        private ListUsers $listUsers,
+        private GetUser $getUser,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->query('per_page', 15);
-        $page = $request->query('page', 1);
+        $perPage = (int) $request->query('per_page', 15);
+        $page = (int) $request->query('page', 1);
         $restaurantId = $request->user()?->restaurant_id;
 
-        $query = EloquentUser::query();
+        $response = ($this->listUsers)($page, $perPage, $restaurantId);
 
-        if ($restaurantId !== null) {
-            $query->where('restaurant_id', $restaurantId);
-        }
-
-        $users = $query->paginate($perPage, ['*'], 'page', $page);
-
-        return response()->json([
-            'data' => $users->items(),
-            'meta' => [
-                'current_page' => $users->currentPage(),
-                'per_page' => $users->perPage(),
-                'total' => $users->total(),
-                'last_page' => $users->lastPage(),
-            ],
-        ]);
+        return new JsonResponse($response->toArray(), 200);
     }
 
     public function show(string $uuid): JsonResponse
     {
-        $user = EloquentUser::where('uuid', $uuid)->first();
+        try {
+            $response = ($this->getUser)($uuid);
 
-        if (! $user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return new JsonResponse($response->toArray(), 200);
+        } catch (InvalidArgumentException $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 404);
         }
-
-        return response()->json($user);
-    }
-
-    public function toggleActive(string $uuid): JsonResponse
-    {
-        $user = EloquentUser::where('uuid', $uuid)->first();
-
-        if (! $user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
-        return response()->json($user);
     }
 }

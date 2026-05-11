@@ -15,7 +15,7 @@ class UpdateFamilyController
     public function __invoke(Request $request, string $uuid): JsonResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:50'],
             'active' => ['required', 'boolean'],
         ]);
 

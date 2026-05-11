@@ -45,11 +45,9 @@ class EloquentSaleRepository implements SaleRepositoryInterface
                 ]
             );
 
-            // Sync lines
             $existingLineIds = $eloquentSale->lines()->pluck('uuid')->toArray();
             $newLineIds = array_map(fn ($line) => $line->id()->value(), $sale->lines());
 
-            // Delete lines not in the new set
             $linesToDelete = array_diff($existingLineIds, $newLineIds);
             EloquentSaleLine::whereIn('uuid', $linesToDelete)->delete();
 

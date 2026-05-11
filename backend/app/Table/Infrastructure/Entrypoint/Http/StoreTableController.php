@@ -16,7 +16,7 @@ class StoreTableController
     {
         $validated = $request->validate([
             'zone_id' => ['required', 'string'],
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:50'],
         ]);
 
         $restaurantId = (int) $request->user()->restaurant_id;

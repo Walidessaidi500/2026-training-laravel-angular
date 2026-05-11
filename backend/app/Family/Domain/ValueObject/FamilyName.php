@@ -14,8 +14,8 @@ class FamilyName
             throw new \InvalidArgumentException('El nombre de la familia no puede estar vacío');
         }
 
-        if (mb_strlen($trimmed) > 255) {
-            throw new \InvalidArgumentException('El nombre de la familia no puede superar 255 caracteres');
+        if (mb_strlen($trimmed) > 50) {
+            throw new \InvalidArgumentException('El nombre de la familia no puede superar 50 caracteres');
         }
 
         $this->value = $trimmed;

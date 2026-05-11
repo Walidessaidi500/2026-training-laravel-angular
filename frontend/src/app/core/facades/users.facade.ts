@@ -82,20 +82,4 @@ export class UsersFacade {
       finalize(() => this.loadingSubject.next(false))
     );
   }
-
-  /**
-   * Toggle el estado activo de un usuario
-   */
-  toggleUserStatus(uuid: string): Observable<User> {
-    return this.userService.toggleActive(uuid).pipe(
-      tap((updatedUser) => {
-        const current = this.usersSubject.getValue();
-        const index = current.findIndex(u => u.uuid === uuid);
-        if (index !== -1) {
-          current[index] = updatedUser;
-          this.usersSubject.next([...current]);
-        }
-      })
-    );
-  }
 }

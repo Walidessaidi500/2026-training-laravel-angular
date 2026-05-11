@@ -18,7 +18,7 @@ class PutController
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email',
-            'password' => 'nullable|string|min:6',
+            'password' => 'nullable|string|min:8',
             'role' => 'sometimes|string|in:admin,supervisor,operator',
             'pin' => 'nullable|string|max:10',
         ]);

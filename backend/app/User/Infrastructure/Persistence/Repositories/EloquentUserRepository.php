@@ -7,6 +7,7 @@ use App\Shared\Domain\ValueObject\Uuid;
 use App\User\Domain\Entity\User;
 use App\User\Domain\Interfaces\UserRepositoryInterface;
 use App\User\Infrastructure\Persistence\Models\EloquentUser;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EloquentUserRepository implements UserRepositoryInterface
 {
@@ -51,6 +52,23 @@ class EloquentUserRepository implements UserRepositoryInterface
         }
 
         return $this->toDomainEntity($model);
+    }
+
+    public function list(int $page = 1, int $perPage = 15, ?int $restaurantId = null): LengthAwarePaginator
+    {
+        $query = $this->model->newQuery();
+
+        if ($restaurantId !== null) {
+            $query->where('restaurant_id', $restaurantId);
+        }
+
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $paginator->getCollection()->transform(function (EloquentUser $model) {
+            return $this->toDomainEntity($model);
+        });
+
+        return $paginator;
     }
 
     public function delete(Uuid $id): void

@@ -9,7 +9,7 @@ class ProcessSaleRequest
         public string $tableUuid,
         public string $userUuid,
         public int $diners,
-        public array $lines, // each line: [product_uuid, quantity, price, tax_percentage]
+        public array $lines, 
         public string $paymentMethod = 'cash',
         public int $amountCash = 0,
         public int $amountCard = 0,

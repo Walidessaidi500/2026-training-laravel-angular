@@ -62,7 +62,6 @@ class SyncOrder
                 $newQuantitiesByProduct[$productUuid] = ($newQuantitiesByProduct[$productUuid] ?? 0) + $line->quantity();
             }
 
-            // Calculate deltas and update stock
             $allProductUuids = array_unique(array_merge(array_keys($oldQuantitiesByProduct), array_keys($newQuantitiesByProduct)));
 
             foreach ($allProductUuids as $productUuid) {

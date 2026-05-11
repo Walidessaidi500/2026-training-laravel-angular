@@ -20,9 +20,6 @@ class EloquentOrderRepository implements OrderRepositoryInterface
 
     private function getUuidFromInternalId(int $id): ?string
     {
-        // Nota: Esto es un poco ambiguo si hay IDs duplicados en ambas tablas,
-        // pero en este sistema restaurant_id y user_id suelen estar claros por contexto.
-        // Como la FK apunta a 'users', primero buscamos en users.
         return DB::table('users')->where('id', $id)->value('uuid')
             ?? DB::table('restaurants')->where('id', $id)->value('uuid');
     }
@@ -44,7 +41,6 @@ class EloquentOrderRepository implements OrderRepositoryInterface
                 ]
             );
 
-            // Sync lines
             $existingLineIds = $eloquentOrder->orderLines()->pluck('uuid')->toArray();
             $newLineIds = array_map(fn ($line) => $line->id()->value(), $order->lines());
 

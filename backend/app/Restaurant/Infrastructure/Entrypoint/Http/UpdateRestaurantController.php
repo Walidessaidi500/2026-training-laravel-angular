@@ -15,8 +15,8 @@ class UpdateRestaurantController
     public function __invoke(Request $request, string $uuid): JsonResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'legal_name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:50'],
+            'legal_name' => ['required', 'string', 'max:50'],
             'tax_id' => ['required', 'string', 'max:20'],
             'email' => ['required', 'email', 'max:255'],
         ]);

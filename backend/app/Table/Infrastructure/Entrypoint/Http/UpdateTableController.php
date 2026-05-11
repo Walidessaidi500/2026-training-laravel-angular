@@ -16,7 +16,7 @@ class UpdateTableController
     {
         $validated = $request->validate([
             'zone_id' => ['required', 'string'],
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:50'],
             'joined_to_uuid' => ['nullable', 'string'],
         ]);
 

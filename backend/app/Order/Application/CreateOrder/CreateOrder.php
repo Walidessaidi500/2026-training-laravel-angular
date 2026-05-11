@@ -20,12 +20,8 @@ class CreateOrder
         $tableUuid = Uuid::create($request->tableUuid);
         $openedByUserUuid = Uuid::create($request->openedByUserUuid);
 
-        // Check if table already has an open order
         $existingOrder = $this->orderRepository->findByTable($tableUuid, 'open');
         if ($existingOrder) {
-            // Ideally we should update the existing order, but for simplicity we'll throw or return existing
-            // For TPV normally we update it.
-            // But let's follow the user's request for now.
         }
 
         $orderId = Uuid::generate();

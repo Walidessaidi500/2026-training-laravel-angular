@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Restaurant
         $this->app->bind(RestaurantRepositoryInterface::class, EloquentRestaurantRepository::class);
-        $this->app->bind(\App\Restaurant\Domain\Interfaces\PasswordHasherInterface::class, \App\Restaurant\Infrastructure\Services\LaravelPasswordHasher::class);
+        $this->app->bind(PasswordHasherInterface::class, LaravelPasswordHasher::class);
 
         // Sale
         $this->app->bind(SaleRepositoryInterface::class, EloquentSaleRepository::class);

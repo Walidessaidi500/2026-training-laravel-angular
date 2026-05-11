@@ -15,8 +15,8 @@ class StoreRestaurantController
     public function __invoke(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'legal_name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:50'],
+            'legal_name' => ['required', 'string', 'max:50'],
             'tax_id' => ['required', 'string', 'max:20'],
             'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:6'],

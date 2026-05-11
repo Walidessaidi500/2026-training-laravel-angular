@@ -32,16 +32,18 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
             return null;
         }
 
-        return Restaurant::fromPersistence(
-            $eloquent->uuid,
-            $eloquent->name,
-            $eloquent->legal_name,
-            $eloquent->tax_id,
-            $eloquent->email,
-            $eloquent->password,
-            new \DateTimeImmutable($eloquent->created_at),
-            new \DateTimeImmutable($eloquent->updated_at),
-        );
+        return $this->toDomain($eloquent);
+    }
+
+    public function searchByInternalId(int $id): ?Restaurant
+    {
+        $eloquent = EloquentRestaurant::find($id);
+
+        if ($eloquent === null) {
+            return null;
+        }
+
+        return $this->toDomain($eloquent);
     }
 
     public function findByEmail(Email $email): ?Restaurant
@@ -52,6 +54,11 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
             return null;
         }
 
+        return $this->toDomain($eloquent);
+    }
+
+    private function toDomain(EloquentRestaurant $eloquent): Restaurant
+    {
         return Restaurant::fromPersistence(
             $eloquent->uuid,
             $eloquent->name,

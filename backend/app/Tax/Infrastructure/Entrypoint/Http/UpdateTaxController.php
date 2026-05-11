@@ -15,7 +15,7 @@ class UpdateTaxController
     public function __invoke(Request $request, string $uuid): JsonResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:50'],
             'percentage' => ['required', 'integer', 'min:0', 'max:100'],
         ]);
 

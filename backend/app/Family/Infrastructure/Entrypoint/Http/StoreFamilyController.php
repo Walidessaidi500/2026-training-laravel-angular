@@ -15,7 +15,7 @@ class StoreFamilyController
     public function __invoke(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:50'],
             'active' => ['sometimes', 'boolean'],
         ]);
 

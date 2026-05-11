@@ -15,5 +15,4 @@ Route::middleware('role:admin')->group(function () {
     Route::post('/users', PostController::class);
     Route::put('/users/{uuid}', PutController::class);
     Route::delete('/users/{uuid}', DeleteController::class);
-    Route::patch('/users/{uuid}/toggle-active', [UserController::class, 'toggleActive']);
 });

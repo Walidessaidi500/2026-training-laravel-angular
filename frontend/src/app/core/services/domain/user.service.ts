@@ -55,8 +55,4 @@ export class UserService {
   delete(uuid: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${uuid}`);
   }
-
-  toggleActive(uuid: string): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/${uuid}/toggle-active`, {});
-  }
 }
