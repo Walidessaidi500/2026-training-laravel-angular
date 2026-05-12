@@ -8,9 +8,9 @@ import { UiService } from '../ui/ui.service';
 export class CrudHelperService {
   constructor(private uiService: UiService) {}
 
-  /**
-   * Handles: creacion con notificaciones estandarizadas de UI
-   */
+  
+  // Handles: creacion con notificaciones estandarizadas de UI
+   
   handleCreate<T>(
     createObservable: Observable<T>,
     successMessage: string,
@@ -30,9 +30,9 @@ export class CrudHelperService {
     });
   }
 
-  /**
-   * Handles: actualizacion con notificaciones estandarizadas de UI
-   */
+ 
+   // Handles: actualizacion con notificaciones estandarizadas de UI
+   
   handleUpdate<T>(
     updateObservable: Observable<T>,
     successMessage: string,
@@ -52,9 +52,9 @@ export class CrudHelperService {
     });
   }
 
-  /**
-   * Handles: eliminacion con notificaciones estandarizadas de UI
-   */
+  
+  // Handles: eliminacion con notificaciones estandarizadas de UI
+   
   handleDelete<T>(
     deleteObservable: Observable<T>,
     successMessage: string,
