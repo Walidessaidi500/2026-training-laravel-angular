@@ -35,6 +35,7 @@ import { FamilyFormComponent } from '@components/families-form/families-form.com
 import { TaxFormComponent } from '@components/tax-form/tax-form.component';
 import { UserFormComponent } from '@components/user-form/user-form.component';
 import { TablesFormComponent } from '@components/tables-form/tables-form.component';
+import { SaleDetailModalComponent } from '@components/sale-detail-modal/sale-detail-modal.component';
 import { MicroStatCardComponent } from '@components/micro-stat-card/micro-stat-card.component';
 import { ShortcutListComponent, ShortcutItem } from '@components/shortcut-list/shortcut-list.component';
 import { AlertListComponent } from '@components/alert-list/alert-list.component';
@@ -60,6 +61,7 @@ import { Observable, firstValueFrom } from 'rxjs';
     TaxFormComponent,
     UserFormComponent,
     TablesFormComponent,
+    SaleDetailModalComponent,
     MicroStatCardComponent,
     ShortcutListComponent,
     AlertListComponent,
@@ -260,5 +262,25 @@ export class DashboardPage implements OnInit {
         error: (err) => this.uiService.showError('Error: ' + (err.error?.message || 'Operación fallida'))
       });
     }
+  }
+
+  async verDetallePedido(order: any): Promise<void> {
+    if (!order.originalData) return;
+    
+    const products = await firstValueFrom(this.facade.getProducts());
+    const dashboardData = await firstValueFrom(this.dashboardData$);
+
+    const modal = await this.modalController.create({
+      component: SaleDetailModalComponent,
+      cssClass: 'sale-detail-modal',
+      componentProps: { 
+        sale: order.originalData,
+        products: products,
+        tables: dashboardData.tables,
+        users: dashboardData.users
+      }
+    });
+
+    await modal.present();
   }
 }

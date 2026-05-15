@@ -16,9 +16,10 @@ class IndexSaleController
     {
         $perPage = (int) $request->query('per_page', 15);
         $page = (int) $request->query('page', 1);
+        $date = $request->query('date');
         $restaurantId = $request->user()?->restaurant_id;
 
-        $sales = $this->saleRepository->list($page, $perPage, $restaurantId);
+        $sales = $this->saleRepository->list($page, $perPage, $restaurantId, $date);
 
         return response()->json($sales);
     }

@@ -17,6 +17,7 @@ class ProcessSaleController
     {
         $validated = $request->validate([
             'table_uuid' => 'required|string|exists:tables,uuid',
+            'user_uuid' => 'nullable|string|exists:users,uuid',
             'diners' => 'required|integer|min:1',
             'lines' => 'required|array|min:1',
             'lines.*.uuid' => 'required|string',
@@ -32,7 +33,7 @@ class ProcessSaleController
         $processSaleRequest = new ProcessSaleRequest(
             $request->user()->restaurant_id,
             $validated['table_uuid'],
-            $request->user()->uuid,
+            $validated['user_uuid'] ?? $request->user()->uuid,
             $validated['diners'],
             $validated['lines'],
             $validated['payment_method'] ?? 'cash',

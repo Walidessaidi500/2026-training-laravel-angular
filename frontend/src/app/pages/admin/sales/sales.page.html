@@ -1,0 +1,61 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Historial de Ventas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button id="open-date-input">
+        <ion-icon name="calendar-outline" slot="start"></ion-icon>
+        {{ selectedDate | date:'dd/MM/yyyy' }}
+      </ion-button>
+      <ion-popover trigger="open-date-input" show-backdrop="false">
+        <ng-template>
+          <ion-datetime
+            presentation="date"
+            [value]="selectedDate"
+            (ionChange)="onDateChange($event)">
+          </ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding dashboard-background">
+  <div class="sales-container">
+    <div class="header-info" *ngIf="!isLoading">
+      <div class="stat">
+        <span class="label">Ventas del día</span>
+        <span class="value">{{ sales.length }}</span>
+      </div>
+    </div>
+
+    <div class="loading-state" *ngIf="isLoading">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Cargando transacciones...</p>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && sales.length === 0">
+      <ion-icon name="funnel-outline"></ion-icon>
+      <h3>No hay ventas este día</h3>
+      <p>Prueba a seleccionar otra fecha en el calendario.</p>
+    </div>
+
+    <ion-list class="transaction-list" *ngIf="!isLoading && sales.length > 0">
+      <ion-item lines="none" class="transaction-item clickable" *ngFor="let sale of sales" (click)="verDetalle(sale)">
+        <div slot="start" class="avatar-circle">
+          <ion-icon name="receipt-outline"></ion-icon>
+        </div>
+        <ion-label>
+          <h2>Ticket #{{ sale.ticket_number || 'S/N' }}</h2>
+          <p>{{ sale.created_at | date:'shortTime' }} · {{ sale.uuid.substring(0,8) }}</p>
+        </ion-label>
+        <div slot="end" class="transaction-meta">
+          <strong>{{ sale.total / 100 | currency:'EUR' }}</strong>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

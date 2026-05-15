@@ -24,6 +24,10 @@ export class InventoryFacade {
   public readonly taxes$ = this.taxesSubject.asObservable();
   public readonly isLoading$ = this.loadingSubject.asObservable();
 
+  getProducts(): Observable<Product[]> {
+    return this.products$;
+  }
+
   /**
    * Carga inicial de productos, familias y taxes
    */

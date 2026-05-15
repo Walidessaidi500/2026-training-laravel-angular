@@ -131,11 +131,11 @@
               <h3>{{ data.recentOrders.length }} transacciones</h3>
             </div>
             <!-- Botón a algún listado de pedidos si existiera, o desactivado -->
-            <button class="btn-soft" (click)="navigateTo('/admin/dashboard')">Ver todo <ion-icon name="arrow-forward-outline"></ion-icon></button>
+            <button class="btn-soft" (click)="navigateTo('/admin/sales')">Ver todo <ion-icon name="arrow-forward-outline"></ion-icon></button>
           </div>
 
           <ion-list class="transaction-list">
-            <ion-item lines="none" class="transaction-item" *ngFor="let order of data.recentOrders">
+            <ion-item lines="none" class="transaction-item clickable" *ngFor="let order of data.recentOrders" (click)="verDetallePedido(order)">
               <div slot="start" class="avatar-circle"
                 [style.background-color]="order.colorAvatar || 'var(--ion-color-primary)'">
                 {{ order.customerInitials }}

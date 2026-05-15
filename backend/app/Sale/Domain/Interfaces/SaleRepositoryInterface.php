@@ -13,5 +13,5 @@ interface SaleRepositoryInterface
 
     public function delete(Uuid $uuid): void;
 
-    public function list(int $page, int $perPage, ?int $restaurantId): array;
+    public function list(int $page, int $perPage, ?int $restaurantId, ?string $date = null): array;
 }

@@ -85,12 +85,16 @@ class EloquentSaleRepository implements SaleRepositoryInterface
         EloquentSale::where('uuid', $uuid->value())->delete();
     }
 
-    public function list(int $page, int $perPage, ?int $restaurantId): array
+    public function list(int $page, int $perPage, ?int $restaurantId, ?string $date = null): array
     {
-        $query = EloquentSale::with(['lines']);
+        $query = EloquentSale::with(['lines'])->orderBy('created_at', 'desc');
 
         if ($restaurantId) {
             $query->where('restaurant_id', $restaurantId);
+        }
+
+        if ($date) {
+            $query->whereDate('created_at', $date);
         }
 
         $paginator = $query->paginate($perPage, ['*'], 'page', $page);

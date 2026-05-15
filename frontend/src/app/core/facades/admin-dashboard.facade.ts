@@ -27,6 +27,8 @@ export interface DashboardData {
   recentOrders: any[];
   alerts: any[];
   activities: any[];
+  tables: any[];
+  users: any[];
 }
 
 @Injectable({
@@ -50,6 +52,8 @@ export class AdminDashboardFacade {
     recentOrders: [],
     alerts: [],
     activities: [],
+    tables: [],
+    users: [],
   });
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
 
@@ -108,19 +112,9 @@ export class AdminDashboardFacade {
       next: (results) => {
         const currentData = this.dashboardDataSubject.getValue();
         
-        // Calcula el total de ingresos sumando el total de cada orden
-        const totalRevenueCents = results.orders.data.reduce((acc, order) => {
-          let orderTotal = 0;
-          if (order.lines && Array.isArray(order.lines)) {
-            orderTotal = order.lines.reduce((sum: number, line: any) => {
-              const price = Number(line.price) || 0;
-              const quantity = Number(line.quantity) || 1;
-              return sum + (price * quantity);
-            }, 0);
-          } else if ((order as any).total) {
-            orderTotal = Number((order as any).total) || 0;
-          }
-          return acc + orderTotal;
+        // Calcula el total de ingresos sumando el total de cada venta (ticket cerrado)
+        const totalRevenueCents = results.sales.data.reduce((acc, sale) => {
+          return acc + (Number(sale.total) || 0);
         }, 0);
         
         const totalRevenue = totalRevenueCents / 100;
@@ -131,15 +125,17 @@ export class AdminDashboardFacade {
             ...currentData.revenue,
             total: totalRevenue,
             thisWeek: totalRevenue, // Se podria calcular solo por semana
-            avgOrder: results.orders.data.length > 0 ? totalRevenue / results.orders.data.length : 0,
+            avgOrder: results.sales.data.length > 0 ? totalRevenue / results.sales.data.length : 0,
           },
           metrics: {
             activeUsers: results.users.meta ? results.users.meta.total : results.users.data.length,
-            ordersToday: results.orders.meta ? results.orders.meta.total : results.orders.data.length,
+            ordersToday: results.sales.meta ? results.sales.meta.total : results.sales.data.length,
             conversionRate: 15.4, 
             totalProducts: results.products.meta ? results.products.meta.total : results.products.data.length,
           },
-          recentOrders: this.mapRecentOrders(results.orders.data)
+          recentOrders: this.mapRecentSales(results.sales.data.slice(0, 10)),
+          tables: results.tables.data || results.tables,
+          users: results.users.data || results.users
         };
 
         this.dashboardDataSubject.next(newData);
@@ -156,27 +152,25 @@ export class AdminDashboardFacade {
     });
   }
 
-  private mapRecentOrders(orders: any[]): any[] {
-    return orders.map(order => {
+  private mapRecentSales(sales: any[]): any[] {
+    return sales.map(sale => {
       let itemsCount = 0;
-      let totalCents = 0;
 
-      if (order.lines && Array.isArray(order.lines)) {
-        itemsCount = order.lines.reduce((acc: number, line: any) => acc + (Number(line.quantity) || 1), 0);
-        totalCents = order.lines.reduce((acc: number, line: any) => acc + ((Number(line.price) || 0) * (Number(line.quantity) || 1)), 0);
-      } else if ((order as any).total) {
-        totalCents = Number((order as any).total) || 0;
+      if (sale.lines && Array.isArray(sale.lines)) {
+        itemsCount = sale.lines.reduce((acc: number, line: any) => acc + (Number(line.quantity) || 1), 0);
       }
       
       return {
-        id: order.uuid ? order.uuid.substring(0, 8) : '00000000',
-        customerName: `Pedido #${order.ticket_number || order.id || 'S/N'}`,
-        customerInitials: 'P',
+        uuid: sale.uuid,
+        id: sale.uuid ? sale.uuid.substring(0, 8) : '00000000',
+        customerName: `Ticket #${sale.ticket_number || 'S/N'}`,
+        customerInitials: 'T',
         itemsCount: itemsCount,
-        total: totalCents / 100,
-        date: order.created_at ? new Date(order.created_at).toLocaleTimeString() : new Date().toLocaleTimeString(),
-        status: order.status === 'closed' || order.status === 'invoiced' ? 'Completed' : 'Processing',
-        colorAvatar: order.status === 'closed' || order.status === 'invoiced' ? 'var(--ion-color-success)' : 'var(--ion-color-primary)'
+        total: (Number(sale.total) || 0) / 100,
+        date: sale.created_at ? new Date(sale.created_at).toLocaleTimeString() : new Date().toLocaleTimeString(),
+        status: 'Completed',
+        colorAvatar: 'var(--ion-color-success)',
+        originalData: sale
       };
     });
   }
@@ -203,8 +197,20 @@ export class AdminDashboardFacade {
     return this.familyService.list().pipe(map(res => res.data));
   }
 
+  getProducts(): Observable<any[]> {
+    return this.productService.list(1, 1000).pipe(map(res => res.data));
+  }
+
   getTaxes(): Observable<any[]> {
     return this.taxService.list().pipe(map(res => res.data));
+  }
+
+  getTables(): Observable<any[]> {
+    return this.tableService.list().pipe(map((res: any) => res.data || res));
+  }
+
+  getUsers(): Observable<any[]> {
+    return this.userService.list(1, 1000).pipe(map(res => res.data));
   }
 
   getZones(): Observable<any[]> {

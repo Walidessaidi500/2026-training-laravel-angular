@@ -3,6 +3,20 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 
+export interface SaleLine {
+  uuid: string;
+  restaurant_id: number;
+  sale_uuid: string;
+  order_line_uuid: string;
+  product_uuid: string;
+  user_uuid: string;
+  quantity: number;
+  price: number;
+  tax_percentage: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Sale {
   id: number;
   uuid: string;
@@ -16,6 +30,7 @@ export interface Sale {
   closed_at?: string;
   value_date?: string;
   total: number;
+  lines?: SaleLine[];
   created_at: string;
   updated_at: string;
 }
@@ -38,10 +53,12 @@ export class SaleService {
 
   constructor(private http: HttpClient) {}
 
-  list(page = 1, perPage = 100): Observable<SaleListResponse> {
-    return this.http.get<SaleListResponse>(
-      `${this.apiUrl}?page=${page}&per_page=${perPage}`
-    );
+  list(page = 1, perPage = 100, date?: string): Observable<SaleListResponse> {
+    let url = `${this.apiUrl}?page=${page}&per_page=${perPage}`;
+    if (date) {
+      url += `&date=${date}`;
+    }
+    return this.http.get<SaleListResponse>(url);
   }
 
   get(uuid: string): Observable<Sale> {

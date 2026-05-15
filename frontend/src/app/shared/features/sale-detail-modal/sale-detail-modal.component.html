@@ -1,0 +1,52 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-icon name="receipt-outline" style="font-size: 24px; margin-left: 16px;"></ion-icon>
+    </ion-buttons>
+    <ion-title>Ticket #{{ sale.ticket_number || 'S/N' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="sale-summary">
+    <div class="summary-item">
+      <span class="label">Fecha</span>
+      <span class="value">{{ sale.created_at | date:'medium' }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Mesa</span>
+      <span class="value">{{ getTableName(sale.table_uuid) }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Abierto por</span>
+      <span class="value">{{ getUserName(sale.opened_by_user_uuid) }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Cobrado por</span>
+      <span class="value">{{ getUserName(sale.closed_by_user_uuid || sale.user_uuid) }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Total</span>
+      <span class="value total">{{ sale.total / 100 | currency:'EUR' }}</span>
+    </div>
+  </div>
+
+  <h3 class="section-title">DETALLES DEL PEDIDO</h3>
+  
+  <ion-list class="lines-list">
+    <ion-item *ngFor="let line of sale.lines" lines="full">
+      <ion-label>
+        <h2>{{ getProductName(line.product_uuid) }}</h2>
+        <p>{{ line.quantity }} x {{ line.price / 100 | currency:'EUR' }} (IVA {{ line.tax_percentage }}%)</p>
+      </ion-label>
+      <ion-note slot="end" color="dark">
+        {{ (line.quantity * (line.price / 100)) | currency:'EUR' }}
+      </ion-note>
+    </ion-item>
+  </ion-list>
+</ion-content>

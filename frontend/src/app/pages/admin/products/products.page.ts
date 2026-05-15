@@ -231,7 +231,7 @@ export class ProductsPage implements OnInit {
           if (this.selectedStock === 'all') return true;
           if (this.selectedStock === 'in_stock') return p.stock > 0;
           if (this.selectedStock === 'out_of_stock') return p.stock <= 0;
-          if (this.selectedStock === 'low_stock') return p.stock > 0 && p.stock <= 5;
+          if (this.selectedStock === 'low_stock') return p.stock > 0 && p.stock <= 10;
           return true;
         }
       ]

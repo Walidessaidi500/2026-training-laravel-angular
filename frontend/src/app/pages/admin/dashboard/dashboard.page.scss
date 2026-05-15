@@ -309,10 +309,24 @@
   background: transparent;
 
   .transaction-item {
-    --padding-start: 0;
+    --padding-start: 12px;
+    --padding-end: 12px;
     --inner-padding-end: 0;
     --background: transparent;
     margin-bottom: 16px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+
+    &.clickable {
+      cursor: pointer;
+      &:hover {
+        background: rgba(var(--ion-color-primary-rgb), 0.05);
+        transform: translateX(4px);
+      }
+      &:active {
+        transform: scale(0.98);
+      }
+    }
 
     .avatar-circle {
       width: 44px;

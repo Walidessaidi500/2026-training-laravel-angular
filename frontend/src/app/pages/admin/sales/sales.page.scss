@@ -1,0 +1,127 @@
+.sales-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header-info {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .label {
+      font-size: 12px;
+      color: var(--ion-color-medium);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .value {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--ion-color-primary);
+    }
+  }
+}
+
+.loading-state, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+
+  ion-spinner {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+
+  ion-icon {
+    font-size: 64px;
+    color: var(--ion-color-medium);
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+  }
+}
+
+.transaction-list {
+  background: transparent;
+
+  .transaction-item {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --inner-padding-end: 0;
+    --background: white;
+    margin-bottom: 12px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease;
+
+    &.clickable {
+      cursor: pointer;
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+      }
+    }
+
+    .avatar-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--ion-color-primary-light);
+      color: var(--ion-color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      font-size: 20px;
+    }
+
+    h2 {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    p {
+      font-size: 13px;
+    }
+
+    .transaction-meta {
+      text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      strong {
+        font-size: 18px;
+        color: var(--ion-color-dark);
+        font-weight: 800;
+      }
+
+      ion-icon {
+        color: var(--ion-color-medium);
+        font-size: 18px;
+      }
+    }
+  }
+}

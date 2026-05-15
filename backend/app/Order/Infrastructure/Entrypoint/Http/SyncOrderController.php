@@ -17,6 +17,7 @@ class SyncOrderController
     {
         $validated = $request->validate([
             'table_uuid' => 'required|string|exists:tables,uuid',
+            'opened_by_user_uuid' => 'nullable|string|exists:users,uuid',
             'diners' => 'required|integer|min:1',
             'lines' => 'required|array',
             'lines.*.uuid' => 'nullable|string',
@@ -29,7 +30,7 @@ class SyncOrderController
         $syncOrderRequest = new SyncOrderRequest(
             $request->user()->restaurant_id,
             $validated['table_uuid'],
-            $request->user()->uuid,
+            $validated['opened_by_user_uuid'] ?? $request->user()->uuid,
             $validated['diners'],
             $validated['lines']
         );
