@@ -91,8 +91,9 @@
         </div>
 
         <div class="payment-actions">
-          <button class="btn-pay-confirm" (click)="onConfirmPayment()" [disabled]="selectedTotal <= 0">
-            Confirmar Pago de {{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2':'es-ES' }}
+          <button class="btn-pay-confirm" (click)="onConfirmPayment()" [disabled]="selectedTotal <= 0 || isProcessing">
+            <ion-spinner *ngIf="isProcessing" name="crescent"></ion-spinner>
+            <span *ngIf="!isProcessing">Confirmar Pago de {{ (selectedTotal / 100) | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</span>
           </button>
         </div>
       </div>

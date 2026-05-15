@@ -23,7 +23,7 @@ export class CrudHelperService {
         if (onSuccess) onSuccess(response);
       },
       error: (error) => {
-        console.error('Error during creation:', error);
+        console.error('Error durante la creación:', error);
         this.uiService.showError('Error al crear el elemento');
         if (onError) onError(error);
       },
@@ -45,7 +45,7 @@ export class CrudHelperService {
         if (onSuccess) onSuccess(response);
       },
       error: (error) => {
-        console.error('Error during update:', error);
+        console.error('Error durante la actualización:', error);
         this.uiService.showError('Error al actualizar el elemento');
         if (onError) onError(error);
       },
@@ -67,7 +67,7 @@ export class CrudHelperService {
         if (onSuccess) onSuccess(response);
       },
       error: (error) => {
-        console.error('Error during deletion:', error);
+        console.error('Error durante la eliminación:', error);
         this.uiService.showError('Error al eliminar el elemento');
         if (onError) onError(error);
       },

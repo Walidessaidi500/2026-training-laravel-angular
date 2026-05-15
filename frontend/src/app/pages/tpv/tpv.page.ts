@@ -67,6 +67,8 @@ export class TpvPage implements OnInit {
 
   public currentUser = this.authService.getUser();
 
+  public isProcessingPayment = false;
+
   constructor() {
     addIcons({
       gridOutline, layersOutline, fastFoodOutline, cartOutline, arrowBackOutline,
@@ -244,6 +246,7 @@ export class TpvPage implements OnInit {
     this.paymentMethod = 'cash';
     this.amountCash = this.cartService.getTotal() / 100;
     this.amountCard = 0;
+    this.amountGiven = this.amountCash;
     this.stateService.setShowPaymentModal(true);
   }
 
@@ -277,12 +280,26 @@ export class TpvPage implements OnInit {
       this.amountCash = 0;
       this.amountCard = amountToPay;
       this.amountGiven = 0;
+    } else if (method === 'mixed') {
+      if (this.amountCash + this.amountCard !== amountToPay) {
+        this.amountCash = amountToPay;
+        this.amountCard = 0;
+        this.amountGiven = amountToPay;
+      }
     }
   }
 
-  public onAmountChange() {
+  public onSelectionChange() {
     const amountToPay = this.cartService.getSelectedTotal(this.paymentType) / 100;
-    if (this.paymentMethod === 'mixed') {
+    if (this.paymentMethod === 'cash') {
+      this.amountCash = amountToPay;
+      this.amountGiven = amountToPay;
+      this.amountCard = 0;
+    } else if (this.paymentMethod === 'card') {
+      this.amountCard = amountToPay;
+      this.amountCash = 0;
+      this.amountGiven = 0;
+    } else if (this.paymentMethod === 'mixed') {
       if (this.amountCash > amountToPay) {
         this.amountCash = amountToPay;
       }
@@ -293,20 +310,47 @@ export class TpvPage implements OnInit {
     }
   }
 
+  public onAmountChange() {
+    const amountToPay = this.cartService.getSelectedTotal(this.paymentType) / 100;
+    const cashValue = Number(this.amountCash);
+    
+    if (this.paymentMethod === 'mixed') {
+      if (cashValue > amountToPay) {
+        this.amountCash = amountToPay;
+      } else {
+        this.amountCash = cashValue;
+      }
+      this.amountCard = Number((amountToPay - this.amountCash).toFixed(2));
+      if (this.amountGiven < this.amountCash) {
+        this.amountGiven = this.amountCash;
+      }
+    }
+  }
+
   public confirmPayment() {
+    if (this.isProcessingPayment) return;
+
     const table = this.stateService.state.selectedTable;
     if (!table || !this.paymentUser) return;
 
-    if ((this.paymentMethod === 'cash' || this.paymentMethod === 'mixed') && this.amountGiven < this.amountCash) {
+    const cashValue = Number(this.amountCash);
+    const givenValue = Number(this.amountGiven);
+
+    if ((this.paymentMethod === 'cash' || this.paymentMethod === 'mixed') && givenValue < cashValue) {
       this.uiService.showError('Importe insuficiente');
       return;
     }
+
+    this.isProcessingPayment = true;
 
     this.cartService.syncOrder(table.uuid, this.paymentUser.uuid).subscribe({
       next: (order) => {
         this.processActualPayment(order);
       },
-      error: () => this.uiService.showError('Error al sincronizar antes de cobrar')
+      error: () => {
+        this.isProcessingPayment = false;
+        this.uiService.showError('Error al sincronizar antes de cobrar');
+      }
     });
   }
 
@@ -334,6 +378,7 @@ export class TpvPage implements OnInit {
     }
 
     if (linesToSell.length === 0) {
+      this.isProcessingPayment = false;
       this.uiService.showError('No hay artículos seleccionados');
       return;
     }
@@ -350,12 +395,16 @@ export class TpvPage implements OnInit {
 
     this.saleService.process(saleData).subscribe({
       next: () => {
+        this.isProcessingPayment = false;
         this.uiService.showSuccess('Pago procesado');
         
         // Recargar estado para reflejar cambios en mesas, órdenes y productos
         this.stateService.loadInitialData().subscribe();
         
-        if (this.paymentType === 'total') {
+        const isPayingTotal = this.paymentType === 'total' || 
+          this.cartService.getSelectedTotal('split') === this.cartService.getTotal();
+
+        if (isPayingTotal) {
           this.stateService.setShowPaymentModal(false);
           this.backToTables();
         } else {
@@ -374,7 +423,10 @@ export class TpvPage implements OnInit {
           });
         }
       },
-      error: () => this.uiService.showError('Error al procesar la venta')
+      error: () => {
+        this.isProcessingPayment = false;
+        this.uiService.showError('Error al procesar la venta');
+      }
     });
   }
 

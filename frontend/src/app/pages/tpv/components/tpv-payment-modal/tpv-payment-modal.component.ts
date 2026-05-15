@@ -37,6 +37,7 @@ export class TpvPaymentModalComponent {
   @Input() amountCard: number = 0;
   @Input() amountGiven: number = 0;
   @Input() changeAmount: number = 0;
+  @Input() isProcessing: boolean = false;
 
   @Output() close = new EventEmitter<void>();
   @Output() setPaymentType = new EventEmitter<'total' | 'split'>();

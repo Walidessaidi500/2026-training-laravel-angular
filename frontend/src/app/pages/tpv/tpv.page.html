@@ -100,10 +100,11 @@
     (close)="stateService.setShowPaymentModal(false)"
     (setPaymentType)="setPaymentType($event)"
     (setPaymentMethod)="setPaymentMethod($event)"
-    (toggleItemSelection)="cartService.toggleItemSelection($event)"
-    (updateSelectedQuantity)="cartService.updateSelectedQuantity($event.item, $event.delta)"
+    (toggleItemSelection)="cartService.toggleItemSelection($event); onSelectionChange()"
+    (updateSelectedQuantity)="cartService.updateSelectedQuantity($event.item, $event.delta); onSelectionChange()"
     (amountCashChange)="amountCash = $event; onAmountChange()"
     (amountGivenChange)="amountGiven = $event"
+    [isProcessing]="isProcessingPayment"
     (confirmPayment)="confirmPayment()">
   </app-tpv-payment-modal>
 
