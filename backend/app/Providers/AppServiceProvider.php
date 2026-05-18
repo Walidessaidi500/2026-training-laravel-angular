@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Family\Domain\Interfaces\FamilyRepositoryInterface;
 use App\Family\Infrastructure\Persistence\Repositories\EloquentFamilyRepository;
+use App\Movement\Domain\Interfaces\MovementRepositoryInterface;
+use App\Movement\Infrastructure\Persistence\Repositories\EloquentMovementRepository;
 use App\Order\Domain\Interfaces\OrderRepositoryInterface;
 use App\Order\Infrastructure\Persistence\Repositories\EloquentOrderRepository;
 use App\Product\Domain\Interfaces\ProductRepositoryInterface;
@@ -59,6 +61,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Order
         $this->app->bind(OrderRepositoryInterface::class, EloquentOrderRepository::class);
+
+        // Movement
+        $this->app->bind(MovementRepositoryInterface::class, EloquentMovementRepository::class);
     }
 
     public function boot(): void

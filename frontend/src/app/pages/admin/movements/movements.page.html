@@ -1,0 +1,102 @@
+<ion-content class="admin-background">
+
+  <app-access-denied *ngIf="!isAdmin" [user]="currentUser"
+    message="Solo los administradores pueden ver el historial de movimientos.">
+  </app-access-denied>
+
+  <ng-container *ngIf="isAdmin">
+    <app-page-header title="Historial de Actividad" icon="list-outline" iconColor="primary">
+      <div class="stats-header" *ngIf="meta$ | async as meta">
+        <div class="stat-item">
+          <span class="label">ACCIONES REGISTRADAS</span>
+          <span class="value">{{ meta.total }}</span>
+        </div>
+      </div>
+    </app-page-header>
+
+    <div class="movements-container">
+      <div class="card-panel">
+        <ion-list lines="none" *ngIf="!(isLoading$ | async)">
+          <div *ngFor="let movement of movements$ | async" class="movement-item" [ngClass]="{'expanded': expandedMovement === movement.uuid}">
+            <div class="movement-main" (click)="toggleExpand(movement.uuid)">
+              
+              <div class="user-avatar-col">
+                <div class="avatar-circle">
+                  {{ getInitials(movement.user_name) }}
+                </div>
+              </div>
+
+              <div class="movement-body">
+                <div class="human-description">
+                  <span class="user-name">{{ movement.user_name || 'Sistema' }}</span>
+                  <span class="action-text">{{ movement.description }}</span>
+                </div>
+                <div class="movement-meta-row">
+                  <span class="time">
+                    <ion-icon name="time-outline"></ion-icon>
+                    {{ movement.created_at }}
+                  </span>
+                  <span class="dot">·</span>
+                  <span class="action-badge">
+                    <ion-icon [name]="getMovementIcon(movement.action)" [color]="getActionColor(movement.action)"></ion-icon>
+                    {{ formatAction(movement.action) }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="movement-actions">
+                <ion-icon [name]="expandedMovement === movement.uuid ? 'chevron-up-outline' : 'chevron-down-outline'" class="expand-icon"></ion-icon>
+              </div>
+            </div>
+
+            <div class="movement-details" *ngIf="expandedMovement === movement.uuid">
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="label">USUARIO</span>
+                  <p>{{ movement.user_name }} ({{ movement.user_email }})</p>
+                </div>
+                <div class="detail-item">
+                  <span class="label">DIRECCIÓN IP</span>
+                  <code>{{ movement.ip_address || 'N/A' }}</code>
+                </div>
+                
+                <div class="detail-item full-width" *ngIf="movement.changes">
+                  <span class="label">DATOS ENVIADOS</span>
+                  <div class="json-viewer">
+                    <pre>{{ movement.changes | json }}</pre>
+                  </div>
+                </div>
+
+                <div class="detail-item full-width">
+                  <span class="label">DISPOSITIVO / NAVEGADOR</span>
+                  <p class="user-agent">{{ movement.user_agent || 'N/A' }}</p>
+                </div>
+                
+                <div class="detail-item">
+                  <span class="label">ID DE SEGUIMIENTO</span>
+                  <code class="small">{{ movement.uuid }}</code>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="(movements$ | async)?.length === 0">
+            <ion-icon name="flash-outline"></ion-icon>
+            <h3>No hay actividad reciente</h3>
+            <p>Las acciones del personal aparecerán aquí automáticamente.</p>
+          </div>
+        </ion-list>
+
+        <!-- Skeleton Loading -->
+        <ion-list lines="none" *ngIf="isLoading$ | async">
+          <div class="movement-item" *ngFor="let i of [1,2,3,4,5,6]">
+            <div class="movement-main">
+              <ion-skeleton-text animated style="width: 100%; height: 64px; border-radius: 12px;"></ion-skeleton-text>
+            </div>
+          </div>
+        </ion-list>
+      </div>
+    </div>
+  </ng-container>
+
+</ion-content>

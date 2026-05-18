@@ -15,7 +15,7 @@ import {
   cashOutline, chevronForward, arrowUp, arrowDown, people, cart,
   pieChart, cube, arrowForwardOutline, checkmarkCircle, time,
   closeCircle, flashOutline, alertCircle, warning, person, cash,
-  folder, receipt, restaurant
+  folder, receipt, restaurant, list
 } from 'ionicons/icons';
 
 // Facades
@@ -89,6 +89,7 @@ export class DashboardPage implements OnInit {
   public dashboardShortcuts: ShortcutItem[] = [
     { id: 'product', icon: 'cube', iconColor: 'primary', title: 'Añadir producto', description: 'Listar nuevo item' },
     { id: 'user', icon: 'people', iconColor: 'warning', title: 'Nuevo Usuario', description: 'Dar acceso al sistema' },
+    { id: 'movements', icon: 'list', iconColor: 'danger', title: 'Historial', description: 'Auditoría de acciones' },
     { id: 'family', icon: 'folder', iconColor: 'success', title: 'Nueva Familia', description: 'Categorizar productos' },
     { id: 'tax', icon: 'receipt', iconColor: 'primary', title: 'Nuevo Impuesto', description: 'Configurar IVA/Tasas' },
     { id: 'table', icon: 'restaurant', iconColor: 'primary', title: 'Nueva Mesa', description: 'Crear nueva mesa' }
@@ -116,6 +117,7 @@ export class DashboardPage implements OnInit {
       'folder': folder,
       'receipt': receipt,
       'restaurant': restaurant,
+      'list': list,
     });
   }
 
@@ -136,11 +138,16 @@ export class DashboardPage implements OnInit {
       case 'family': this.agregarFamilia(); break;
       case 'tax': this.agregarImpuesto(); break;
       case 'table': this.agregarMesa(); break;
+      case 'movements': this.navigateTo('/admin/movements'); break;
     }
   }
 
   navigateTo(path: string): void {
     this.router.navigate([path]);
+  }
+
+  setFilter(range: '24h' | '7d' | '30d' | '90d'): void {
+    this.facade.setRevenueFilter(range);
   }
 
   async agregarProducto(): Promise<void> {

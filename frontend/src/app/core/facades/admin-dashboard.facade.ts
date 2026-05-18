@@ -256,6 +256,62 @@ export class AdminDashboardFacade {
     });
   }
 
+  public setRevenueFilter(range: '24h' | '7d' | '30d' | '90d'): void {
+    const current = this.dashboardDataSubject.getValue();
+    const now = new Date().getTime();
+    let timeAgo = 0;
+    let label = '';
+
+    switch (range) {
+      case '24h':
+        timeAgo = now - (24 * 60 * 60 * 1000);
+        label = 'INGRESOS ÚLTIMAS 24H';
+        break;
+      case '7d':
+        timeAgo = now - (7 * 24 * 60 * 60 * 1000);
+        label = 'INGRESOS SEMANALES';
+        break;
+      case '30d':
+        timeAgo = now - (30 * 24 * 60 * 60 * 1000);
+        label = 'INGRESOS MENSUALES';
+        break;
+      case '90d':
+        timeAgo = now - (90 * 24 * 60 * 60 * 1000);
+        label = 'INGRESOS TRIMESTRALES';
+        break;
+    }
+
+    const filteredSales = this.allSales.filter(s => new Date(s.created_at).getTime() >= timeAgo);
+    const filteredAmount = filteredSales.reduce((acc, sale) => acc + (Number(sale.total) || 0), 0) / 100;
+
+    const periodDuration = now - timeAgo;
+    const previousPeriodAgo = timeAgo - periodDuration;
+    
+    const previousFilteredSales = this.allSales.filter(s => {
+      const t = new Date(s.created_at).getTime();
+      return t >= previousPeriodAgo && t < timeAgo;
+    });
+    
+    const previousFilteredAmount = previousFilteredSales.reduce((acc, sale) => acc + (Number(sale.total) || 0), 0) / 100;
+    
+    let trend = 0;
+    if (previousFilteredAmount > 0) {
+      trend = Number(((filteredAmount - previousFilteredAmount) / previousFilteredAmount * 100).toFixed(1));
+    } else if (filteredAmount > 0) {
+      trend = 100;
+    }
+
+    this.dashboardDataSubject.next({
+      ...current,
+      revenue: {
+        ...current.revenue,
+        filteredAmount: filteredAmount,
+        filteredLabel: label,
+        filteredRange: range,
+      }
+    });
+  }
+
   // Servicios para obtener los datos
   
   getFamilies(): Observable<any[]> {

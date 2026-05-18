@@ -1,18 +1,25 @@
-<div class="panel-card list-card">
-  <div class="card-header">
+<div class="shortcuts-container">
+  <div class="section-header" *ngIf="label">
     <span class="label">{{ label }}</span>
     <ion-icon name="flash-outline" color="medium"></ion-icon>
   </div>
   
-  <ion-list>
-    <ion-item *ngFor="let shortcut of shortcuts" lines="none" button class="action-item" detail="true" (click)="onShortcutClick(shortcut.id)">
-      <div slot="start" class="icon-box" [ngClass]="shortcut.iconColor + '-light'">
-        <ion-icon [name]="shortcut.icon" [color]="shortcut.iconColor"></ion-icon>
+  <div class="shortcuts-list">
+    <div *ngFor="let shortcut of shortcuts" 
+         class="shortcut-card" 
+         (click)="onShortcutClick(shortcut.id)">
+      <div class="shortcut-content">
+        <div class="icon-box" [ngClass]="shortcut.iconColor + '-light'">
+          <ion-icon [name]="shortcut.icon" [color]="shortcut.iconColor"></ion-icon>
+        </div>
+        <div class="text-group">
+          <h2>{{ shortcut.title }}</h2>
+          <p>{{ shortcut.description }}</p>
+        </div>
       </div>
-      <ion-label>
-        <h2>{{ shortcut.title }}</h2>
-        <p>{{ shortcut.description }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+      <div class="arrow-box">
+        <ion-icon name="chevron-forward"></ion-icon>
+      </div>
+    </div>
+  </div>
 </div>

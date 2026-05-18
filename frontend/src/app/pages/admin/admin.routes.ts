@@ -46,6 +46,10 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./settings/settings.component').then((m) => m.SettingsComponent),
+      },
+      {
+        path: 'movements',
+        loadComponent: () => import('./movements/movements.page').then((m) => m.MovementsPage),
       }
     ],
   },

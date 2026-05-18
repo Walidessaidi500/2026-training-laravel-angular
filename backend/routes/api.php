@@ -24,4 +24,5 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__.'/api/taxes.php';
     require __DIR__.'/api/users.php';
     require __DIR__.'/api/zones.php';
+    require __DIR__.'/api/movements.php';
 });
