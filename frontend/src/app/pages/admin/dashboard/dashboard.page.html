@@ -59,7 +59,7 @@
                 <strong>{{ data.revenue.avgOrder | currency:'EUR':'symbol':'1.2-2' }}</strong>
               </div>
               <div class="stat-item">
-                <span class="label">INGRESOS RECURRENTES MENSUALES</span>
+                <span class="label">VENTAS ÚLTIMOS 30 DÍAS</span>
                 <strong>{{ data.revenue.mrr | currency:'EUR':'symbol':'1.1-1' }}</strong>
               </div>
             </div>
@@ -70,8 +70,8 @@
           <app-micro-stat-card
             icon="people"
             iconColor="primary"
-            trendPercentage="+12.5"
-            trendType="success"
+            [trendPercentage]="(data.metrics.activeUsersTrend >= 0 ? '+' : '') + data.metrics.activeUsersTrend"
+            [trendType]="data.metrics.activeUsersTrend >= 0 ? 'success' : 'danger'"
             [value]="data.metrics.activeUsers | number"
             label="USUARIOS ACTIVOS"
             (click)="navigateTo('/admin/users')"
@@ -81,8 +81,8 @@
           <app-micro-stat-card
             icon="cart"
             iconColor="primary"
-            trendPercentage="+8.2"
-            trendType="success"
+            [trendPercentage]="(data.metrics.ordersTodayTrend >= 0 ? '+' : '') + data.metrics.ordersTodayTrend"
+            [trendType]="data.metrics.ordersTodayTrend >= 0 ? 'success' : 'danger'"
             [value]="data.metrics.ordersToday | number"
             label="PEDIDOS HOY">
           </app-micro-stat-card>
@@ -90,17 +90,17 @@
           <app-micro-stat-card
             icon="pie-chart"
             iconColor="primary"
-            trendPercentage="-0.8"
-            trendType="danger"
-            [value]="data.metrics.conversionRate + '%'"
-            label="CONVERSIÓN">
+            [trendPercentage]="(data.metrics.conversionRateTrend >= 0 ? '+' : '') + data.metrics.conversionRateTrend"
+            [trendType]="data.metrics.conversionRateTrend >= 0 ? 'success' : 'danger'"
+            [value]="data.metrics.conversionRate | number:'1.1-1'"
+            label="ITEMS / TICKET">
           </app-micro-stat-card>
 
           <app-micro-stat-card
             icon="cube"
             iconColor="primary"
-            trendPercentage="+3"
-            trendType="success"
+            [trendPercentage]="(data.metrics.totalProductsTrend >= 0 ? '+' : '') + data.metrics.totalProductsTrend"
+            [trendType]="data.metrics.totalProductsTrend >= 0 ? 'success' : 'danger'"
             [value]="data.metrics.totalProducts | number"
             label="PRODUCTOS"
             (click)="navigateTo('/admin/products')"
@@ -120,7 +120,10 @@
           </div>
           <div class="chart-header-stats">
             <div class="amount-medium">{{ data.revenue.thisWeek | currency:'EUR':'symbol':'1.0-0' }}</div>
-            <span class="trend-badge success"><ion-icon name="arrow-up"></ion-icon> 12.5%</span>
+            <span class="trend-badge" [ngClass]="data.revenue.trendPercentage >= 0 ? 'success' : 'danger'">
+              <ion-icon [name]="data.revenue.trendPercentage >= 0 ? 'arrow-up' : 'arrow-down'"></ion-icon>
+              {{ data.revenue.trendPercentage }}%
+            </span>
           </div>
         </div>
 
@@ -138,11 +141,11 @@
             <ion-item lines="none" class="transaction-item clickable" *ngFor="let order of data.recentOrders" (click)="verDetallePedido(order)">
               <div slot="start" class="avatar-circle"
                 [style.background-color]="order.colorAvatar || 'var(--ion-color-primary)'">
-                {{ order.customerInitials }}
+                <ion-icon name="receipt-outline" style="font-size: 20px;"></ion-icon>
               </div>
               <ion-label>
                 <h2>{{ order.customerName }}</h2>
-                <p>#{{ order.id }} · {{ order.itemsCount }} items</p>
+                <p>#{{ order.id }} · {{ order.itemsCount }} Productos</p>
               </ion-label>
               <div slot="end" class="transaction-meta">
                 <strong>{{ order.total | currency:'EUR' }}</strong>

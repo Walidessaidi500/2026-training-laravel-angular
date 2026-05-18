@@ -17,12 +17,19 @@ export interface DashboardData {
     thisWeek: number;
     avgOrder: number;
     mrr: number;
+    filteredAmount: number;
+    filteredLabel: string;
+    filteredRange: string;
   };
   metrics: {
     activeUsers: number;
+    activeUsersTrend: number;
     ordersToday: number;
+    ordersTodayTrend: number;
     conversionRate: number;
+    conversionRateTrend: number;
     totalProducts: number;
+    totalProductsTrend: number;
   };
   recentOrders: any[];
   alerts: any[];
@@ -45,10 +52,20 @@ export class AdminDashboardFacade {
   private readonly saleService = inject(SaleService);
   private readonly tableService = inject(TableService);
 
+  private allSales: any[] = [];
+
   // Estados
   private readonly dashboardDataSubject = new BehaviorSubject<DashboardData>({
-    revenue: { total: 0, trendPercentage: 0, thisWeek: 0, avgOrder: 0, mrr: 0 },
-    metrics: { activeUsers: 0, ordersToday: 0, conversionRate: 0, totalProducts: 0 },
+    revenue: { 
+      total: 0, trendPercentage: 0, thisWeek: 0, avgOrder: 0, mrr: 0,
+      filteredAmount: 0, filteredLabel: 'INGRESOS SEMANALES', filteredRange: '7d'
+    },
+    metrics: { 
+      activeUsers: 0, activeUsersTrend: 0, 
+      ordersToday: 0, ordersTodayTrend: 0, 
+      conversionRate: 0, conversionRateTrend: 0, 
+      totalProducts: 0, totalProductsTrend: 0 
+    },
     recentOrders: [],
     alerts: [],
     activities: [],
@@ -111,29 +128,77 @@ export class AdminDashboardFacade {
     ).subscribe({
       next: (results) => {
         const currentData = this.dashboardDataSubject.getValue();
+        const sales = results.sales.data;
+        this.allSales = sales;
         
-        // Calcula el total de ingresos sumando el total de cada venta (ticket cerrado)
-        const totalRevenueCents = results.sales.data.reduce((acc, sale) => {
-          return acc + (Number(sale.total) || 0);
-        }, 0);
-        
+        // --- Calculos de Ingresos ---
+        const totalRevenueCents = sales.reduce((acc, sale) => acc + (Number(sale.total) || 0), 0);
         const totalRevenue = totalRevenueCents / 100;
+
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const sevenDaysAgo = now.getTime() - (7 * 24 * 60 * 60 * 1000);
+
+        const salesToday = sales.filter(s => new Date(s.created_at).getTime() >= startOfDay);
+        const salesThisWeek = sales.filter(s => new Date(s.created_at).getTime() >= sevenDaysAgo);
         
+        const revenueThisWeek = salesThisWeek.reduce((acc, sale) => acc + (Number(sale.total) || 0), 0) / 100;
+        
+        // Tendencia: Comparar ultimos 30 dias con los 30 anteriores (simulado con los datos que tenemos)
+        const thirtyDaysAgo = now.getTime() - (30 * 24 * 60 * 60 * 1000);
+        const sixtyDaysAgo = now.getTime() - (60 * 24 * 60 * 60 * 1000);
+        
+        const last30DaysRevenue = sales.filter(s => new Date(s.created_at).getTime() >= thirtyDaysAgo)
+                                       .reduce((acc, s) => acc + (Number(s.total) || 0), 0);
+        const prev30DaysRevenue = sales.filter(s => {
+          const t = new Date(s.created_at).getTime();
+          return t >= sixtyDaysAgo && t < thirtyDaysAgo;
+        }).reduce((acc, s) => acc + (Number(s.total) || 0), 0);
+        
+        let revenueTrend = 0;
+        if (prev30DaysRevenue > 0) {
+          revenueTrend = Number(((last30DaysRevenue - prev30DaysRevenue) / prev30DaysRevenue * 100).toFixed(1));
+        } else if (last30DaysRevenue > 0) {
+          revenueTrend = 100;
+        }
+
+        // --- Calculos de Metricas ---
+        const activeUsers = results.users.meta ? results.users.meta.total : results.users.data.length;
+        const totalProducts = results.products.meta ? results.products.meta.total : results.products.data.length;
+        
+        // Items por ticket como "tasa de conversion/eficiencia"
+        const totalItems = sales.reduce((acc, s) => {
+          if (s.lines && Array.isArray(s.lines)) {
+            return acc + s.lines.reduce((lAcc: number, l: any) => lAcc + (Number(l.quantity) || 1), 0);
+          }
+          return acc + 1;
+        }, 0);
+        const avgItemsPerTicket = sales.length > 0 ? Number((totalItems / sales.length).toFixed(1)) : 0;
+
         const newData: DashboardData = {
           ...currentData,
           revenue: {
             ...currentData.revenue,
             total: totalRevenue,
-            thisWeek: totalRevenue, // Se podria calcular solo por semana
-            avgOrder: results.sales.data.length > 0 ? totalRevenue / results.sales.data.length : 0,
+            trendPercentage: revenueTrend,
+            thisWeek: revenueThisWeek,
+            avgOrder: sales.length > 0 ? totalRevenue / sales.length : 0,
+            mrr: last30DaysRevenue / 100, // Monthly Revenue (Actual last 30 days)
+            filteredAmount: revenueThisWeek,
+            filteredLabel: 'INGRESOS SEMANALES',
+            filteredRange: '7d'
           },
           metrics: {
-            activeUsers: results.users.meta ? results.users.meta.total : results.users.data.length,
-            ordersToday: results.sales.meta ? results.sales.meta.total : results.sales.data.length,
-            conversionRate: 15.4, 
-            totalProducts: results.products.meta ? results.products.meta.total : results.products.data.length,
+            activeUsers: activeUsers,
+            activeUsersTrend: 12.5, // Simulado
+            ordersToday: salesToday.length,
+            ordersTodayTrend: 8.2, // Simulado
+            conversionRate: avgItemsPerTicket, 
+            conversionRateTrend: -0.8, // Simulado
+            totalProducts: totalProducts,
+            totalProductsTrend: 3.0 // Simulado
           },
-          recentOrders: this.mapRecentSales(results.sales.data.slice(0, 10)),
+          recentOrders: this.mapRecentSales(sales.slice(0, 10)),
           tables: results.tables.data || results.tables,
           users: results.users.data || results.users
         };
