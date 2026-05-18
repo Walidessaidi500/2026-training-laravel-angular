@@ -174,22 +174,40 @@
       &.small { font-size: 10px; }
     }
 
-    .json-viewer {
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 16px;
-      max-height: 300px;
-      overflow-y: auto;
+    .simplified-changes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fdfdfd;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
 
-      pre {
-        margin: 0;
-        color: #ce9178;
-        font-size: 12px;
-        font-family: 'Consolas', 'Monaco', monospace;
-        white-space: pre-wrap;
-        word-break: break-all;
-      }
+  .change-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
     }
+
+    .change-key {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ion-color-medium);
+    }
+
+    .change-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ion-color-secondary);
+    }
+  }
+}
 
     .user-agent {
       font-size: 12px;

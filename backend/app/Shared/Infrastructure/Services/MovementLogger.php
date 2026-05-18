@@ -17,15 +17,21 @@ class MovementLogger
         string $description,
         ?string $resourceType = null,
         ?string $resourceId = null,
-        ?array $changes = null
+        ?array $changes = null,
+        ?array $customUser = null
     ): void {
         $user = Auth::user();
         
+        $userId = $customUser['id'] ?? $user?->id;
+        $restaurantId = $customUser['restaurant_id'] ?? $user?->restaurant_id;
+        $userName = $customUser['name'] ?? $user?->name;
+        $userEmail = $customUser['email'] ?? $user?->email;
+
         $this->logMovementUseCase->execute(
-            $user?->id,
-            $user?->restaurant_id,
-            $user?->name,
-            $user?->email,
+            $userId,
+            $restaurantId,
+            $userName,
+            $userEmail,
             $action,
             $description,
             $resourceType,

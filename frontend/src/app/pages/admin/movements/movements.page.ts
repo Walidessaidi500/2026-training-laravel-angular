@@ -152,4 +152,29 @@ export class MovementsPage implements OnInit {
   formatAction(action: string): string {
     return action.replace(/_/g, ' ').toUpperCase();
   }
+
+  getObjectKeys(obj: any): string[] {
+    return obj ? Object.keys(obj) : [];
+  }
+
+  formatKey(key: string): string {
+    const keys: any = {
+      'name': 'Nombre',
+      'email': 'Email',
+      'role': 'Rol',
+      'price': 'Precio',
+      'stock': 'Stock',
+      'description': 'Descripción',
+      'table_id': 'Mesa',
+      'total': 'Total',
+      'items': 'Productos',
+      'lines': 'Líneas',
+      'family_id': 'Familia',
+      'tax_id': 'Impuesto',
+      'active': 'Activo',
+      'capacity': 'Capacidad',
+      'status': 'Estado'
+    };
+    return keys[key] || key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ');
+  }
 }

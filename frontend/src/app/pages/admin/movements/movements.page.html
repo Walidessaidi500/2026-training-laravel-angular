@@ -51,30 +51,28 @@
 
             <div class="movement-details" *ngIf="expandedMovement === movement.uuid">
               <div class="details-grid">
+                <div class="detail-item full-width" *ngIf="movement.changes">
+                  <span class="label">DETALLES DE LA ACCIÓN</span>
+                  <div class="simplified-changes">
+                    <div class="change-row" *ngFor="let change of getObjectKeys(movement.changes)">
+                      <span class="change-key">{{ formatKey(change) }}:</span>
+                      <span class="change-value">{{ movement.changes[change] }}</span>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="detail-item">
-                  <span class="label">USUARIO</span>
-                  <p>{{ movement.user_name }} ({{ movement.user_email }})</p>
+                  <span class="label">USUARIO RESPONSABLE</span>
+                  <p>{{ movement.user_name || 'Sistema' }} ({{ movement.user_email || 'N/A' }})</p>
                 </div>
                 <div class="detail-item">
                   <span class="label">DIRECCIÓN IP</span>
                   <code>{{ movement.ip_address || 'N/A' }}</code>
                 </div>
                 
-                <div class="detail-item full-width" *ngIf="movement.changes">
-                  <span class="label">DATOS ENVIADOS</span>
-                  <div class="json-viewer">
-                    <pre>{{ movement.changes | json }}</pre>
-                  </div>
-                </div>
-
                 <div class="detail-item full-width">
-                  <span class="label">DISPOSITIVO / NAVEGADOR</span>
+                  <span class="label">DISPOSITIVO</span>
                   <p class="user-agent">{{ movement.user_agent || 'N/A' }}</p>
-                </div>
-                
-                <div class="detail-item">
-                  <span class="label">ID DE SEGUIMIENTO</span>
-                  <code class="small">{{ movement.uuid }}</code>
                 </div>
               </div>
             </div>

@@ -3,6 +3,8 @@
 namespace App\Movement\Infrastructure\Entrypoint\Http\Middleware;
 
 use App\Shared\Infrastructure\Services\MovementLogger;
+use App\User\Domain\Interfaces\UserRepositoryInterface;
+use App\Shared\Domain\ValueObject\Uuid;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,7 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 class RecordMovementMiddleware
 {
     public function __construct(
-        private MovementLogger $logger
+        private MovementLogger $logger,
+        private UserRepositoryInterface $userRepository
     ) {}
 
     /**
@@ -32,20 +35,48 @@ class RecordMovementMiddleware
     {
         $action = $this->determineAction($request);
         
-        // We skip logging the logging itself or login
+        // We skip logging the logging itself or login or GETs
         if ($action === 'login' || str_contains($request->path(), 'movements')) {
             return;
         }
 
         $description = $this->generateHumanDescription($request);
+        $customUser = $this->resolveWorker($request);
 
         $this->logger->log(
             $action,
             $description,
             $this->determineResourceType($request),
             $this->determineResourceId($request),
-            $request->except(['password', 'password_confirmation', 'pin', 'image_src'])
+            $this->extractSimplifiedChanges($request),
+            $customUser
         );
+    }
+
+    private function resolveWorker(Request $request): ?array
+    {
+        // Many TPV actions send the worker UUID in the request body
+        $userUuid = $request->input('user_uuid') ?? $request->input('opened_by_user_uuid');
+        
+        if (!$userUuid) {
+            return null;
+        }
+
+        try {
+            $worker = $this->userRepository->findById(Uuid::create($userUuid));
+            if ($worker) {
+                return [
+                    'id' => null, // We don't have the numeric ID here easily, but name/email is what matters
+                    'name' => $worker->name(),
+                    'email' => $worker->email()->value(),
+                    'restaurant_id' => $worker->restaurantId()->value()
+                ];
+            }
+        } catch (\Exception $e) {
+            // Ignore resolution errors
+        }
+
+        return null;
     }
 
     private function determineAction(Request $request): string
@@ -82,38 +113,72 @@ class RecordMovementMiddleware
         return (is_numeric($last) || strlen($last) > 20) ? $last : null;
     }
 
+    private function extractSimplifiedChanges(Request $request): array
+    {
+        $data = $request->except(['password', 'password_confirmation', 'pin', 'image_src', 'id', 'uuid', 'restaurant_id', 'created_at', 'updated_at']);
+        $simplified = [];
+        
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                if ($key === 'items' || $key === 'lines') {
+                    $simplified[$key] = count($value) . ' elementos';
+                } else {
+                    $simplified[$key] = '(detalles complejos)';
+                }
+            } else {
+                $simplified[$key] = $value;
+            }
+        }
+        
+        return $simplified;
+    }
+
     private function generateHumanDescription(Request $request): string
     {
         $method = $request->method();
         $path = $request->path();
         $data = $request->all();
-        $resourceType = $this->determineResourceType($request) ?? 'recurso';
+        $resourceType = $this->determineResourceType($request);
         
-        $actionText = 'realizó una acción en';
-        if ($method === 'POST') $actionText = 'creó un nuevo';
-        if ($method === 'PUT' || $method === 'PATCH') $actionText = 'actualizó el';
-        if ($method === 'DELETE') $actionText = 'eliminó el';
+        $typeName = [
+            'product' => 'el producto',
+            'order' => 'la comanda',
+            'sale' => 'la venta',
+            'user' => 'el usuario',
+            'family' => 'la familia',
+            'table' => 'la mesa',
+            'tax' => 'el impuesto',
+            'zone' => 'la zona',
+        ][$resourceType] ?? 'un recurso';
 
-        $resourceName = $resourceType;
-        if (isset($data['name'])) $resourceName .= ' "' . $data['name'] . '"';
-        elseif (isset($data['title'])) $resourceName .= ' "' . $data['title'] . '"';
-        elseif (isset($data['ticket_number'])) $resourceName .= ' de ticket #' . $data['ticket_number'];
-        elseif (isset($data['table_id'])) $resourceName .= ' para la mesa #' . $data['table_id'];
-
-        // Casos especiales
-        if (str_contains($path, 'orders') && $method === 'POST') {
-            $itemsCount = count($data['items'] ?? []);
-            return "Mandó una comanda con $itemsCount productos para la mesa #" . ($data['table_id'] ?? '?');
+        // Casos especiales para POST (Creaciones)
+        if ($method === 'POST') {
+            if ($resourceType === 'order') {
+                $itemsCount = count($data['items'] ?? []);
+                return "Envió una nueva comanda con $itemsCount productos para la mesa #" . ($data['table_id'] ?? '?');
+            }
+            if ($resourceType === 'sale') {
+                $total = ($data['total'] ?? 0) / 100;
+                return "Cerró una cuenta y generó un ticket por $total €";
+            }
+            if ($resourceType === 'user') return "Creó al usuario \"" . ($data['name'] ?? 'Nuevo') . "\"";
+            if ($resourceType === 'product') return "Añadió el producto \"" . ($data['name'] ?? 'Nuevo') . "\" al catálogo";
+            
+            return "Creó un nuevo " . str_replace('el ', '', $typeName) . (isset($data['name']) ? " (\"{$data['name']}\")" : "");
         }
 
-        if (str_contains($path, 'sales') && $method === 'POST') {
-            return "Cerró la cuenta y generó un ticket por " . (($data['total'] ?? 0) / 100) . "€";
+        // Casos para PUT/PATCH (Actualizaciones)
+        if ($method === 'PUT' || $method === 'PATCH') {
+            $name = $data['name'] ?? $data['title'] ?? null;
+            $nameStr = $name ? " (\"$name\")" : "";
+            return "Actualizó los datos de $typeName$nameStr";
         }
 
-        if (str_contains($path, 'users') && $method === 'POST') {
-            return "Creó al usuario " . ($data['name'] ?? 'nuevo');
+        // Casos para DELETE (Eliminaciones)
+        if ($method === 'DELETE') {
+            return "Eliminó $typeName del sistema";
         }
 
-        return ucfirst("$actionText $resourceName");
+        return "Realizó una operación en $typeName";
     }
 }
