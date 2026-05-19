@@ -19,7 +19,7 @@ class FamilyResponse
     {
         return new self(
             $family->id()->value(),
-            $family->restaurantId(),
+            $family->restaurantId()->value(),
             $family->name(),
             $family->isActive(),
             $family->createdAt()->format('Y-m-d\TH:i:s'),

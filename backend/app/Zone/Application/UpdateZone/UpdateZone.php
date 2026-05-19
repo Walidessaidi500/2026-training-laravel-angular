@@ -16,7 +16,7 @@ class UpdateZone
         $uuid = Uuid::create($id);
         $zone = $this->zoneRepository->findById($uuid);
 
-        if ($zone === null || $zone->restaurantId() !== $restaurantId) {
+        if ($zone === null || $zone->restaurantId()->value() !== $restaurantId) {
             throw new \InvalidArgumentException('Zona no encontrada');
         }
 

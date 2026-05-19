@@ -2,13 +2,13 @@
 
 namespace App\Movement\Infrastructure\Entrypoint\Http;
 
-use App\Movement\Application\UseCases\ListMovementsUseCase;
+use App\Movement\Application\ListMovements\ListMovements;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ListMovementsController
 {
-    public function __invoke(Request $request, ListMovementsUseCase $useCase): JsonResponse
+    public function __invoke(Request $request, ListMovements $useCase): JsonResponse
     {
         $user = $request->user();
         
@@ -21,7 +21,7 @@ class ListMovementsController
         $perPage = (int) $request->query('perPage', 50);
         $restaurantId = $user->restaurant_id;
 
-        $movements = $useCase->execute($page, $perPage, $restaurantId);
+        $movements = $useCase($page, $perPage, $restaurantId);
 
         return response()->json([
             'data' => array_map(function ($movement) {

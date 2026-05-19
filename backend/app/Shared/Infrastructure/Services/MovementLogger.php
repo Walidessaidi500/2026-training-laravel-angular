@@ -2,14 +2,14 @@
 
 namespace App\Shared\Infrastructure\Services;
 
-use App\Movement\Application\UseCases\LogMovementUseCase;
+use App\Movement\Application\LogMovement\LogMovement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 
 class MovementLogger
 {
     public function __construct(
-        private LogMovementUseCase $logMovementUseCase
+        private LogMovement $logMovement
     ) {}
 
     public function log(
@@ -27,7 +27,7 @@ class MovementLogger
         $userName = $customUser['name'] ?? $user?->name;
         $userEmail = $customUser['email'] ?? $user?->email;
 
-        $this->logMovementUseCase->execute(
+        ($this->logMovement)(
             $userId,
             $restaurantId,
             $userName,

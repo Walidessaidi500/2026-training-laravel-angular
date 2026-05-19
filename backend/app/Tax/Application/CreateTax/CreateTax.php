@@ -2,6 +2,7 @@
 
 namespace App\Tax\Application\CreateTax;
 
+use App\Shared\Domain\ValueObject\RestaurantId;
 use App\Tax\Application\Shared\TaxResponse;
 use App\Tax\Domain\Entity\Tax;
 use App\Tax\Domain\Interfaces\TaxRepositoryInterface;
@@ -19,7 +20,7 @@ class CreateTax
         $tax = Tax::dddCreate(
             TaxName::create($name),
             TaxPercentage::create($percentage),
-            $restaurantId,
+            RestaurantId::create($restaurantId),
         );
 
         $this->taxRepository->save($tax);

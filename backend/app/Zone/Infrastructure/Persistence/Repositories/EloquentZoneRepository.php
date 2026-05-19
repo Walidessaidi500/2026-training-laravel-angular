@@ -17,7 +17,7 @@ class EloquentZoneRepository implements ZoneRepositoryInterface
         $this->model->newQuery()->updateOrCreate(
             ['uuid' => $zone->id()->value()],
             [
-                'restaurant_id' => $zone->restaurantId(),
+                'restaurant_id' => $zone->restaurantId()->value(),
                 'name' => $zone->name(),
                 'created_at' => $zone->createdAt()->value(),
                 'updated_at' => $zone->updatedAt()->value(),

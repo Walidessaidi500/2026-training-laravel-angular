@@ -19,7 +19,7 @@ class TaxResponse
     {
         return new self(
             $tax->id()->value(),
-            $tax->restaurantId(),
+            $tax->restaurantId()->value(),
             $tax->name(),
             $tax->percentage(),
             $tax->createdAt()->format('Y-m-d\TH:i:s'),

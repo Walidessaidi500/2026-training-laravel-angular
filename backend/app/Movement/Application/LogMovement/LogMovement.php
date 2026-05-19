@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Movement\Application\UseCases;
+namespace App\Movement\Application\LogMovement;
 
 use App\Movement\Domain\Entity\Movement;
 use App\Movement\Domain\Interfaces\MovementRepositoryInterface;
+use App\Shared\Domain\ValueObject\RestaurantId;
 
-class LogMovementUseCase
+class LogMovement
 {
     public function __construct(
         private MovementRepositoryInterface $repository,
     ) {}
 
-    public function execute(
+    public function __invoke(
         ?int $userId,
         ?int $restaurantId,
         ?string $userName,
@@ -24,9 +25,9 @@ class LogMovementUseCase
         ?string $ipAddress = null,
         ?string $userAgent = null
     ): void {
-        $movement = Movement::create(
+        $movement = Movement::dddCreate(
             $userId,
-            $restaurantId,
+            $restaurantId ? RestaurantId::create($restaurantId) : null,
             $userName,
             $userEmail,
             $action,

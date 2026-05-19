@@ -4,13 +4,14 @@ namespace App\Movement\Domain\Entity;
 
 use App\Shared\Domain\ValueObject\Uuid;
 use App\Shared\Domain\ValueObject\DomainDateTime;
+use App\Shared\Domain\ValueObject\RestaurantId;
 
 class Movement
 {
     private function __construct(
         private Uuid $id,
         private ?int $userId,
-        private ?int $restaurantId,
+        private ?RestaurantId $restaurantId,
         private ?string $userName,
         private ?string $userEmail,
         private string $action,
@@ -23,9 +24,9 @@ class Movement
         private DomainDateTime $createdAt,
     ) {}
 
-    public static function create(
+    public static function dddCreate(
         ?int $userId,
-        ?int $restaurantId,
+        ?RestaurantId $restaurantId,
         ?string $userName,
         ?string $userEmail,
         string $action,
@@ -71,7 +72,7 @@ class Movement
         return new self(
             Uuid::create($uuid),
             $userId,
-            $restaurantId,
+            $restaurantId ? RestaurantId::create($restaurantId) : null,
             $userName,
             $userEmail,
             $action,
@@ -87,7 +88,7 @@ class Movement
 
     public function id(): Uuid { return $this->id; }
     public function userId(): ?int { return $this->userId; }
-    public function restaurantId(): ?int { return $this->restaurantId; }
+    public function restaurantId(): ?RestaurantId { return $this->restaurantId; }
     public function userName(): ?string { return $this->userName; }
     public function userEmail(): ?string { return $this->userEmail; }
     public function action(): string { return $this->action; }

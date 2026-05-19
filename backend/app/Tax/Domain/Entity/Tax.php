@@ -3,6 +3,7 @@
 namespace App\Tax\Domain\Entity;
 
 use App\Shared\Domain\ValueObject\DomainDateTime;
+use App\Shared\Domain\ValueObject\RestaurantId;
 use App\Shared\Domain\ValueObject\Uuid;
 use App\Tax\Domain\ValueObject\TaxName;
 use App\Tax\Domain\ValueObject\TaxPercentage;
@@ -11,14 +12,14 @@ class Tax implements \JsonSerializable
 {
     private function __construct(
         private Uuid $id,
-        private int $restaurantId,
+        private RestaurantId $restaurantId,
         private TaxName $name,
         private TaxPercentage $percentage,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
     ) {}
 
-    public static function dddCreate(TaxName $name, TaxPercentage $percentage, int $restaurantId): self
+    public static function dddCreate(TaxName $name, TaxPercentage $percentage, RestaurantId $restaurantId): self
     {
         $now = DomainDateTime::now();
 
@@ -42,7 +43,7 @@ class Tax implements \JsonSerializable
     ): self {
         return new self(
             Uuid::create($id),
-            $restaurantId,
+            RestaurantId::create($restaurantId),
             TaxName::create($name),
             TaxPercentage::create($percentage),
             DomainDateTime::create($createdAt),
@@ -55,7 +56,7 @@ class Tax implements \JsonSerializable
         return $this->id;
     }
 
-    public function restaurantId(): int
+    public function restaurantId(): RestaurantId
     {
         return $this->restaurantId;
     }

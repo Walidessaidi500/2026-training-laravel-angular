@@ -2,6 +2,7 @@
 
 namespace App\Table\Application\CreateTable;
 
+use App\Shared\Domain\ValueObject\RestaurantId;
 use App\Shared\Domain\ValueObject\Uuid;
 use App\Table\Application\Shared\TableResponse;
 use App\Table\Domain\Entity\Table;
@@ -14,7 +15,7 @@ class CreateTable
 
     public function __invoke(string $zoneId, string $name, int $restaurantId): TableResponse
     {
-        $table = Table::dddCreate(Uuid::create($zoneId), TableName::create($name), $restaurantId);
+        $table = Table::dddCreate(Uuid::create($zoneId), TableName::create($name), RestaurantId::create($restaurantId));
         $this->tableRepository->save($table);
 
         return TableResponse::create($table);

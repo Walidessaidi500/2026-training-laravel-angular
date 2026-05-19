@@ -7,6 +7,8 @@ use App\Family\Domain\Entity\Family;
 use App\Family\Domain\Interfaces\FamilyRepositoryInterface;
 use App\Family\Domain\ValueObject\FamilyName;
 
+use App\Shared\Domain\ValueObject\RestaurantId;
+
 class CreateFamily
 {
     public function __construct(
@@ -17,7 +19,7 @@ class CreateFamily
     {
         $family = Family::dddCreate(
             FamilyName::create($name),
-            $restaurantId,
+            RestaurantId::create($restaurantId),
             $active,
         );
 

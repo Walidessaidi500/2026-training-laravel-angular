@@ -3,6 +3,7 @@
 namespace App\Zone\Domain\Entity;
 
 use App\Shared\Domain\ValueObject\DomainDateTime;
+use App\Shared\Domain\ValueObject\RestaurantId;
 use App\Shared\Domain\ValueObject\Uuid;
 use App\Zone\Domain\ValueObject\ZoneName;
 
@@ -10,14 +11,14 @@ class Zone implements \JsonSerializable
 {
     private function __construct(
         private Uuid $id,
-        private int $restaurantId,
+        private RestaurantId $restaurantId,
         private ZoneName $name,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
         private ?int $tableCount = null,
     ) {}
 
-    public static function dddCreate(ZoneName $name, int $restaurantId): self
+    public static function dddCreate(ZoneName $name, RestaurantId $restaurantId): self
     {
         $now = DomainDateTime::now();
 
@@ -40,7 +41,7 @@ class Zone implements \JsonSerializable
     ): self {
         return new self(
             Uuid::create($id),
-            $restaurantId,
+            RestaurantId::create($restaurantId),
             ZoneName::create($name),
             DomainDateTime::create($createdAt),
             DomainDateTime::create($updatedAt),
@@ -53,7 +54,7 @@ class Zone implements \JsonSerializable
         return $this->id;
     }
 
-    public function restaurantId(): int
+    public function restaurantId(): RestaurantId
     {
         return $this->restaurantId;
     }
@@ -88,7 +89,7 @@ class Zone implements \JsonSerializable
     {
         return [
             'uuid' => $this->id->value(),
-            'restaurant_id' => $this->restaurantId,
+            'restaurant_id' => $this->restaurantId->value(),
             'name' => $this->name->value(),
             'tableCount' => $this->tableCount,
             'created_at' => $this->createdAt->value()->format('Y-m-d\TH:i:s.u\Z'),

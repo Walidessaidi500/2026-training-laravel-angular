@@ -18,7 +18,7 @@ class EloquentMovementRepository implements MovementRepositoryInterface
         $this->model->newQuery()->create([
             'uuid' => $movement->id()->value(),
             'user_id' => $movement->userId(),
-            'restaurant_id' => $movement->restaurantId(),
+            'restaurant_id' => $movement->restaurantId()?->value(),
             'user_name' => $movement->userName(),
             'user_email' => $movement->userEmail(),
             'action' => $movement->action(),

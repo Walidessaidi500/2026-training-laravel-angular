@@ -4,20 +4,21 @@ namespace App\Family\Domain\Entity;
 
 use App\Family\Domain\ValueObject\FamilyName;
 use App\Shared\Domain\ValueObject\DomainDateTime;
+use App\Shared\Domain\ValueObject\RestaurantId;
 use App\Shared\Domain\ValueObject\Uuid;
 
 class Family implements \JsonSerializable
 {
     private function __construct(
         private Uuid $id,
-        private int $restaurantId,
+        private RestaurantId $restaurantId,
         private FamilyName $name,
         private bool $active,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
     ) {}
 
-    public static function dddCreate(FamilyName $name, int $restaurantId, bool $active = true): self
+    public static function dddCreate(FamilyName $name, RestaurantId $restaurantId, bool $active = true): self
     {
         $now = DomainDateTime::now();
 
@@ -41,7 +42,7 @@ class Family implements \JsonSerializable
     ): self {
         return new self(
             Uuid::create($id),
-            $restaurantId,
+            RestaurantId::create($restaurantId),
             FamilyName::create($name),
             $active,
             DomainDateTime::create($createdAt),
@@ -54,7 +55,7 @@ class Family implements \JsonSerializable
         return $this->id;
     }
 
-    public function restaurantId(): int
+    public function restaurantId(): RestaurantId
     {
         return $this->restaurantId;
     }

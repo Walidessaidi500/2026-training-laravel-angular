@@ -3,6 +3,7 @@
 namespace App\Table\Domain\Entity;
 
 use App\Shared\Domain\ValueObject\DomainDateTime;
+use App\Shared\Domain\ValueObject\RestaurantId;
 use App\Shared\Domain\ValueObject\Uuid;
 use App\Table\Domain\ValueObject\TableName;
 
@@ -10,7 +11,7 @@ class Table implements \JsonSerializable
 {
     private function __construct(
         private Uuid $id,
-        private int $restaurantId,
+        private RestaurantId $restaurantId,
         private Uuid $zoneId,
         private TableName $name,
         private ?Uuid $joinedToUuid,
@@ -22,7 +23,7 @@ class Table implements \JsonSerializable
     {
         return [
             'uuid' => $this->id->value(),
-            'restaurant_id' => $this->restaurantId,
+            'restaurant_id' => $this->restaurantId->value(),
             'zone_id' => $this->zoneId->value(),
             'name' => $this->name->value(),
             'joined_to_uuid' => $this->joinedToUuid?->value(),
@@ -31,7 +32,7 @@ class Table implements \JsonSerializable
         ];
     }
 
-    public static function dddCreate(Uuid $zoneId, TableName $name, int $restaurantId, ?Uuid $joinedToUuid = null): self
+    public static function dddCreate(Uuid $zoneId, TableName $name, RestaurantId $restaurantId, ?Uuid $joinedToUuid = null): self
     {
         $now = DomainDateTime::now();
 
@@ -57,7 +58,7 @@ class Table implements \JsonSerializable
     ): self {
         return new self(
             Uuid::create($id),
-            $restaurantId,
+            RestaurantId::create($restaurantId),
             Uuid::create($zoneId),
             TableName::create($name),
             $joinedToUuid ? Uuid::create($joinedToUuid) : null,
@@ -71,7 +72,7 @@ class Table implements \JsonSerializable
         return $this->id;
     }
 
-    public function restaurantId(): int
+    public function restaurantId(): RestaurantId
     {
         return $this->restaurantId;
     }
