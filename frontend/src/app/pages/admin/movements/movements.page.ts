@@ -166,15 +166,31 @@ export class MovementsPage implements OnInit {
       'stock': 'Stock',
       'description': 'Descripción',
       'table_id': 'Mesa',
+      'table_uuid': 'Mesa',
       'total': 'Total',
       'items': 'Productos',
       'lines': 'Líneas',
       'family_id': 'Familia',
       'tax_id': 'Impuesto',
+      'zone_id': 'Zona',
       'active': 'Activo',
       'capacity': 'Capacidad',
-      'status': 'Estado'
+      'status': 'Estado',
+      'user_uuid': 'Usuario',
+      'opened_by_user_uuid': 'Abierto por',
+      'diners': 'Comensales',
+      'order_id': 'Comanda',
+      'sale_id': 'Venta',
+      'product_id': 'Producto',
+      'title': 'Título',
+      'note': 'Nota'
     };
-    return keys[key] || key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ');
+    
+    if (keys[key]) return keys[key];
+    
+    return key.replace(/_/g, ' ')
+              .split(' ')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ');
   }
 }

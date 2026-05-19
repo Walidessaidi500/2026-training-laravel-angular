@@ -1,11 +1,9 @@
 <ion-content class="dashboard-background">
 
-  <!-- Mensaje si no es admin -->
   <app-access-denied *ngIf="!isAdmin && !(isLoading$ | async)" [user]="currentUser"
     message="Este dashboard solo está disponible para administradores.">
   </app-access-denied>
   
-  <!-- Loading -->
   <div class="dashboard-grid" *ngIf="isLoading$ | async">
     <div class="main-column">
       <ion-skeleton-text animated style="height: 250px; border-radius: 16px; margin-bottom: 24px;"></ion-skeleton-text>
@@ -19,7 +17,6 @@
     </div>
   </div>
 
-  <!-- Dashboard content - solo para admin -->
   <ng-container *ngIf="dashboardData$ | async as data">
     <div class="dashboard-grid" *ngIf="isAdmin && !(isLoading$ | async)">
 
@@ -122,7 +119,6 @@
           </div>
           <div class="chart-header-stats">
             <div class="amount-medium">{{ (data.revenue.filteredAmount !== undefined ? data.revenue.filteredAmount : data.revenue.thisWeek) | currency:'EUR':'symbol':'1.0-0' }}</div>
-            <!-- Mantenemos la tendencia global o podríamos calcular una específica si estuviera disponible -->
           </div>
         </div>
 

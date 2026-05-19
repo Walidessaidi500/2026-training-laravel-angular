@@ -4,6 +4,11 @@ namespace App\Movement\Infrastructure\Entrypoint\Http\Middleware;
 
 use App\Shared\Infrastructure\Services\MovementLogger;
 use App\User\Domain\Interfaces\UserRepositoryInterface;
+use App\Family\Domain\Interfaces\FamilyRepositoryInterface;
+use App\Tax\Domain\Interfaces\TaxRepositoryInterface;
+use App\Table\Domain\Interfaces\TableRepositoryInterface;
+use App\Zone\Domain\Interfaces\ZoneRepositoryInterface;
+use App\Product\Domain\Interfaces\ProductRepositoryInterface;
 use App\Shared\Domain\ValueObject\Uuid;
 use Closure;
 use Illuminate\Http\Request;
@@ -13,7 +18,12 @@ class RecordMovementMiddleware
 {
     public function __construct(
         private MovementLogger $logger,
-        private UserRepositoryInterface $userRepository
+        private UserRepositoryInterface $userRepository,
+        private FamilyRepositoryInterface $familyRepository,
+        private TaxRepositoryInterface $taxRepository,
+        private TableRepositoryInterface $tableRepository,
+        private ZoneRepositoryInterface $zoneRepository,
+        private ProductRepositoryInterface $productRepository
     ) {}
 
     /**
@@ -113,6 +123,46 @@ class RecordMovementMiddleware
         return (is_numeric($last) || strlen($last) > 20) ? $last : null;
     }
 
+    private function resolveIdToName(string $key, $value): string
+    {
+        if (!$value || !is_string($value) || strlen($value) < 20) {
+            return (string)$value;
+        }
+
+        try {
+            $uuid = Uuid::create($value);
+            
+            if ($key === 'family_id' || $key === 'family') {
+                $family = $this->familyRepository->findById($uuid);
+                return $family ? $family->name() : $value;
+            }
+            if ($key === 'tax_id' || $key === 'tax') {
+                $tax = $this->taxRepository->findById($uuid);
+                return $tax ? $tax->name() : $value;
+            }
+            if ($key === 'table_id' || $key === 'table_uuid' || $key === 'joined_to_uuid' || $key === 'table') {
+                $table = $this->tableRepository->findById($uuid);
+                return $table ? $table->name() : $value;
+            }
+            if ($key === 'zone_id' || $key === 'zone') {
+                $zone = $this->zoneRepository->findById($uuid);
+                return $zone ? $zone->name() : $value;
+            }
+            if ($key === 'user_id' || $key === 'user_uuid' || $key === 'opened_by_user_uuid' || $key === 'user') {
+                $user = $this->userRepository->findById($uuid);
+                return $user ? $user->name() : $value;
+            }
+            if ($key === 'product_id' || $key === 'product') {
+                $product = $this->productRepository->findById($uuid);
+                return $product ? $product->name() : $value;
+            }
+        } catch (\Exception $e) {
+            // Not a UUID or other error
+        }
+
+        return (string)$value;
+    }
+
     private function extractSimplifiedChanges(Request $request): array
     {
         $data = $request->except(['password', 'password_confirmation', 'pin', 'image_src', 'id', 'uuid', 'restaurant_id', 'created_at', 'updated_at']);
@@ -126,7 +176,7 @@ class RecordMovementMiddleware
                     $simplified[$key] = '(detalles complejos)';
                 }
             } else {
-                $simplified[$key] = $value;
+                $simplified[$key] = $this->resolveIdToName($key, $value);
             }
         }
         
@@ -155,7 +205,8 @@ class RecordMovementMiddleware
         if ($method === 'POST') {
             if ($resourceType === 'order') {
                 $itemsCount = count($data['items'] ?? []);
-                return "Envió una nueva comanda con $itemsCount productos para la mesa #" . ($data['table_id'] ?? '?');
+                $tableName = $this->resolveIdToName('table_id', $data['table_id'] ?? null);
+                return "Envió una nueva comanda con $itemsCount productos para la mesa $tableName";
             }
             if ($resourceType === 'sale') {
                 $total = ($data['total'] ?? 0) / 100;
@@ -170,13 +221,33 @@ class RecordMovementMiddleware
         // Casos para PUT/PATCH (Actualizaciones)
         if ($method === 'PUT' || $method === 'PATCH') {
             $name = $data['name'] ?? $data['title'] ?? null;
+            if (!$name && $resourceType) {
+                $id = $this->determineResourceId($request);
+                if ($id) {
+                    $resolvedName = $this->resolveIdToName($resourceType, $id);
+                    if ($resolvedName !== $id) {
+                        $name = $resolvedName;
+                    }
+                }
+            }
             $nameStr = $name ? " (\"$name\")" : "";
             return "Actualizó los datos de $typeName$nameStr";
         }
 
         // Casos para DELETE (Eliminaciones)
         if ($method === 'DELETE') {
-            return "Eliminó $typeName del sistema";
+            $name = null;
+            if ($resourceType) {
+                $id = $this->determineResourceId($request);
+                if ($id) {
+                    $resolvedName = $this->resolveIdToName($resourceType, $id);
+                    if ($resolvedName !== $id) {
+                        $name = $resolvedName;
+                    }
+                }
+            }
+            $nameStr = $name ? " (\"$name\")" : "";
+            return "Eliminó $typeName$nameStr del sistema";
         }
 
         return "Realizó una operación en $typeName";
