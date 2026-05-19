@@ -183,7 +183,10 @@ export class MovementsPage implements OnInit {
       'sale_id': 'Venta',
       'product_id': 'Producto',
       'title': 'Título',
-      'note': 'Nota'
+      'note': 'Nota',
+      'amount_cash': 'Efectivo',
+      'amount_card': 'Tarjeta',
+      'payment_method': 'Método de pago'
     };
     
     if (keys[key]) return keys[key];
@@ -192,5 +195,27 @@ export class MovementsPage implements OnInit {
               .split(' ')
               .map(word => word.charAt(0).toUpperCase() + word.slice(1))
               .join(' ');
+  }
+
+  formatValue(key: string, value: any): any {
+    if (value === null || value === undefined) return 'N/A';
+    
+    const currencyKeys = ['price', 'total', 'amount_cash', 'amount_card', 'amount'];
+    
+    if (currencyKeys.includes(key.toLowerCase())) {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue)) {
+        return (numValue / 100).toLocaleString('es-ES', { 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+        }) + ' €';
+      }
+    }
+    
+    if (typeof value === 'boolean' || value === 'true' || value === 'false') {
+      return (value === true || value === 'true') ? 'Sí' : 'No';
+    }
+    
+    return value;
   }
 }

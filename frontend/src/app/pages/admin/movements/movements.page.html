@@ -56,7 +56,7 @@
                   <div class="simplified-changes">
                     <div class="change-row" *ngFor="let change of getObjectKeys(movement.changes)">
                       <span class="change-key">{{ formatKey(change) }}:</span>
-                      <span class="change-value">{{ movement.changes[change] }}</span>
+                      <span class="change-value">{{ formatValue(change, movement.changes[change]) }}</span>
                     </div>
                   </div>
                 </div>
