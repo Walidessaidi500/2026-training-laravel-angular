@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '@environments/environment';
 
 export interface Family {
   uuid: string;
@@ -24,12 +23,11 @@ export interface FamilyListResponse {
   providedIn: 'root',
 })
 export class FamilyService {
-  private readonly apiUrl = `${environment.apiUrl}/families`;
 
   constructor(private http: HttpClient) {}
 
   list(active?: boolean): Observable<FamilyListResponse> {
-    let url = this.apiUrl;
+    let url = 'families';
     if (active !== undefined) {
       url += `?active=${active ? 1 : 0}`;
     }
@@ -37,22 +35,22 @@ export class FamilyService {
   }
 
   get(uuid: string): Observable<Family> {
-    return this.http.get<Family>(`${this.apiUrl}/${uuid}`);
+    return this.http.get<Family>(`families/${uuid}`);
   }
 
   create(data: Partial<Family>): Observable<Family> {
-    return this.http.post<Family>(this.apiUrl, data);
+    return this.http.post<Family>('families', data);
   }
 
   update(uuid: string, data: Partial<Family>): Observable<Family> {
-    return this.http.put<Family>(`${this.apiUrl}/${uuid}`, data);
+    return this.http.put<Family>(`families/${uuid}`, data);
   }
 
   delete(uuid: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${uuid}`);
+    return this.http.delete<void>(`families/${uuid}`);
   }
 
   toggle(uuid: string): Observable<Family> {
-    return this.http.patch<Family>(`${this.apiUrl}/${uuid}/toggle-active`, {});
+    return this.http.patch<Family>(`families/${uuid}/toggle-active`, {});
   }
 }

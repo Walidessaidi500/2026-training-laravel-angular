@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '@environments/environment';
 
 export interface Restaurant {
   uuid: string;
@@ -25,27 +24,26 @@ export interface RestaurantListResponse {
   providedIn: 'root',
 })
 export class RestaurantService {
-  private readonly apiUrl = `${environment.apiUrl}/restaurants`;
 
   constructor(private http: HttpClient) {}
 
   list(): Observable<RestaurantListResponse> {
-    return this.http.get<RestaurantListResponse>(this.apiUrl);
+    return this.http.get<RestaurantListResponse>('restaurants');
   }
 
   get(uuid: string): Observable<Restaurant> {
-    return this.http.get<Restaurant>(`${this.apiUrl}/${uuid}`);
+    return this.http.get<Restaurant>(`restaurants/${uuid}`);
   }
 
   create(data: Partial<Restaurant>): Observable<Restaurant> {
-    return this.http.post<Restaurant>(this.apiUrl, data);
+    return this.http.post<Restaurant>('restaurants', data);
   }
 
   update(uuid: string, data: Partial<Restaurant>): Observable<Restaurant> {
-    return this.http.put<Restaurant>(`${this.apiUrl}/${uuid}`, data);
+    return this.http.put<Restaurant>(`restaurants/${uuid}`, data);
   }
 
   delete(uuid: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${uuid}`);
+    return this.http.delete<void>(`restaurants/${uuid}`);
   }
 }

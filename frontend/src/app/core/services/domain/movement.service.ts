@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '@environments/environment';
 
 export interface Movement {
   uuid: string;
@@ -33,13 +32,12 @@ export interface MovementResponse {
 })
 export class MovementService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/movements`;
 
   list(page: number = 1, perPage: number = 50): Observable<MovementResponse> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('perPage', perPage.toString());
 
-    return this.http.get<MovementResponse>(this.apiUrl, { params });
+    return this.http.get<MovementResponse>('movements', { params });
   }
 }

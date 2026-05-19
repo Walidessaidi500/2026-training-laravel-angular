@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '@environments/environment';
 
 export interface OrderLine {
   uuid: string;
@@ -45,41 +44,40 @@ export interface OrderListResponse {
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = `${environment.apiUrl}/orders`;
 
   constructor(private http: HttpClient) {}
 
   list(page = 1, perPage = 100): Observable<OrderListResponse> {
     return this.http.get<OrderListResponse>(
-      `${this.apiUrl}?page=${page}&per_page=${perPage}`
+      `orders?page=${page}&per_page=${perPage}`
     );
   }
 
   get(uuid: string): Observable<Order> {
-    return this.http.get<Order>(`${this.apiUrl}/${uuid}`);
+    return this.http.get<Order>(`orders/${uuid}`);
   }
 
   getActiveOrderByTable(tableUuid: string): Observable<Order | null> {
-    return this.http.get<Order | null>(`${this.apiUrl}/table/${tableUuid}`);
+    return this.http.get<Order | null>(`orders/table/${tableUuid}`);
   }
 
   create(data: Partial<Order>): Observable<Order> {
-    return this.http.post<Order>(this.apiUrl, data);
+    return this.http.post<Order>('orders', data);
   }
 
   sync(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/sync`, data);
+    return this.http.post<any>('orders/sync', data);
   }
 
   update(uuid: string, data: Partial<Order>): Observable<Order> {
-    return this.http.put<Order>(`${this.apiUrl}/${uuid}`, data);
+    return this.http.put<Order>(`orders/${uuid}`, data);
   }
 
   delete(uuid: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${uuid}`);
+    return this.http.delete<void>(`orders/${uuid}`);
   }
 
   closeOrder(uuid: string): Observable<Order> {
-    return this.http.post<Order>(`${this.apiUrl}/${uuid}/close`, {});
+    return this.http.post<Order>(`orders/${uuid}/close`, {});
   }
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '@environments/environment';
 
 export interface SaleLine {
   uuid: string;
@@ -49,12 +48,11 @@ export interface SaleListResponse {
   providedIn: 'root'
 })
 export class SaleService {
-  private apiUrl = `${environment.apiUrl}/sales`;
 
   constructor(private http: HttpClient) {}
 
   list(page = 1, perPage = 100, date?: string): Observable<SaleListResponse> {
-    let url = `${this.apiUrl}?page=${page}&per_page=${perPage}`;
+    let url = `sales?page=${page}&per_page=${perPage}`;
     if (date) {
       url += `&date=${date}`;
     }
@@ -62,26 +60,26 @@ export class SaleService {
   }
 
   get(uuid: string): Observable<Sale> {
-    return this.http.get<Sale>(`${this.apiUrl}/${uuid}`);
+    return this.http.get<Sale>(`sales/${uuid}`);
   }
 
   create(data: Partial<Sale>): Observable<Sale> {
-    return this.http.post<Sale>(this.apiUrl, data);
+    return this.http.post<Sale>('sales', data);
   }
 
   process(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/process`, data);
+    return this.http.post<any>('sales/process', data);
   }
 
   update(uuid: string, data: Partial<Sale>): Observable<Sale> {
-    return this.http.put<Sale>(`${this.apiUrl}/${uuid}`, data);
+    return this.http.put<Sale>(`sales/${uuid}`, data);
   }
 
   delete(uuid: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${uuid}`);
+    return this.http.delete<void>(`sales/${uuid}`);
   }
 
   closeSale(uuid: string): Observable<Sale> {
-    return this.http.post<Sale>(`${this.apiUrl}/${uuid}/close`, {});
+    return this.http.post<Sale>(`sales/${uuid}/close`, {});
   }
 }

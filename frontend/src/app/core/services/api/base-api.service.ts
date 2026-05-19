@@ -1,4 +1,3 @@
-import { environment } from '../../../environments/environment';
 import { Injectable, Injector } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
@@ -9,8 +8,6 @@ export type HttpMethod = 'get' | 'post' | 'patch' | 'put' | 'delete';
   providedIn: 'root',
 })
 export abstract class BaseApiService {
-
-  protected apiUrl: string = environment.apiUrl;
 
   public http: HttpClient;
 
@@ -56,35 +53,35 @@ export abstract class BaseApiService {
 
   
   private postHttpCall(endpoint: string, params: any): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(this.apiUrl + endpoint, params)
+    return this.http.post<ApiResponse>(endpoint, params)
       .pipe(catchError((error) => this.handleError(error)));
   }
 
 
   
   private putHttpCall(endpoint: string, params: any): Observable<ApiResponse> {
-    return this.http.put<ApiResponse>(this.apiUrl + endpoint, params)
+    return this.http.put<ApiResponse>(endpoint, params)
       .pipe(catchError((error) => this.handleError(error)));
   }
 
 
   
   private patchHttpCall(endpoint: string, params?: any): Observable<ApiResponse> {
-    return this.http.patch<ApiResponse>(this.apiUrl + endpoint, params)
+    return this.http.patch<ApiResponse>(endpoint, params)
       .pipe(catchError((error) => this.handleError(error)));
   }
 
 
   
   private deleteHttpCall(endpoint: string, params?: any): Observable<ApiResponse> {
-    return this.http.delete<ApiResponse>(this.apiUrl + endpoint, { params })
+    return this.http.delete<ApiResponse>(endpoint, { params })
       .pipe(catchError((error) => this.handleError(error)));
   }
 
 
   
   private getHttpCall(endpoint: string, params?: any): Observable<ApiResponse> {
-    return this.http.get<ApiResponse>(this.apiUrl + endpoint, { params })
+    return this.http.get<ApiResponse>(endpoint, { params })
       .pipe(catchError((error) => this.handleError(error)));
   }
 

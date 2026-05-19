@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '@environments/environment';
 
 export interface Tax {
   uuid: string;
@@ -23,27 +22,26 @@ export interface TaxListResponse {
   providedIn: 'root',
 })
 export class TaxService {
-  private readonly apiUrl = `${environment.apiUrl}/taxes`;
 
   constructor(private http: HttpClient) {}
 
   list(): Observable<TaxListResponse> {
-    return this.http.get<TaxListResponse>(this.apiUrl);
+    return this.http.get<TaxListResponse>('taxes');
   }
 
   get(uuid: string): Observable<Tax> {
-    return this.http.get<Tax>(`${this.apiUrl}/${uuid}`);
+    return this.http.get<Tax>(`taxes/${uuid}`);
   }
 
   create(data: Partial<Tax>): Observable<Tax> {
-    return this.http.post<Tax>(this.apiUrl, data);
+    return this.http.post<Tax>('taxes', data);
   }
 
   update(uuid: string, data: Partial<Tax>): Observable<Tax> {
-    return this.http.put<Tax>(`${this.apiUrl}/${uuid}`, data);
+    return this.http.put<Tax>(`taxes/${uuid}`, data);
   }
 
   delete(uuid: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${uuid}`);
+    return this.http.delete<void>(`taxes/${uuid}`);
   }
 }

@@ -26,7 +26,6 @@ export interface AuthResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = `${environment.apiUrl}`;
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   private userSubject = new BehaviorSubject<User | null>(this.getStoredUser());
@@ -39,10 +38,9 @@ export class AuthService {
   }
 
   refreshUser(): Observable<User | null> {
-    return this.http.get<User>(`${this.apiUrl}/me`).pipe(
+    return this.http.get<User>('me').pipe(
       tap((user) => this.setUser(user)),
       catchError((error) => {
-
         if (error.status === 401 || error.status === 403) {
           this.logout();
         }
@@ -58,13 +56,13 @@ export class AuthService {
 
   login(credentials: LoginRequest): Observable<User> {
     return this.http
-      .post<{ token: string }>(`${this.apiUrl}/login`, credentials)
+      .post<{ token: string }>('login', credentials)
       .pipe(
         tap((response) => {
           this.setToken(response.token);
           this.isAuthenticatedSubject.next(true);
         }),
-        switchMap(() => this.http.get<User>(`${this.apiUrl}/me`)),
+        switchMap(() => this.http.get<User>('me')),
         tap((user) => {
           this.setUser(user);
         })

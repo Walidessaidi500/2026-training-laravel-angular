@@ -50,15 +50,18 @@ backend/app/
 
 ```
 frontend/src/app/
-├── components/        # Componentes reutilizables (botones, cards, modals...)
-├── pages/             # Páginas de la aplicación
-│   └── core/          # Páginas principales
-├── pipes/             # Pipes personalizados
-├── providers/         # Interceptores y providers (HTTP interceptor)
-└── services/          # Servicios (llamadas API, lógica compartida)
+├── core/              # Lógica central
+│   ├── guards/        # Guardianes de rutas (auth, role, guest)
+│   ├── interceptors/  # Interceptor HTTP (prefijo de API y headers)
+│   └── services/      # Servicios de dominio y API
+├── shared/            # Recursos compartidos
+│   ├── ui/            # Componentes reutilizables (botones, cards, sidebar...)
+│   ├── features/      # Funcionalidades compartidas
+│   └── pipes/         # Pipes personalizados
+└── pages/             # Páginas de la aplicación (admin, auth, supervisor, tpv)
 ```
 
-- **Interceptor HTTP** (`providers/interceptor.ts`): prefija la URL base de la API (`environment.apiUrl`) y añade headers por defecto.
+- **Interceptor HTTP** (`core/interceptors/interceptor.ts`): prefija automáticamente la URL base de la API (`environment.apiUrl`), añade el token de autorización y gestiona las cabeceras por defecto. Los servicios deben usar rutas relativas (ej: `'login'`, `'products'`).
 - **Providers registrados en `main.ts`** con `withInterceptorsFromDi()` y `withFetch()`.
 
 ### Docker y servicios

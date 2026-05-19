@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '@environments/environment';
 
 export interface Product {
   uuid: string;
@@ -28,12 +27,11 @@ export interface ProductListResponse {
   providedIn: 'root',
 })
 export class ProductService {
-  private readonly apiUrl = `${environment.apiUrl}/products`;
 
   constructor(private http: HttpClient) {}
 
   list(page: number = 1, perPage: number = 100, active?: boolean): Observable<ProductListResponse> {
-    let url = `${this.apiUrl}?page=${page}&per_page=${perPage}`;
+    let url = `products?page=${page}&per_page=${perPage}`;
     if (active !== undefined) {
       url += `&active=${active ? 1 : 0}`;
     }
@@ -41,7 +39,7 @@ export class ProductService {
   }
 
   get(uuid: string): Observable<Product> {
-    return this.http.get<Product>(`${this.apiUrl}/${uuid}`);
+    return this.http.get<Product>(`products/${uuid}`);
   }
 
   create(data: any): Observable<Product> {
@@ -50,7 +48,7 @@ export class ProductService {
       price_in_cents: data.priceInCents
     };
     delete backendData.priceInCents;
-    return this.http.post<Product>(this.apiUrl, backendData);
+    return this.http.post<Product>('products', backendData);
   }
 
   update(uuid: string, data: any): Observable<Product> {
@@ -59,14 +57,14 @@ export class ProductService {
       price_in_cents: data.priceInCents
     };
     delete backendData.priceInCents;
-    return this.http.put<Product>(`${this.apiUrl}/${uuid}`, backendData);
+    return this.http.put<Product>(`products/${uuid}`, backendData);
   }
 
   delete(uuid: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${uuid}`);
+    return this.http.delete<void>(`products/${uuid}`);
   }
 
   toggle(uuid: string): Observable<Product> {
-    return this.http.patch<Product>(`${this.apiUrl}/${uuid}/toggle-active`, {});
+    return this.http.patch<Product>(`products/${uuid}/toggle-active`, {});
   }
 }
