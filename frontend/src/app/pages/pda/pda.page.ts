@@ -197,13 +197,19 @@ export class PdaPage implements OnInit, OnDestroy {
   }
 
   public onDinersConfirm() {
-    const diners = parseInt(this.cartService.tempDinersValue);
+    const dinersCount = this.cartService.tempDinersValue;
     const table = this.stateService.state.selectedTable;
-    const user = this.stateService.state.selectedUserForPin;
+    let user = this.stateService.state.selectedUserForPin;
+
+    if (!user) {
+      user = this.getValidWorkerSession();
+    }
 
     if (table && user) {
       this.stateService.setShowDinersSelection(false);
+      this.stateService.setSelectedOpUser(user);
       this.cartService.clearCart();
+      this.cartService.setTempDiners(dinersCount);
       this.pdaViewState = 'order';
     }
   }
@@ -219,9 +225,12 @@ export class PdaPage implements OnInit, OnDestroy {
 
   public sendOrder() {
     const table = this.stateService.state.selectedTable;
-    const user = this.stateService.state.selectedUserForPin;
+    const user = this.stateService.state.selectedUserForPin || this.getValidWorkerSession();
 
-    if (!table || !user) return;
+    if (!table || !user) {
+      this.uiService.showError('Error: Mesa o usuario no seleccionado');
+      return;
+    }
 
     this.cartService.syncOrder(table.uuid, user.uuid).subscribe({
       next: () => {
