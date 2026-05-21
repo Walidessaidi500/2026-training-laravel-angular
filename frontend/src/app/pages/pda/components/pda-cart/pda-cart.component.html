@@ -4,10 +4,10 @@
       <ion-item>
         <ion-label>
           <h3>{{ item.product.name }}</h3>
-          <p>{{ item.quantity }} x {{ (item.product.priceInCents / 100) | currency:'EUR' }}</p>
+          <p>{{ item.quantity }} x {{ (cartService.getPriceWithTax(item.product) / 100) | currency:'EUR' }}</p>
         </ion-label>
         <ion-note slot="end" color="primary">
-          {{ (item.quantity * item.product.priceInCents / 100) | currency:'EUR' }}
+          {{ (item.quantity * cartService.getPriceWithTax(item.product) / 100) | currency:'EUR' }}
         </ion-note>
       </ion-item>
       <ion-item-options side="end">
