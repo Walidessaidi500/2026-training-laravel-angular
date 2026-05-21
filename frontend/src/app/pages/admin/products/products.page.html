@@ -2,7 +2,6 @@
   <app-access-denied *ngIf="!isAdmin && !isSupervisor && !(isLoading$ | async)" [user]="currentUser"
     message="Esta página solo está disponible para administradores y supervisores."></app-access-denied>
 
-  <!-- Skeleton Loading -->
   <div class="page-container" *ngIf="isLoading$ | async">
     <div class="page-header">
       <ion-skeleton-text animated style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text>
@@ -16,7 +15,6 @@
     </div>
   </div>
 
-  <!-- Content -->
   <div class="page-container" *ngIf="!(isLoading$ | async) && (isAdmin || isSupervisor)">
 
     <div class="page-header">
@@ -34,7 +32,6 @@
       </button>
     </div>
 
-    <!-- Stats Section -->
     <div class="stats-grid three-cols" *ngIf="productStats$ | async as productStats">
       <div class="panel-card stat-card">
         <div class="stat-content">
@@ -67,7 +64,6 @@
       </div>
     </div>
 
-    <!-- Advanced Filters -->
     <div class="panel-card filter-panel advanced-filters">
       <div class="search-section">
         <ion-searchbar placeholder="Buscar producto por nombre..." (ionInput)="onSearchChange($event)"
@@ -75,7 +71,6 @@
       </div>
 
       <div class="selects-row">
-        <!-- Filtro por Familia -->
         <div class="filter-select">
           <ion-select label="Familia" labelPlacement="floating" [(ngModel)]="selectedFamily"
             (ionChange)="onFilterChange()" interface="popover">
@@ -85,7 +80,6 @@
           </ion-select>
         </div>
 
-        <!-- Filtro por Impuesto -->
         <div class="filter-select">
           <ion-select label="Impuesto" labelPlacement="floating" [(ngModel)]="selectedTax"
             (ionChange)="onFilterChange()" interface="popover">
@@ -95,7 +89,6 @@
           </ion-select>
         </div>
 
-        <!-- Filtro por Estado -->
         <div class="filter-select">
           <ion-select label="Estado" labelPlacement="floating" [(ngModel)]="selectedStatus"
             (ionChange)="onFilterChange()" interface="popover">
@@ -105,7 +98,6 @@
           </ion-select>
         </div>
 
-        <!-- Filtro por Stock -->
         <div class="filter-select">
           <ion-select label="Stock" labelPlacement="floating" [(ngModel)]="selectedStock" (ionChange)="onFilterChange()"
             interface="popover">
@@ -118,7 +110,6 @@
       </div>
     </div>
 
-    <!-- Main List Panel -->
     <div class="panel-card table-panel" *ngIf="displayedProducts$ | async as displayedProducts">
       <div class="card-header">
         <div *ngIf="filteredProducts$ | async as filteredProducts">
@@ -126,7 +117,6 @@
           <h3>{{ filteredProducts.length }} resultado{{ filteredProducts.length !== 1 ? 's' : '' }}</h3>
         </div>
         
-        <!-- Toggle de Visualización -->
         <div class="display-mode-row">
           <ion-segment [(ngModel)]="displayMode" (ionChange)="onDisplayModeChange()" class="custom-segment">
             <ion-segment-button value="scroll">
@@ -141,14 +131,12 @@
         </div>
       </div>
 
-      <!-- Empty State -->
       <div class="empty-state" *ngIf="displayedProducts.length === 0">
         <div class="empty-icon"><ion-icon name="options-outline"></ion-icon></div>
         <p class="empty-title">Sin resultados</p>
         <p class="empty-description">No hay productos que coincidan con los filtros aplicados.</p>
       </div>
 
-      <!-- List -->
       <ion-list class="products-list" *ngIf="displayedProducts.length > 0">
         <ion-item lines="none" class="product-item animated-fadeIn" *ngFor="let product of displayedProducts">
           <div class="product-icon">
@@ -196,13 +184,11 @@
         </ion-item>
       </ion-list>
 
-      <!-- Infinite Scroll -->
       <ion-infinite-scroll *ngIf="displayMode === 'scroll'" (ionInfinite)="loadMore($event)" [disabled]="isInfiniteDisabled">
         <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más productos...">
         </ion-infinite-scroll-content>
       </ion-infinite-scroll>
 
-      <!-- Pagination Controls -->
       <div class="pagination-footer" *ngIf="displayMode === 'pagination'">
         <button class="pagination-btn" [disabled]="currentPage === 1" (click)="prevPage()">
           <ion-icon name="chevron-back-outline"></ion-icon> Anterior

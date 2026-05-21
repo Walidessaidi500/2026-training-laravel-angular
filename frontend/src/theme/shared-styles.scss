@@ -1,8 +1,4 @@
-/* ==========================================================================
-   Backoffice Shared Layout & UI
-   ========================================================================== */
 
-/* Page Containers */
 .page-container {
   padding: 24px;
   max-width: 1400px;
@@ -41,7 +37,6 @@
   }
 }
 
-/* Common Buttons */
 .btn-primary {
   background: var(--ion-color-primary);
   color: white;
@@ -80,7 +75,6 @@
   }
 }
 
-/* Base Cards & Panels */
 .panel-card {
   background: #ffffff;
   border-radius: 20px;
@@ -114,7 +108,6 @@
   }
 }
 
-/* Stats Components */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -175,7 +168,6 @@
   &.warning-light { background: var(--ion-color-warning-light); color: var(--ion-color-warning); }
 }
 
-/* Badges & Tags */
 .status-badge, .stock-badge {
   display: inline-flex;
   align-items: center;
@@ -203,7 +195,6 @@
   font-weight: 500;
 }
 
-/* Utilities */
 .price-tag {
   font-size: 14px;
   font-weight: 700;
@@ -214,7 +205,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Action Buttons */
 .action-btn {
   background: transparent;
   border: 1.5px solid;
@@ -245,7 +235,6 @@
   ion-icon { font-size: 18px; }
 }
 
-/* Filter Panel & Controls */
 .filter-panel {
   margin-bottom: 24px;
 
@@ -299,7 +288,6 @@
   }
 }
 
-/* Empty State */
 .empty-state {
   display: flex;
   flex-direction: column;

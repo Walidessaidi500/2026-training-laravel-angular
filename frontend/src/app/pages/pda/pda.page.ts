@@ -64,7 +64,6 @@ export class PdaPage implements OnInit, OnDestroy {
   public pdaViewState: PdaViewState = 'tables';
   public currentUser = this.authService.getUser();
 
-  // Estado para pagos (portado de TPV)
   public paymentType: 'total' | 'split' = 'total';
   public paymentMethod: 'cash' | 'card' | 'mixed' = 'cash';
   public amountCash: number = 0;
@@ -96,14 +95,12 @@ export class PdaPage implements OnInit, OnDestroy {
     this.stateService.loadInitialData().subscribe(res => {
       this.cartService.setTaxes(res.taxes.data);
       
-      // Restaurar sesión de trabajador si existe y es válida
       const worker = this.getValidWorkerSession();
       if (worker) {
         this.stateService.setShowPinModal(false, worker);
       }
     });
 
-    // Iniciar polling de estado de mesas cada 5 segundos
     this.stateService.startPolling(5000);
   }
 
@@ -149,7 +146,6 @@ export class PdaPage implements OnInit, OnDestroy {
     if (this.stateService.state.tableOrders[effectiveTable.uuid]) {
       this.cartService.loadOrderForTable(effectiveTable.uuid, this.stateService.state.products)
         .subscribe(() => {
-          // Asegurar que el trabajador esté en el estado si hay sesión activa
           const worker = this.getValidWorkerSession();
           if (worker && !this.stateService.state.selectedUserForPin) {
             this.stateService.setShowPinModal(false, worker);
@@ -159,7 +155,6 @@ export class PdaPage implements OnInit, OnDestroy {
     } else {
       const worker = this.getValidWorkerSession();
       if (worker) {
-        // Si hay sesión válida, saltar selección de usuario y PIN
         this.stateService.setShowPinModal(false, worker);
         this.stateService.setShowUserSelection(false, 'opening');
         this.stateService.setShowDinersSelection(true);
@@ -173,7 +168,7 @@ export class PdaPage implements OnInit, OnDestroy {
     this.pdaViewState = 'tables';
     this.stateService.setSelectedTable(null);
     this.cartService.clearCart();
-    this.stateService.refreshTableStatus(); // Actualizar estado al volver
+    this.stateService.refreshTableStatus(); 
   }
 
   public selectUser(user: User) {
@@ -187,7 +182,7 @@ export class PdaPage implements OnInit, OnDestroy {
 
     if (user?.pin === pin) {
       this.saveWorkerSession(user);
-      this.stateService.setShowPinModal(false, user); // Mantener el usuario en el estado
+      this.stateService.setShowPinModal(false, user); 
       this.stateService.resetPinBuffer();
       
       if (this.stateService.state.userSelectionContext === 'opening') {
@@ -239,7 +234,6 @@ export class PdaPage implements OnInit, OnDestroy {
     });
   }
 
-  // Lógica de Pagos portados de TPV
 
   public closeTicket() {
     if (this.cartService.cartValue.length === 0 || !this.stateService.state.selectedTable) return;
@@ -409,7 +403,7 @@ export class PdaPage implements OnInit, OnDestroy {
         this.isProcessingPayment = false;
         this.uiService.showSuccess('Pago procesado');
         
-        // Recargar estado para reflejar cambios en mesas, órdenes y productos
+
         this.stateService.loadInitialData().subscribe();
         
         const isPayingTotal = this.paymentType === 'total' || 

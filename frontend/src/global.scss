@@ -17,17 +17,14 @@
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/* Shared Backoffice Styles */
 @import "./theme/shared-styles.scss";
 @import "./theme/backoffice-forms.scss";
 
-/* Tipografía general más limpia y moderna */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Modal de Formulario de Usuario */
 .user-form-modal {
   --width: 600px !important;
   --height: auto !important;
@@ -52,7 +49,6 @@ body {
     }
   }
 
-  /* global.scss */
   .fullscreen-modal {
     --width: 100%;
     --height: 100%;

@@ -16,9 +16,7 @@ export interface FilterCriteria<T> {
   providedIn: 'root',
 })
 export class FilterService {
-  /**
-   * Aplica multiples filtros a una lista de objetos según los criterios especificados
-   */
+  
   applyFilters<T>(items: T[], criteria: FilterCriteria<T>): T[] {
     if (!items || !items.length) {
       return [];
@@ -26,7 +24,6 @@ export class FilterService {
 
     let filtered = [...items];
 
-    // Buscar por termino en propiedades específicas
     if (criteria.searchTerm && criteria.searchProperties?.length) {
       filtered = this.filterBySearchTerm(
         filtered,
@@ -35,12 +32,10 @@ export class FilterService {
       );
     }
 
-    // Estado activo/inactivo
     if (criteria.status && criteria.status !== 'all') {
       filtered = this.filterByStatus(filtered as any, criteria.status) as any;
     }
 
-    // Filtros por propiedad específica
     if (criteria.propertyFilters?.length) {
       criteria.propertyFilters.forEach((filter) => {
         filtered = this.filterByProperty(
@@ -52,7 +47,6 @@ export class FilterService {
       });
     }
 
-    // Filtros personalizados
     if (criteria.customFilters?.length) {
       criteria.customFilters.forEach((filterFn) => {
         filtered = filtered.filter(filterFn);
@@ -62,9 +56,7 @@ export class FilterService {
     return filtered;
   }
 
-  /**
-   * Filtra una lista de objetos por un termino de busqueda en una o varias propiedades
-   */
+  
   filterBySearchTerm<T>(
     items: T[],
     searchTerm: string,
@@ -87,9 +79,6 @@ export class FilterService {
     });
   }
 
-  /**
-   * Filtra una lista por un estado activo/inactivo
-   */
   filterByStatus<T extends { active: boolean }>(
     items: T[],
     status: string
@@ -101,9 +90,7 @@ export class FilterService {
     return items.filter((item) => item.active === wantActive);
   }
 
-  /**
-   * Filtra por una propiedad especifica y un valor
-   */
+
   filterByProperty<T>(
     items: T[],
     property: keyof T,

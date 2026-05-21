@@ -9,7 +9,6 @@ import {
 import { AuthService, LoginRequest } from '@services/auth/auth.service';
 import { AuthCardComponent } from '../auth-card/auth-card.component';
 
-// Importación de iconos (Crucial para Ionic Standalone)
 import { addIcons } from 'ionicons';
 import { mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline, alertCircleOutline } from 'ionicons/icons';
 
@@ -27,14 +26,13 @@ export class LoginPage implements OnInit {
   loginForm!: FormGroup;
   isLoading = false;
   errorMessage = '';
-  showPassword = false; // Estado para el ojito
+  showPassword = false; 
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private router: Router
   ) {
-    // Registramos los iconos que usamos en el HTML
     addIcons({ mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline, alertCircleOutline });
   }
 
@@ -49,11 +47,9 @@ export class LoginPage implements OnInit {
     });
   }
 
-  // Getters para el HTML
   get email() { return this.loginForm.get('email'); }
   get password() { return this.loginForm.get('password'); }
 
-  // Función para el botón del ojito
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
@@ -79,7 +75,6 @@ export class LoginPage implements OnInit {
             this.router.navigate(['/admin']);
             break;
           default:
-            // restaurant y otros roles van al TPV
             this.router.navigate(['/tpv']);
             break;
         }

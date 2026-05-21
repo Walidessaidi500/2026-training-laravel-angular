@@ -10,7 +10,6 @@
 </app-pda-header>
 
 <ion-content *ngIf="stateService.state$ | async as state">
-  <!-- View 1: Table Selection -->
   <app-tpv-table-selection
     *ngIf="pdaViewState === 'tables'"
     [zones]="state.zones"
@@ -22,7 +21,6 @@
     (tableClick)="onTableClick($event)">
   </app-tpv-table-selection>
 
-  <!-- View 2: Order Management (Products) -->
   <app-pda-product-list
     *ngIf="pdaViewState === 'order'"
     [families]="state.families"
@@ -32,7 +30,6 @@
     (productSelect)="addToCart($event)">
   </app-pda-product-list>
 
-  <!-- View 3: Cart -->
   <app-pda-cart
     *ngIf="pdaViewState === 'cart'"
     [cart]="(cartService.cart$ | async) || []"
@@ -42,7 +39,6 @@
     (pay)="closeTicket()">
   </app-pda-cart>
 
-  <!-- Modals (Reused from TPV) -->
   <app-tpv-user-selection-modal
     [isOpen]="state.showUserSelection"
     [users]="state.users"

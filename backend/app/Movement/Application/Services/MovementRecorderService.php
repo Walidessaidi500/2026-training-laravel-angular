@@ -27,7 +27,6 @@ class MovementRecorderService
                     $existingOrder = $this->orderRepository->findByTable(Uuid::create($tableUuid), 'open');
                     $request->attributes->set('movement_order_existed', $existingOrder !== null);
                 } catch (\Exception $e) {
-                    // Ignorar errores de resolución
                 }
             }
         }
@@ -37,7 +36,6 @@ class MovementRecorderService
     {
         $action = $this->descriptor->determineAction($request);
         
-        // Evitamos registrar el propio log, login o GETs
         if ($action === 'login' || str_contains($request->path(), 'movements')) {
             return;
         }
@@ -69,7 +67,6 @@ class MovementRecorderService
                 ];
             }
         } catch (\Exception $e) {
-            // Ignorar errores de resolución
         }
 
         return null;

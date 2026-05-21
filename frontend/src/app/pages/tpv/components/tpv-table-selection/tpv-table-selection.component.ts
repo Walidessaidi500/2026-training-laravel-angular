@@ -58,7 +58,7 @@ export class TpvTableSelectionComponent {
     this.pressTimeout = setTimeout(() => {
       this.isLongPress = true;
       this.tableLongPress.emit(table);
-    }, 250); // Reducido a 250ms para mayor rapidez
+    }, 250);
   }
 
   onPointerUp(table: Table, event: any) {

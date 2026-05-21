@@ -10,7 +10,6 @@
     </app-tpv-header>
 
     <div class="tpv-body">
-      <!-- View 1: Table Selection -->
       <app-tpv-table-selection
         *ngIf="state.viewState === 'tables'"
         [zones]="state.zones"
@@ -23,7 +22,6 @@
         (tableLongPress)="onTableLongPress($event)">
       </app-tpv-table-selection>
 
-      <!-- View 2: Order Management -->
       <ng-container *ngIf="state.viewState === 'order'">
         <main class="order-container">
           <app-tpv-order-management
@@ -55,7 +53,6 @@
     </div>
   </div>
 
-  <!-- Modals -->
   <app-tpv-user-selection-modal
     [isOpen]="state.showUserSelection"
     [users]="state.users"

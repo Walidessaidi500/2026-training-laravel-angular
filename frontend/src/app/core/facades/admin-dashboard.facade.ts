@@ -74,13 +74,10 @@ export class AdminDashboardFacade {
   });
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
 
-  // Observables para que los componentes se suscriban
   public readonly dashboardData$ = this.dashboardDataSubject.asObservable();
   public readonly isLoading$ = this.loadingSubject.asObservable();
 
-  /**
-   * Carga las estadisticas para el dashboard
-   */
+ 
   loadStatistics(): void {
     const currentUser = this.authService.getUser();
     const restaurantId = currentUser?.restaurant_id;
@@ -166,7 +163,6 @@ export class AdminDashboardFacade {
         const activeUsers = results.users.meta ? results.users.meta.total : results.users.data.length;
         const totalProducts = results.products.meta ? results.products.meta.total : results.products.data.length;
         
-        // Items por ticket como "tasa de conversion/eficiencia"
         const totalItems = sales.reduce((acc, s) => {
           if (s.lines && Array.isArray(s.lines)) {
             return acc + s.lines.reduce((lAcc: number, l: any) => lAcc + (Number(l.quantity) || 1), 0);
@@ -183,20 +179,20 @@ export class AdminDashboardFacade {
             trendPercentage: revenueTrend,
             thisWeek: revenueThisWeek,
             avgOrder: sales.length > 0 ? totalRevenue / sales.length : 0,
-            mrr: last30DaysRevenue / 100, // Monthly Revenue (Actual last 30 days)
+            mrr: last30DaysRevenue / 100, 
             filteredAmount: revenueThisWeek,
             filteredLabel: 'INGRESOS SEMANALES',
             filteredRange: '7d'
           },
           metrics: {
             activeUsers: activeUsers,
-            activeUsersTrend: 12.5, // Simulado
+            activeUsersTrend: 70,
             ordersToday: salesToday.length,
-            ordersTodayTrend: 8.2, // Simulado
+            ordersTodayTrend: 8.2, 
             conversionRate: avgItemsPerTicket, 
-            conversionRateTrend: -0.8, // Simulado
+            conversionRateTrend: -0.8,
             totalProducts: totalProducts,
-            totalProductsTrend: 3.0 // Simulado
+            totalProductsTrend: 3.0 
           },
           recentOrders: this.mapRecentSales(sales.slice(0, 10)),
           tables: results.tables.data || results.tables,
@@ -312,7 +308,6 @@ export class AdminDashboardFacade {
     });
   }
 
-  // Servicios para obtener los datos
   
   getFamilies(): Observable<any[]> {
     return this.familyService.list().pipe(map(res => res.data));

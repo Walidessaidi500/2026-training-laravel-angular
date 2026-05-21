@@ -3,7 +3,6 @@
     message="Esta página solo está disponible para administradores y supervisores.">
   </app-access-denied>
 
-  <!-- Skeleton Loading -->
   <div class="page-container" *ngIf="isLoading$ | async">
     <div class="page-header">
       <ion-skeleton-text animated style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text>
@@ -17,7 +16,6 @@
     </div>
   </div>
 
-  <!-- Content -->
   <div class="page-container" *ngIf="!(isLoading$ | async) && (isAdmin || isSupervisor)">
 
     <div class="page-header">
@@ -35,7 +33,6 @@
       </button>
     </div>
 
-    <!-- Stats -->
     <div class="stats-grid" [class.two-cols]="isAdmin" *ngIf="userStats$ | async as userStats">
       <div class="panel-card stat-card">
         <div class="stat-content">
@@ -62,7 +59,6 @@
       </div>
     </div>
 
-    <!-- Filters -->
     <div class="panel-card filter-panel">
       <div class="search-section">
         <ion-searchbar placeholder="Buscar por nombre o email..." (ionInput)="onSearchChange($event)"
@@ -88,7 +84,6 @@
       </div>
     </div>
 
-    <!-- Table Panel -->
     <div class="panel-card table-panel" *ngIf="filteredUsers$ | async as filteredUsers">
       <div class="card-header">
         <div>
@@ -97,7 +92,6 @@
         </div>
       </div>
 
-      <!-- Empty State -->
       <div class="empty-state" *ngIf="filteredUsers.length === 0">
         <div class="empty-icon"><ion-icon name="people-outline"></ion-icon></div>
         <p class="empty-title">No hay usuarios</p>

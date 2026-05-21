@@ -10,18 +10,15 @@ export class AuthFacade {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  // Estados para manejar la carga y errores
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
   private readonly errorSubject = new BehaviorSubject<string | null>(null);
 
-  // Exposed Observables
   public readonly user$ = this.authService.user$;
   public readonly isAuthenticated$ = this.authService.isAuthenticated$;
   public readonly isLoading$ = this.loadingSubject.asObservable();
   public readonly error$ = this.errorSubject.asObservable();
 
 
-  // Login y redirección basada en el rol del usuario
   login(credentials: LoginRequest): void {
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
@@ -40,7 +37,6 @@ export class AuthFacade {
   }
 
 
-  // Cierra la sesión del usuario y redirige a la página de inicio de sesión
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
@@ -79,7 +75,6 @@ export class AuthFacade {
   }
 
 
-  // Limpia el mensaje de error actual
   clearError(): void {
     this.errorSubject.next(null);
   }

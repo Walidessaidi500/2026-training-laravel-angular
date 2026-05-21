@@ -12,13 +12,11 @@ export class InventoryFacade {
   private readonly familyService = inject(FamilyService);
   private readonly taxService = inject(TaxService);
 
-  // Estados internos
   private readonly productsSubject = new BehaviorSubject<Product[]>([]);
   private readonly familiesSubject = new BehaviorSubject<Family[]>([]);
   private readonly taxesSubject = new BehaviorSubject<Tax[]>([]);
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
 
-  // Observables publicos
   public readonly products$ = this.productsSubject.asObservable();
   public readonly families$ = this.familiesSubject.asObservable();
   public readonly taxes$ = this.taxesSubject.asObservable();
@@ -28,9 +26,7 @@ export class InventoryFacade {
     return this.products$;
   }
 
-  /**
-   * Carga inicial de productos, familias y taxes
-   */
+  
   loadAll(): void {
     this.loadingSubject.next(true);
 
@@ -50,7 +46,6 @@ export class InventoryFacade {
     });
   }
 
-  // Helpers: Productos
 
   createProduct(data: any): Observable<Product> {
     this.loadingSubject.next(true);
@@ -70,7 +65,6 @@ export class InventoryFacade {
         const current = this.productsSubject.getValue();
         const index = current.findIndex(p => p.uuid === uuid);
         if (index !== -1) {
-          // Patch locally since backend might not return the full updated object
           current[index] = { ...current[index], ...data } as Product;
           this.productsSubject.next([...current]);
         }
@@ -103,7 +97,6 @@ export class InventoryFacade {
     );
   }
 
-  // Helpers: Familias
 
   createFamily(data: any): Observable<Family> {
     this.loadingSubject.next(true);
@@ -159,7 +152,6 @@ export class InventoryFacade {
     );
   }
 
-  // Helpers: Taxes
 
   createTax(data: any): Observable<Tax> {
     this.loadingSubject.next(true);
@@ -198,16 +190,12 @@ export class InventoryFacade {
     );
   }
 
-  /**
-   * Actualiza la lista de familias
-   */
+  
   refreshFamilies(): void {
     this.familyService.list().subscribe(res => this.familiesSubject.next(res.data));
   }
 
-  /**
-   * Actualiza la lista de taxes
-   */
+ 
   refreshTaxes(): void {
     this.taxService.list().subscribe(res => this.taxesSubject.next(res.data));
   }

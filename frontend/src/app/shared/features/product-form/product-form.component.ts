@@ -47,7 +47,6 @@ export class ProductFormComponent implements OnInit {
     private modalCtrl: ModalController,
     private authService: AuthService
   ) {
-    // Registrar iconos inmediatamente
     addIcons({
       'close-outline': closeOutline,
       'save-outline': saveOutline

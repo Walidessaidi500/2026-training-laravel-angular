@@ -8,19 +8,15 @@ import { UserService, User } from '../services/domain/user.service';
 export class UsersFacade {
   private readonly userService = inject(UserService);
 
-  // Estados internos
   private readonly usersSubject = new BehaviorSubject<User[]>([]);
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
   private readonly totalUsersSubject = new BehaviorSubject<number>(0);
 
-  // Observables publicos
   public readonly users$ = this.usersSubject.asObservable();
   public readonly isLoading$ = this.loadingSubject.asObservable();
   public readonly totalUsers$ = this.totalUsersSubject.asObservable();
 
-  /**
-   * Carga la lista de usuarios con paginación
-   */
+  
   loadUsers(page: number = 1, perPage: number = 10): void {
     this.loadingSubject.next(true);
     this.userService.list(page, perPage).pipe(
@@ -34,9 +30,7 @@ export class UsersFacade {
     });
   }
 
-  /**
-   * Crear un nuevo usuario y actualizar el estado
-   */
+  
   createUser(userData: Partial<User>): Observable<User> {
     this.loadingSubject.next(true);
     return this.userService.create(userData).pipe(
@@ -49,9 +43,7 @@ export class UsersFacade {
     );
   }
 
-  /**
-   * Actualizar un usuario existente
-   */
+
   updateUser(uuid: string, userData: Partial<User>): Observable<User> {
     this.loadingSubject.next(true);
     return this.userService.update(uuid, userData).pipe(
@@ -59,7 +51,6 @@ export class UsersFacade {
         const current = this.usersSubject.getValue();
         const index = current.findIndex(u => u.uuid === uuid);
         if (index !== -1) {
-          // Actualiza el usuario en la lista
           current[index] = { ...current[index], ...userData } as User;
           this.usersSubject.next([...current]);
         }
@@ -68,9 +59,7 @@ export class UsersFacade {
     );
   }
 
-  /**
-   * Elimina un usuario
-   */
+
   deleteUser(uuid: string): Observable<void> {
     this.loadingSubject.next(true);
     return this.userService.delete(uuid).pipe(

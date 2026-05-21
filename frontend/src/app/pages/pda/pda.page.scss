@@ -1,7 +1,6 @@
 .pda-view-container {
-  height: calc(100vh - 112px); /* Ajustar según altura de header y segment */
+  height: calc(100vh - 112px);
   display: flex;
   flex-direction: column;
 }
 
-/* Los estilos específicos se han movido a sus respectivos componentes */

@@ -1,6 +1,4 @@
-/* ==========================================================================
-   Backoffice Reactive Forms Styles
-   ========================================================================== */
+
 
 .yurest-form {
   padding: 24px;
@@ -50,7 +48,6 @@
   }
 }
 
-/* Custom Item Inputs */
 .custom-input-item {
   --background: var(--ion-color-light);
   --border-radius: 12px;
@@ -71,7 +68,6 @@
     border: 1.5px solid rgba(0, 0, 0, 0.05);
   }
 
-  /* Validation Colors */
   &.ion-invalid.ion-touched {
     --border-color: var(--ion-color-danger);
     border-color: var(--ion-color-danger);
@@ -84,7 +80,6 @@
   }
 }
 
-/* Switches & Toggles */
 .toggle-group {
   display: flex;
   justify-content: space-between;
@@ -117,7 +112,6 @@
   }
 }
 
-/* Custom Footer Buttons */
 .form-footer {
   display: flex;
   justify-content: flex-end;

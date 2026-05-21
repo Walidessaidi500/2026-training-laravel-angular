@@ -1,6 +1,6 @@
 /* Fondo general */
 .auth-content {
-  --background: var(--ion-color-light); /* Un gris muy sutil, casi blanco */
+  --background: var(--ion-color-light);
 }
 
 .auth-container {
@@ -17,7 +17,6 @@
   justify-content: center;
 }
 
-/* Banner de Error */
 .error-banner {
   display: flex;
   align-items: center;
@@ -40,14 +39,13 @@
   }
 }
 
-/* Inputs Modernos (Estilo "Caja" sin líneas) */
 .custom-input {
   --background: var(--ion-color-light);
   --padding-start: 16px;
   --inner-padding-end: 8px;
   border-radius: 12px;
   border: 1px solid var(--ion-color-light);
-  margin-bottom: 8px; /* Espacio para el texto de error debajo */
+  margin-bottom: 8px; 
   transition: all 0.2s ease;
 
   &:focus-within {
@@ -78,7 +76,6 @@
   --padding-end: 8px;
 }
 
-/* Texto de validación */
 .error-text {
   font-size: 13px;
   color: var(--ion-color-danger);
@@ -86,7 +83,6 @@
   font-weight: 500;
 }
 
-/* Botón Principal (específico del formulario de login) */
 .submit-button {
   --border-radius: 12px;
   --box-shadow: 0 8px 16px rgba(var(--ion-color-primary-rgb), 0.25);

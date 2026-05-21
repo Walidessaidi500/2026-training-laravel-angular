@@ -5,7 +5,6 @@ import { Injectable } from '@angular/core';
 })
 export class UtilsService {
   
-  // Calcula estadísticas comunes a partir de un array de objetos
   calculateStats<T>(
     items: T[],
     criteria: {
@@ -25,7 +24,6 @@ export class UtilsService {
   }
 
   
-  // Formatos comunes de texto, como obtener iniciales de un nombre
   getInitials(name: string): string {
     if (!name) return '';
     return name
@@ -37,7 +35,6 @@ export class UtilsService {
       .slice(0, 2);
   }
 
-  // Clona profundamente un objeto usando JSON
   deepClone<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
   }

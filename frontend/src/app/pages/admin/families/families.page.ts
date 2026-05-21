@@ -23,7 +23,6 @@ import { CrudHelperService } from '@app/core/services/helper/crud-helper.service
 import { FamilyFormComponent, FamilyFormData } from '@components/families-form/families-form.component';
 import { AccessDeniedComponent } from '@components/access-denied/access-denied.component';
 
-// Pipes
 import { ActiveStatusPipe } from '@shared/pipes/active-status.pipe';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -97,7 +96,6 @@ export class FamiliesPage implements OnInit, OnDestroy {
     this.isAdmin = true;
     this.isSupervisor = false;
 
-    // Suscribirse a los datos del facade
     this.facade.families$
       .pipe(takeUntil(this.destroy$))
       .subscribe(families => {

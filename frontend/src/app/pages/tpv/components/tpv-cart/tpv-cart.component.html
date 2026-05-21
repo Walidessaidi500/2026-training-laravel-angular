@@ -24,7 +24,6 @@
       <p>El pedido está vacío</p>
     </div>
 
-    <!-- Items list for Screen and Print -->
     <div *ngFor="let item of cart; let i = index" class="cart-item">
       <div class="item-info">
         <span class="item-name"><span class="print-only">{{ item.quantity }}x </span>{{ item.product.name }}</span>

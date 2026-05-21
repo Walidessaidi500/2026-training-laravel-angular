@@ -108,7 +108,6 @@ export class TaxesPage implements OnInit, OnDestroy {
 
     this.isAdmin = true;
 
-    // Suscribirse a los datos del facade
     this.facade.taxes$
       .pipe(
         takeUntil(this.destroy$),

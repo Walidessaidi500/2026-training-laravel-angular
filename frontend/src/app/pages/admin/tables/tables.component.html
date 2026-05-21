@@ -2,7 +2,6 @@
   <app-access-denied *ngIf="!isAdmin && !isSupervisor && !isLoading" [user]="currentUser"
     message="Esta página solo está disponible para administradores y supervisores."></app-access-denied>
 
-  <!-- Skeleton Loading -->
   <div class="page-container" *ngIf="isLoading">
     <div class="page-header">
       <ion-skeleton-text animated style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text>
@@ -12,7 +11,6 @@
     </div>
   </div>
 
-  <!-- Content -->
   <div class="page-container" *ngIf="!isLoading && (isAdmin || isSupervisor)">
 
     <div class="page-header">
@@ -30,7 +28,6 @@
       </button>
     </div>
 
-    <!-- Stats Summary -->
     <div class="stats-grid three-cols animated-fadeIn">
       <div class="stat-card panel-card">
         <div class="stat-content">
@@ -69,7 +66,6 @@
       </div>
     </div>
 
-    <!-- Filtros por Zona -->
     <div class="zone-filters">
       <button class="pill-btn" [class.active]="activeZoneId === 'all'" (click)="filterByZone('all')">
         Todas las zonas
@@ -80,7 +76,6 @@
       </button>
     </div>
 
-    <!-- Grupos de Mesas por Zona -->
     <div class="empty-state-container" *ngIf="groupedTables.length === 0">
       <div class="empty-state">
         <div class="empty-icon"><ion-icon name="restaurant-outline"></ion-icon></div>
@@ -90,7 +85,6 @@
     </div>
 
     <div class="zone-section animated-fadeIn" *ngFor="let group of groupedTables">
-      <!-- Cabecera Zona -->
       <div class="active-zone-header">
         <div class="zone-title-block">
           <div class="vertical-line"></div>
@@ -104,7 +98,6 @@
         </button>
       </div>
 
-      <!-- Grid de Mesas -->
       <div class="tables-grid">
         <div class="table-card panel-card available" *ngFor="let table of group.tables">
           <div class="card-top">
@@ -126,7 +119,6 @@
             </div>
           </div>
         </div>
-        <!-- Empty zone message -->
         <div class="empty-zone-msg" *ngIf="group.tables.length === 0">
           No hay mesas configuradas en "{{ group.zone.name }}".
         </div>

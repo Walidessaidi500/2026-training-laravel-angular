@@ -1,11 +1,9 @@
 <ion-content class="dashboard-background">
 
-  <!-- Mensaje si no es supervisor -->
   <app-access-denied *ngIf="!isSupervisor && !isLoading" [user]="currentUser"
     message="Este dashboard solo está disponible para supervisores y gerentes.">
   </app-access-denied>
   
-  <!-- Loading -->
   <div class="dashboard-grid" *ngIf="isLoading">
     <div class="main-column">
       <ion-skeleton-text animated style="height: 250px; border-radius: 16px; margin-bottom: 24px;"></ion-skeleton-text>
@@ -19,7 +17,6 @@
     </div>
   </div>
 
-  <!-- Dashboard content - solo para supervisor/gerente -->
   <div class="dashboard-grid" *ngIf="dashboardData && isSupervisor">
 
     <div class="main-column">

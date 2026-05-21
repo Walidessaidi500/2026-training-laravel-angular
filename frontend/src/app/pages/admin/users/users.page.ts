@@ -110,7 +110,6 @@ export class UsersPage implements OnInit {
       'person-outline': personOutline,
     });
 
-    // Inicializa el filtrado de usuarios
     this.filteredUsers$ = this.users$.pipe(
       map(users => {
         let allUsers = [...users];
@@ -121,7 +120,6 @@ export class UsersPage implements OnInit {
       })
     );
 
-    // Inicializa las estadisticas de usuarios
     this.userStats$ = this.users$.pipe(
       map(users => {
         const stats = this.utilsService.calculateStats(users, [

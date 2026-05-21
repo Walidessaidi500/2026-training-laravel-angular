@@ -55,7 +55,6 @@ export class SidebarComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // Observables reactivos
   isAdmin$ = this.authService.user$.pipe(map(user => user?.role === 'admin'));
   isSupervisor$ = this.authService.user$.pipe(map(user => user?.role === 'admin' || user?.role === 'supervisor'));
 

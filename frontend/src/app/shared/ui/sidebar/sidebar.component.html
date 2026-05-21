@@ -9,13 +9,11 @@
 <ion-content class="sidebar-content">
   <ion-list lines="none" class="nav-menu">
 
-    <!-- Dashboard -->
     <ion-item button [class.active]="activeItem === 'dashboard'" (click)="navigate('dashboard')" title="Dashboard"
       class="nav-item">
       <div class="nav-icon"><ion-icon name="grid-outline"></ion-icon></div>
     </ion-item>
 
-    <!-- Usuarios -->
     <ng-container *ngIf="isSupervisor$ | async">
       <div class="nav-divider"></div>
 
@@ -25,7 +23,6 @@
       </ion-item>
     </ng-container>
 
-    <!-- Impuestos -->
     <ng-container *ngIf="isAdmin$ | async">
       <div class="nav-divider"></div>
 
@@ -35,7 +32,6 @@
       </ion-item>
     </ng-container>
 
-    <!-- Familias -->
     <ng-container *ngIf="isAdmin$ | async">
       <div class="nav-divider"></div>
       <ion-item button [class.active]="activeItem === 'families'" (click)="navigate('families')" title="Familias"
@@ -44,7 +40,6 @@
       </ion-item>
     </ng-container>
 
-    <!-- Servicio -->
     <div class="nav-divider"></div>
 
     <ion-item button [class.active]="activeItem === 'products'" (click)="navigate('products')" title="Productos"
@@ -52,7 +47,6 @@
       <div class="nav-icon"><ion-icon name="restaurant-outline"></ion-icon></div>
     </ion-item>
 
-    <!-- Zonas -->
     <ng-container *ngIf="isAdmin$ | async">
       <div class="nav-divider"></div>
 
@@ -62,7 +56,6 @@
     </ng-container>
 
 
-    <!-- Mesas -->
     <div class="nav-divider"></div>
 
     <ion-item button [class.active]="activeItem === 'tables'" (click)="navigate('tables')" title="Mesas"
@@ -84,23 +77,19 @@
     <div class="avatar-circle">
       <ion-icon name="person-outline"></ion-icon>
     </div>
-    <!-- Indicador visual de desplegable -->
     <ion-icon name="chevron-down-outline" class="dropdown-icon"></ion-icon>
   </ion-item>
 
-  <!-- Menú desplegable -->
   <ion-popover #userPopover [dismissOnSelect]="true" class="user-popover">
     <ng-template>
       <ion-content class="ion-padding-vertical">
         <ion-list lines="none" class="popover-list">
 
-          <!-- Opción: Configuración -->
           <ion-item button (click)="navigate('settings')" detail="false">
             <ion-icon name="settings-outline" slot="start"></ion-icon>
             <ion-label>Configuración</ion-label>
           </ion-item>
 
-          <!-- Opción: Logout -->
           <ion-item button (click)="logout()" detail="false" class="logout-option">
             <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
             <ion-label color="danger">Cerrar sesión</ion-label>

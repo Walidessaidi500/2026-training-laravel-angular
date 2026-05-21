@@ -4,7 +4,6 @@
     message="Esta página solo está disponible para administradores.">
   </app-access-denied>
 
-  <!-- Skeleton Loading -->
   <div class="page-container" *ngIf="isLoading">
     <div class="page-header">
       <ion-skeleton-text animated style="height: 40px; border-radius: 12px; max-width: 300px;"></ion-skeleton-text>
@@ -18,7 +17,6 @@
     </div>
   </div>
 
-  <!-- Content -->
   <div class="page-container" *ngIf="!isLoading && isAdmin">
 
     <div class="page-header">
@@ -36,7 +34,6 @@
       </button>
     </div>
 
-    <!-- Stats -->
     <div class="stats-grid two-cols">
       <div class="panel-card stat-card">
         <div class="stat-content">
@@ -51,7 +48,6 @@
       </div>
     </div>
 
-    <!-- Filters -->
     <div class="panel-card filter-panel">
       <div class="search-section">
         <ion-searchbar placeholder="Buscar por nombre..." (ionChange)="onSearchChange($event)" [value]="searchTerm"
@@ -59,7 +55,6 @@
       </div>
     </div>
 
-    <!-- Table Panel -->
     <div class="panel-card table-panel">
       <div class="card-header">
         <div>
@@ -68,7 +63,6 @@
         </div>
       </div>
 
-      <!-- Empty State -->
       <div class="empty-state" *ngIf="filteredTaxes.length === 0">
         <div class="empty-icon">
           <ion-icon name="receipt-outline"></ion-icon>
@@ -79,7 +73,6 @@
         </p>
       </div>
 
-      <!-- List -->
       <ion-list class="taxes-list" *ngIf="filteredTaxes.length > 0">
         <ion-item lines="none" class="tax-item animated-fadeIn" *ngFor="let tax of filteredTaxes">
           <ion-label class="tax-info">
