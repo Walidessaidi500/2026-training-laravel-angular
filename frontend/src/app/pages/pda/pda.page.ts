@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ActionSheetController } from '@ionic/angular';
+import { IonicModule, ActionSheetController, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { Router } from '@angular/router';
 import {
@@ -9,7 +9,8 @@ import {
   personCircleOutline, receiptOutline, checkmarkCircleOutline, trashOutline,
   addOutline, removeOutline, closeOutline, cloudUploadOutline, walletOutline,
   logOutOutline, chevronDownOutline, peopleOutline, printOutline, backspaceOutline,
-  checkmarkCircle, alertCircle, cashOutline, cardOutline, checkboxOutline, squareOutline
+  checkmarkCircle, alertCircle, cashOutline, cardOutline, checkboxOutline, squareOutline,
+  restaurantOutline, listOutline, wallet
 } from 'ionicons/icons';
 
 import { Table } from '@services/domain/table.service';
@@ -20,54 +21,65 @@ import { UiService } from '@app/core/services/ui/ui.service';
 import { SaleService } from '@services/domain/sale.service';
 import { Order } from '@services/domain/order.service';
 
-import { TpvStateService } from './services/tpv-state.service';
-import { CartService } from './services/cart.service';
+import { TpvStateService } from '../tpv/services/tpv-state.service';
+import { CartService } from '../tpv/services/cart.service';
 
-import { TpvHeaderComponent } from './components/tpv-header/tpv-header.component';
-import { TpvTableSelectionComponent } from './components/tpv-table-selection/tpv-table-selection.component';
-import { TpvOrderManagementComponent } from './components/tpv-order-management/tpv-order-management.component';
-import { TpvCartComponent } from './components/tpv-cart/tpv-cart.component';
-import { TpvUserSelectionModalComponent } from './components/tpv-user-selection-modal/tpv-user-selection-modal.component';
-import { TpvPinModalComponent } from './components/tpv-pin-modal/tpv-pin-modal.component';
-import { TpvDinersModalComponent } from './components/tpv-diners-modal/tpv-diners-modal.component';
-import { TpvPaymentModalComponent } from './components/tpv-payment-modal/tpv-payment-modal.component';
+import { TpvTableSelectionComponent } from '../tpv/components/tpv-table-selection/tpv-table-selection.component';
+import { TpvUserSelectionModalComponent } from '../tpv/components/tpv-user-selection-modal/tpv-user-selection-modal.component';
+import { TpvPinModalComponent } from '../tpv/components/tpv-pin-modal/tpv-pin-modal.component';
+import { TpvDinersModalComponent } from '../tpv/components/tpv-diners-modal/tpv-diners-modal.component';
+import { TpvPaymentModalComponent } from '../tpv/components/tpv-payment-modal/tpv-payment-modal.component';
+
+import { PdaHeaderComponent } from './layout/pda-header/pda-header.component';
+import { PdaProductListComponent } from './components/pda-product-list/pda-product-list.component';
+import { PdaCartComponent } from './components/pda-cart/pda-cart.component';
+
+export type PdaViewState = 'tables' | 'order' | 'cart';
+
+const PDA_WORKER_SESSION_KEY = 'pda_worker_session';
+const SESSION_DURATION = 4 * 60 * 60 * 1000; 
 
 @Component({
-  selector: 'app-tpv',
-  templateUrl: './tpv.page.html',
-  styleUrls: ['./tpv.page.scss'],
+  selector: 'app-pda',
+  templateUrl: './pda.page.html',
+  styleUrls: ['./pda.page.scss'],
   standalone: true,
   imports: [
     CommonModule, IonicModule, FormsModule, CurrencyPipe,
-    TpvHeaderComponent, TpvTableSelectionComponent, TpvOrderManagementComponent,
-    TpvCartComponent, TpvUserSelectionModalComponent, TpvPinModalComponent,
-    TpvDinersModalComponent, TpvPaymentModalComponent
+    TpvTableSelectionComponent, TpvUserSelectionModalComponent, TpvPinModalComponent,
+    TpvDinersModalComponent, TpvPaymentModalComponent,
+    PdaHeaderComponent, PdaProductListComponent, PdaCartComponent
   ]
 })
-export class TpvPage implements OnInit, OnDestroy {
+export class PdaPage implements OnInit, OnDestroy {
   public readonly stateService = inject(TpvStateService);
   public readonly cartService = inject(CartService);
   public readonly uiService = inject(UiService);
-  private readonly authService = inject(AuthService);
+  public readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly saleService = inject(SaleService);
   private readonly actionSheetCtrl = inject(ActionSheetController);
+  private readonly modalCtrl = inject(ModalController);
 
-  // Estado local para el manejo de datos
+  public pdaViewState: PdaViewState = 'tables';
+  public currentUser = this.authService.getUser();
+
+  // Estado para pagos (portado de TPV)
   public paymentType: 'total' | 'split' = 'total';
   public paymentMethod: 'cash' | 'card' | 'mixed' = 'cash';
   public amountCash: number = 0;
   public amountCard: number = 0;
   public amountGiven: number = 0;
   public paymentUser: User | null = null;
+  public isProcessingPayment = false;
 
   public get changeAmount(): number {
     return this.amountGiven - this.amountCash;
   }
 
-  public currentUser = this.authService.getUser();
-
-  public isProcessingPayment = false;
+  public get activeWorkerName(): string {
+    return this.stateService.state.selectedUserForPin?.name || this.getValidWorkerSession()?.name || '';
+  }
 
   constructor() {
     addIcons({
@@ -75,16 +87,23 @@ export class TpvPage implements OnInit, OnDestroy {
       personCircleOutline, receiptOutline, checkmarkCircleOutline, trashOutline,
       addOutline, removeOutline, closeOutline, cloudUploadOutline, walletOutline,
       logOutOutline, chevronDownOutline, peopleOutline, printOutline, backspaceOutline,
-      checkmarkCircle, alertCircle, cashOutline, cardOutline, checkboxOutline, squareOutline
+      checkmarkCircle, alertCircle, cashOutline, cardOutline, checkboxOutline, squareOutline,
+      restaurantOutline, listOutline, wallet
     });
   }
 
   ngOnInit() {
     this.stateService.loadInitialData().subscribe(res => {
       this.cartService.setTaxes(res.taxes.data);
+      
+      // Restaurar sesión de trabajador si existe y es válida
+      const worker = this.getValidWorkerSession();
+      if (worker) {
+        this.stateService.setShowPinModal(false, worker);
+      }
     });
 
-    // Iniciar refresco automático de mesas cada 5 segundos
+    // Iniciar polling de estado de mesas cada 5 segundos
     this.stateService.startPolling(5000);
   }
 
@@ -92,7 +111,33 @@ export class TpvPage implements OnInit, OnDestroy {
     this.stateService.stopPolling();
   }
 
-  // Acciones sobre las mesas
+  public setViewState(view: PdaViewState) {
+    this.pdaViewState = view;
+  }
+
+  private getValidWorkerSession(): User | null {
+    const sessionStr = localStorage.getItem(PDA_WORKER_SESSION_KEY);
+    if (!sessionStr) return null;
+
+    try {
+      const session = JSON.parse(sessionStr);
+      if (Date.now() < session.expiresAt) {
+        return session.user;
+      }
+      localStorage.removeItem(PDA_WORKER_SESSION_KEY);
+    } catch (e) {
+      localStorage.removeItem(PDA_WORKER_SESSION_KEY);
+    }
+    return null;
+  }
+
+  private saveWorkerSession(user: User) {
+    const session = {
+      user,
+      expiresAt: Date.now() + SESSION_DURATION
+    };
+    localStorage.setItem(PDA_WORKER_SESSION_KEY, JSON.stringify(session));
+  }
 
   public onTableClick(table: Table) {
     const effectiveTable = table.joined_to_uuid 
@@ -103,86 +148,33 @@ export class TpvPage implements OnInit, OnDestroy {
 
     if (this.stateService.state.tableOrders[effectiveTable.uuid]) {
       this.cartService.loadOrderForTable(effectiveTable.uuid, this.stateService.state.products)
-        .subscribe(() => this.stateService.setViewState('order'));
+        .subscribe(() => {
+          // Asegurar que el trabajador esté en el estado si hay sesión activa
+          const worker = this.getValidWorkerSession();
+          if (worker && !this.stateService.state.selectedUserForPin) {
+            this.stateService.setShowPinModal(false, worker);
+          }
+          this.pdaViewState = 'order';
+        });
     } else {
-      this.stateService.setShowUserSelection(true, 'opening');
-    }
-  }
-
-  public async onTableLongPress(table: Table) {
-    const joinedTables = this.stateService.state.tables.filter(t => t.joined_to_uuid === table.uuid);
-    const buttons: any[] = [
-      {
-        text: 'Juntar con otra mesa',
-        icon: 'add-outline',
-        handler: () => {
-          setTimeout(() => this.showJoinTableSelection(table), 100);
-        }
+      const worker = this.getValidWorkerSession();
+      if (worker) {
+        // Si hay sesión válida, saltar selección de usuario y PIN
+        this.stateService.setShowPinModal(false, worker);
+        this.stateService.setShowUserSelection(false, 'opening');
+        this.stateService.setShowDinersSelection(true);
+      } else {
+        this.stateService.setShowUserSelection(true, 'opening');
       }
-    ];
-
-    if (joinedTables.length > 0) {
-      buttons.push({
-        text: 'Separar mesas vinculadas',
-        icon: 'close-outline',
-        role: 'destructive',
-        handler: () => this.stateService.confirmUnjoin(table, joinedTables)
-      });
     }
-
-    if (table.joined_to_uuid) {
-      buttons.push({
-        text: 'Separar de mesa principal',
-        icon: 'close-outline',
-        role: 'destructive',
-        handler: () => this.stateService.confirmUnjoin(table, [])
-      });
-    }
-
-    buttons.push({ text: 'Cancelar', role: 'cancel' });
-
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: `Mesa ${table.name}`,
-      buttons
-    });
-    await actionSheet.present();
-  }
-
-  private async showJoinTableSelection(masterTable: Table) {
-    const availableTables = this.stateService.state.tables.filter(t => 
-      t.uuid !== masterTable.uuid && !t.joined_to_uuid && 
-      !this.stateService.state.tableOrders[t.uuid] &&
-      t.zone_id === masterTable.zone_id
-    );
-
-    if (availableTables.length === 0) {
-      this.uiService.showError('No hay mesas libres en esta zona para juntar');
-      return;
-    }
-
-    const buttons = availableTables.map(t => ({
-      text: `Mesa ${t.name}`,
-      handler: () => this.stateService.confirmJoin(t, masterTable)
-    }));
-
-    buttons.push({ text: 'Cancelar', role: 'cancel' } as any);
-
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Selecciona mesa para juntar',
-      buttons
-    });
-    await actionSheet.present();
   }
 
   public backToTables() {
-    this.stateService.setViewState('tables');
+    this.pdaViewState = 'tables';
     this.stateService.setSelectedTable(null);
     this.cartService.clearCart();
-    this.stateService.setSelectedOpUser(null);
-    this.stateService.refreshTableStatus();
+    this.stateService.refreshTableStatus(); // Actualizar estado al volver
   }
-
-  // Acciones sobre usuarios y apertura/cierre de mesa
 
   public selectUser(user: User) {
     this.stateService.setShowUserSelection(false);
@@ -190,19 +182,18 @@ export class TpvPage implements OnInit, OnDestroy {
   }
 
   public onPinConfirm() {
-    const selectedUser = this.stateService.state.selectedUserForPin;
-    const pinEntered = this.stateService.state.pinBuffer;
-    if (!selectedUser) return;
+    const user = this.stateService.state.selectedUserForPin;
+    const pin = this.stateService.state.pinBuffer;
 
-    if ((selectedUser.pin || '') === pinEntered) {
-      this.stateService.setShowPinModal(false);
-
+    if (user?.pin === pin) {
+      this.saveWorkerSession(user);
+      this.stateService.setShowPinModal(false, user); // Mantener el usuario en el estado
+      this.stateService.resetPinBuffer();
+      
       if (this.stateService.state.userSelectionContext === 'opening') {
-        this.stateService.setSelectedOpUser(selectedUser);
-        this.cartService.setTempDiners('1');
         this.stateService.setShowDinersSelection(true);
       } else {
-        this.processClosing(selectedUser);
+        this.processClosing(user);
       }
     } else {
       this.uiService.showError('PIN incorrecto');
@@ -210,41 +201,56 @@ export class TpvPage implements OnInit, OnDestroy {
     }
   }
 
-  // Acciones sobre comanda y comensales
-
   public onDinersConfirm() {
-    const dinersCount = parseInt(this.cartService.tempDinersValue) || 1;
-    this.stateService.setShowDinersSelection(false);
-    
-    if (this.cartService.currentOrderValue) {
-      this.cartService.currentOrderValue.diners = dinersCount;
-      this.sendOrder();
-    } else {
-      this.stateService.setViewState('order');
+    const diners = parseInt(this.cartService.tempDinersValue);
+    const table = this.stateService.state.selectedTable;
+    const user = this.stateService.state.selectedUserForPin;
+
+    if (table && user) {
+      this.stateService.setShowDinersSelection(false);
       this.cartService.clearCart();
-      this.cartService.setTempDiners(dinersCount.toString());
+      this.pdaViewState = 'order';
     }
   }
 
-  // Acciones sobre el carrito
+  public selectFamily(familyUuid: string) {
+    this.stateService.selectFamily(familyUuid);
+  }
+
+  public addToCart(product: Product) {
+    this.cartService.addToCart(product);
+    this.uiService.showSuccess(`Añadido: ${product.name}`);
+  }
 
   public sendOrder() {
     const table = this.stateService.state.selectedTable;
-    if (!table) return;
+    const user = this.stateService.state.selectedUserForPin;
 
-    const openedByUserUuid = this.stateService.state.selectedOpUser?.uuid || this.currentUser?.uuid;
-    this.cartService.syncOrder(table.uuid, openedByUserUuid).subscribe({
+    if (!table || !user) return;
+
+    this.cartService.syncOrder(table.uuid, user.uuid).subscribe({
       next: () => {
-        this.uiService.showSuccess('Pedido mandado a cocina');
-        this.stateService.loadInitialData().subscribe(); 
+        this.uiService.showSuccess('Pedido enviado');
+        this.backToTables();
       },
-      error: () => this.uiService.showError('Error al enviar a cocina')
+      error: (err) => {
+        this.uiService.showError('Error al enviar pedido');
+      }
     });
   }
 
+  // Lógica de Pagos portados de TPV
+
   public closeTicket() {
     if (this.cartService.cartValue.length === 0 || !this.stateService.state.selectedTable) return;
-    this.stateService.setShowUserSelection(true, 'closing');
+    
+    const worker = this.getValidWorkerSession();
+    if (worker) {
+      this.stateService.setShowPinModal(false, worker);
+      this.processClosing(worker);
+    } else {
+      this.stateService.setShowUserSelection(true, 'closing');
+    }
   }
 
   private processClosing(user: User) {
@@ -256,8 +262,6 @@ export class TpvPage implements OnInit, OnDestroy {
     this.amountGiven = this.amountCash;
     this.stateService.setShowPaymentModal(true);
   }
-
-  // Acciones sobre el cobro
 
   public setPaymentType(type: 'total' | 'split') {
     this.paymentType = type;
@@ -415,11 +419,6 @@ export class TpvPage implements OnInit, OnDestroy {
           this.stateService.setShowPaymentModal(false);
           this.backToTables();
         } else {
-          /**
-           * Comprobar si quedan articulos por cobrar en la orden
-           * en caso de que no, cerrar la comanda y volver a la vista de las 
-           * mesas
-           */
           this.cartService.loadOrderForTable(saleData.table_uuid, this.stateService.state.products).subscribe(remainingOrder => {
             if (!remainingOrder || !remainingOrder.lines || remainingOrder.lines.length === 0) {
               this.stateService.setShowPaymentModal(false);
@@ -438,6 +437,7 @@ export class TpvPage implements OnInit, OnDestroy {
   }
 
   public logout() {
+    localStorage.removeItem(PDA_WORKER_SESSION_KEY);
     this.authService.logout();
     this.router.navigate(['/login']);
   }

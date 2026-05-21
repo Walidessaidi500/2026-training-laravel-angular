@@ -25,6 +25,11 @@ export const routes: Routes = [
     loadChildren: () => import('./pages/tpv/tpv.routes').then((m) => m.TPV_ROUTES),
   },
   {
+    path: 'pda',
+    canActivate: [authGuard, roleGuard(['supervisor', 'restaurant'])],
+    loadChildren: () => import('./pages/pda/pda.routes').then((m) => m.PDA_ROUTES),
+  },
+  {
     path: '**',
     redirectTo: 'login',
     pathMatch: 'full',

@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button *ngIf="pdaViewState !== 'tables'" (click)="onBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="header-info">
+        <span class="restaurant-name">{{ restaurantName }}</span>
+        <span class="worker-name" *ngIf="workerName"> ({{ workerName }})</span>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="onLogout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar *ngIf="pdaViewState === 'order' || pdaViewState === 'cart'">
+    <ion-segment [value]="pdaViewState" (ionChange)="onSegmentChange($event)">
+      <ion-segment-button value="order">
+        <ion-label>Productos</ion-label>
+        <ion-icon name="fast-food-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="cart">
+        <ion-label>Carrito ({{ cartItemsCount }})</ion-label>
+        <ion-icon name="cart-outline"></ion-icon>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>

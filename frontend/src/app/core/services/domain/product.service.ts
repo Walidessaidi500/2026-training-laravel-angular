@@ -8,6 +8,7 @@ export interface Product {
   priceInCents: number;
   stock: number;
   active: boolean;
+  image_src?: string | null;
   family_id: string;
   tax_id: string;
   created_at: string;

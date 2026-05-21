@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, forkJoin, map, of, catchError, tap } from 'rxjs';
+import { BehaviorSubject, Observable, forkJoin, map, of, catchError, tap, Subscription, interval, switchMap } from 'rxjs';
 import { Zone, ZoneService } from '@services/domain/zone.service';
 import { Table, TableService } from '@services/domain/table.service';
 import { Product, ProductService } from '@services/domain/product.service';
@@ -79,6 +79,7 @@ export class TpvStateService {
   });
 
   public readonly state$ = this._state.asObservable();
+  private pollingSubscription?: Subscription;
 
   public get state(): TpvState {
     return this._state.value;
@@ -150,6 +151,25 @@ export class TpvStateService {
       const tableOrders = this.processActiveOrders(res.data, this.state.tables);
       this.updateState({ tableOrders });
     });
+  }
+
+  public startPolling(intervalMs: number = 5000) {
+    this.stopPolling();
+    this.pollingSubscription = interval(intervalMs)
+      .pipe(
+        switchMap(() => this.orderService.list(1, 1000)),
+        map(res => this.processActiveOrders(res.data, this.state.tables))
+      )
+      .subscribe(tableOrders => {
+        this.updateState({ tableOrders });
+      });
+  }
+
+  public stopPolling() {
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+      this.pollingSubscription = undefined;
+    }
   }
 
   public selectZone(zoneUuid: string) {

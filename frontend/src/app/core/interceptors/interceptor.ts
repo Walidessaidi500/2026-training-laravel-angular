@@ -11,7 +11,6 @@ export class InterceptorProvider implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let url = request.url;
 
-    // Prefijar con apiUrl si la URL es relativa
     if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('./') && !url.startsWith('assets/')) {
       const baseUrl = environment.apiUrl.endsWith('/') 
         ? environment.apiUrl.slice(0, -1) 

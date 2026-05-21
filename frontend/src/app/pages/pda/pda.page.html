@@ -1,0 +1,97 @@
+<app-pda-header
+  [pdaViewState]="pdaViewState"
+  [selectedTable]="stateService.state.selectedTable"
+  [cartItemsCount]="(cartService.cart$ | async)?.length || 0"
+  [restaurantName]="(authService.user$ | async)?.name || 'Restaurante'"
+  [workerName]="activeWorkerName"
+  (back)="backToTables()"
+  (logout)="logout()"
+  (viewStateChange)="setViewState($event)">
+</app-pda-header>
+
+<ion-content *ngIf="stateService.state$ | async as state">
+  <!-- View 1: Table Selection -->
+  <app-tpv-table-selection
+    *ngIf="pdaViewState === 'tables'"
+    [zones]="state.zones"
+    [selectedZoneUuid]="state.selectedZoneUuid"
+    [filteredTables]="state.filteredTables"
+    [allTables]="state.tables"
+    [tableOrders]="state.tableOrders"
+    (zoneSelect)="stateService.selectZone($event)"
+    (tableClick)="onTableClick($event)">
+  </app-tpv-table-selection>
+
+  <!-- View 2: Order Management (Products) -->
+  <app-pda-product-list
+    *ngIf="pdaViewState === 'order'"
+    [families]="state.families"
+    [selectedFamilyUuid]="state.selectedFamilyUuid"
+    [filteredProducts]="state.filteredProducts"
+    (familySelect)="selectFamily($event)"
+    (productSelect)="addToCart($event)">
+  </app-pda-product-list>
+
+  <!-- View 3: Cart -->
+  <app-pda-cart
+    *ngIf="pdaViewState === 'cart'"
+    [cart]="(cartService.cart$ | async) || []"
+    [total]="cartService.getTotal()"
+    (removeItem)="cartService.removeFromCart($event)"
+    (sendOrder)="sendOrder()"
+    (pay)="closeTicket()">
+  </app-pda-cart>
+
+  <!-- Modals (Reused from TPV) -->
+  <app-tpv-user-selection-modal
+    [isOpen]="state.showUserSelection"
+    [users]="state.users"
+    [context]="state.userSelectionContext"
+    (close)="stateService.setShowUserSelection(false)"
+    (selectUser)="selectUser($event)">
+  </app-tpv-user-selection-modal>
+
+  <app-tpv-pin-modal
+    [isOpen]="state.showPinModal"
+    [selectedUser]="state.selectedUserForPin"
+    [pinBuffer]="state.pinBuffer"
+    (close)="stateService.setShowPinModal(false)"
+    (confirm)="onPinConfirm()"
+    (digitClick)="stateService.addPinDigit($event)"
+    (backspaceClick)="stateService.removePinDigit()">
+  </app-tpv-pin-modal>
+
+  <app-tpv-diners-modal
+    [isOpen]="state.showDinersSelection"
+    [tempDiners]="(cartService.tempDiners$ | async) || '1'"
+    (close)="stateService.setShowDinersSelection(false)"
+    (confirm)="onDinersConfirm()"
+    (digitClick)="cartService.addDinerDigit($event)"
+    (backspaceClick)="cartService.removeDinerDigit()">
+  </app-tpv-diners-modal>
+
+  <app-tpv-payment-modal
+    *ngIf="cartService.cart$ | async as cart"
+    [isOpen]="state.showPaymentModal"
+    [selectedTable]="state.selectedTable"
+    [total]="cartService.getTotal()"
+    [selectedTotal]="cartService.getSelectedTotal(paymentType)"
+    [cart]="cart"
+    [taxes]="state.taxes"
+    [paymentType]="paymentType"
+    [paymentMethod]="paymentMethod"
+    [amountCash]="amountCash"
+    [amountCard]="amountCard"
+    [amountGiven]="amountGiven"
+    [changeAmount]="changeAmount"
+    (close)="stateService.setShowPaymentModal(false)"
+    (setPaymentType)="setPaymentType($event)"
+    (setPaymentMethod)="setPaymentMethod($event)"
+    (toggleItemSelection)="cartService.toggleItemSelection($event); onSelectionChange()"
+    (updateSelectedQuantity)="cartService.updateSelectedQuantity($event.item, $event.delta); onSelectionChange()"
+    (amountCashChange)="amountCash = $event; onAmountChange()"
+    (amountGivenChange)="amountGiven = $event"
+    [isProcessing]="isProcessingPayment"
+    (confirmPayment)="confirmPayment()">
+  </app-tpv-payment-modal>
+</ion-content>

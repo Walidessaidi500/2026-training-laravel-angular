@@ -1,0 +1,25 @@
+<div class="pda-view-container">
+  <div class="family-scroll">
+    <ion-chip *ngFor="let family of families" 
+              [color]="selectedFamilyUuid === family.uuid ? 'primary' : 'light'"
+              (click)="onFamilyClick(family.uuid)">
+      {{ family.name }}
+    </ion-chip>
+  </div>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6" *ngFor="let product of filteredProducts">
+        <ion-card (click)="onProductClick(product)" class="product-card">
+          <div class="product-image" *ngIf="product.image_src">
+            <img [src]="product.image_src" alt="product">
+          </div>
+          <ion-card-header>
+            <ion-card-subtitle>{{ (product.priceInCents / 100) | currency:'EUR' }}</ion-card-subtitle>
+            <ion-card-title>{{ product.name }}</ion-card-title>
+          </ion-card-header>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</div>
