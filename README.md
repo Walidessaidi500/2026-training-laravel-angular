@@ -7,15 +7,19 @@ Este repositorio sirve como proyecto base para prácticas de desarrollo backend 
 
 ## Índice
 
-- [Prerrequisitos](#prerrequisitos)
-- [Cómo empezar](#cómo-empezar)
-- [Estructura del proyecto](#estructura-del-proyecto)
-  - [Backend (`backend/`)](#backend-backend)
-  - [Frontend (`frontend/`)](#frontend-frontend)
-  - [DbGate (cliente de base de datos)](#dbgate-cliente-de-base-de-datos)
-- [Objetivos de aprendizaje](#objetivos-de-aprendizaje)
-- [Buenas prácticas](#buenas-prácticas)
-- [Estilo de código](#estilo-de-código)
+- [2026 Training: Laravel + Angular Starter Kit](#2026-training-laravel--angular-starter-kit)
+  - [Índice](#índice)
+  - [Prerrequisitos](#prerrequisitos)
+  - [Cómo empezar](#cómo-empezar)
+  - [Estructura del proyecto](#estructura-del-proyecto)
+    - [Backend (`backend/`)](#backend-backend)
+    - [Frontend (`frontend/`)](#frontend-frontend)
+    - [DbGate (cliente de base de datos)](#dbgate-cliente-de-base-de-datos)
+  - [Sobre el Proyecto](#sobre-el-proyecto)
+    - [Funcionalidades principales:](#funcionalidades-principales)
+  - [Usuarios de Prueba (Restaurante: Los Gomez)](#usuarios-de-prueba-restaurante-los-gomez)
+    - [Acceso al Backoffice (Administración)](#acceso-al-backoffice-administración)
+    - [Acceso al TPV (Terminal Punto de Venta)](#acceso-al-tpv-terminal-punto-de-venta)
 
 ---
 
@@ -73,48 +77,49 @@ Tras seguir estos pasos tendrás:
 
 ### Backend (`backend/`)
 
-El backend sigue un enfoque **DDD + Hexagonal**, con cada dominio encapsulado bajo su propio namespace.  
-El ejemplo que se muestra a continuación es para el dominio `User`.
+El backend sigue un enfoque **DDD + Hexagonal**, con cada dominio encapsulado bajo su propio namespace dentro de `app/`.
 
 ```text
-App/
-└── User/
-    ├── Domain/
-    │   ├── Entity/
-    │   ├── ValueObject/
-    │   └── Interfaces/
-    ├── Application/
-    │   └── CreateUser.php
-    └── Infrastructure/
-        ├── Persistence/
-        └── Entrypoint/Http/
+backend/app/
+├── <Domain>/          # Ejemplos: User, Product, Sale, Movement...
+│   ├── Application/   # Casos de uso y handlers
+│   ├── Domain/        # Lógica de negocio pura (Entidades, Value Objects, Interfaces)
+│   └── Infrastructure/# Adaptadores (Persistencia, Entrypoints HTTP, Repositorios)
+├── Shared/            # Dominio compartido para lógica transversal
+└── Providers/         # Service Providers del framework Laravel
 ```
+
+**Dominios actuales:** `Family`, `Movement`, `Order`, `Product`, `Restaurant`, `Sale`, `Table`, `Tax`, `User`, `Zone`.
 
 | Carpeta | Descripción |
 |---------|-------------|
 | **Domain/** | Lógica de negocio pura, entidades y value objects. |
-| **Interfaces/** | Contratos del dominio (por ejemplo `UserRepositoryInterface`). |
-| **Application/** | Casos de uso y handlers. |
-| **Infrastructure/** | Adaptadores que conectan el dominio con el mundo externo: persistencia, HTTP, colas. |
-| **Entrypoint/Http/** | Controladores o endpoints HTTP. |
+| **Application/** | Casos de uso que orquestan la lógica del dominio. |
+| **Infrastructure/** | Adaptadores que conectan el dominio con el mundo externo (Base de datos, API REST). |
+| **Shared/** | Código reutilizable por múltiples dominios para evitar duplicación. |
 
 ### Frontend (`frontend/`)
 
-Proyecto **Angular + Ionic** (standalone components). Cliente que consume la API del backend.
+Proyecto **Angular + Ionic** utilizando **Standalone Components** y una arquitectura modular.
 
 ```text
 frontend/src/app/
-├── components/        # Componentes reutilizables
-├── pages/             # Páginas de la aplicación
-│   └── core/          # Páginas principales
-│       └── home/
-├── pipes/             # Pipes personalizados
-├── providers/         # Interceptores y providers
-│   └── interceptor.ts
-└── services/          # Servicios (llamadas a la API, lógica compartida)
+├── core/              # Singleton services, interceptors, guards y facades
+├── pages/             # Páginas de la aplicación organizadas por módulos:
+│   ├── admin/         # Gestión administrativa
+│   ├── auth/          # Autenticación y Login
+│   ├── pda/           # Interfaz para dispositivos móviles (PDA)
+│   ├── supervisor/    # Panel de supervisión
+│   └── tpv/           # Terminal Punto de Venta (POS)
+└── shared/            # Recursos compartidos (Features, Pipes, UI components)
 ```
 
-El interceptor HTTP (`providers/interceptor.ts`) prefija automáticamente la URL base de la API y añade los headers por defecto (`Accept`, `Accept-Language`).
+| Carpeta | Descripción |
+|---------|-------------|
+| **core/** | Lógica central del sistema que debe estar disponible globalmente. |
+| **pages/** | Vistas principales de la aplicación divididas por contexto de uso. |
+| **shared/** | Componentes UI, pipes y lógica compartida entre diferentes páginas. |
+| **facades/** | (Dentro de core) Abstracción para simplificar el acceso a servicios y estado. |
 
 ### DbGate (cliente de base de datos)
 
@@ -122,45 +127,47 @@ Interfaz web para explorar y consultar la base MySQL. La conexión **Training My
 
 ---
 
-## Objetivos de aprendizaje
+## Sobre el Proyecto
 
-- Comprender y aplicar **DDD**: separar Domain, Application e Infrastructure.
-- Aprender a usar **repositorios e interfaces** para desacoplar dominio de la persistencia.
-- Practicar la implementación de **casos de uso y handlers**.
-- Exponer la lógica de negocio a través de **HTTP entrypoints** y mantener el dominio independiente del framework.
-- Familiarizarse con **Docker**, **Composer** y **Node** en un flujo de desarrollo profesional.
+Este proyecto es un **Sistema de Punto de Venta (TPV/POS)** diseñado específicamente para el sector de la restauración. Permite gestionar de manera integral el flujo de trabajo de un restaurante, desde la organización física del local hasta el cierre de ventas y control de inventario.
 
----
-
-## Buenas prácticas
-
-- Programar contra **interfaces**, no implementaciones concretas.
-- Evitar lógica de negocio en Controllers o Eloquent Models.
-- Mantener los dominios **autocontenidos**, siguiendo la convención: `App/<Dominio>/{Domain, Application, Infrastructure}`.
-- Escribir **tests** que dependan de la interfaz del dominio, no de la implementación concreta.
+### Funcionalidades principales:
+- **Gestión Multi-Restaurante:** Soporte para múltiples establecimientos con configuraciones independientes.
+- **Distribución de Mesa y Zonas:** Organización del local por zonas (ej. Terraza, Comedor) y gestión de mesas.
+- **Catálogo de Productos:** Gestión de categorías (Familias), productos, precios e impuestos (IVA).
+- **Gestión de Comandas:** Toma de pedidos (Orders) y líneas de pedido en tiempo real.
+- **Proceso de Venta:** Conversión de comandas en ventas finales (Sales) con diversos métodos de pago.
+- **Control de Movimientos:** Registro de movimientos de stock y auditoría.
+- **Arquitectura Robusta:** Backend con Laravel siguiendo principios DDD y Hexagonal, y Frontend con Angular + Ionic para una experiencia multiplataforma (Web y Móvil).
 
 ---
 
-## Estilo de código
+## Usuarios de Prueba (Restaurante: Los Gomez)
 
-Para mantener un código consistente entre todos los colaboradores (humanos y IAs), se siguen estas pautas:
+Para facilitar las pruebas, a continuación se detallan las credenciales de acceso para el restaurante **"Los Gomez"**.
 
-- **Backend (PHP):** PSR-12 y las recomendaciones de [Symfony Coding Standards](https://symfony.com/doc/current/contributing/code/standards.html).
-- **Frontend (Angular):** [Angular Style Guide](https://angular.dev/style-guide).
-- **Convenciones básicas**:
-  - Una **clase por archivo**.
-  - `camelCase` para variables y métodos, `PascalCase` para clases, `SCREAMING_SNAKE_CASE` para constantes.
-  - Propiedades antes de los métodos; métodos públicos antes que protegidos y privados.
-  - Imports (`use`) para todas las clases que no estén en el espacio de nombres actual.
-- **Estructura y formato**:
-  - Siempre usar paréntesis al instanciar clases (`new Foo()`).
-  - En arrays multilínea, dejar **coma final** en cada elemento.
-  - Añadir una línea en blanco antes de un `return` cuando mejore la legibilidad.
-  - Evitar lógica compleja en una sola línea; preferir bloques claros con llaves siempre presentes.
+### Acceso al Backoffice (Administración)
+Utiliza estas credenciales para acceder al panel de gestión (backend/admin).
+- **Usuario:** `admin@yurest.com`
+- **Contraseña:** `password`
 
-Antes de subir cambios, se recomienda:
+### Acceso al TPV (Terminal Punto de Venta)
+Para entrar al TPV, primero se identifica el establecimiento y luego el empleado mediante su PIN.
 
-```bash
-make test   # tests del backend (PHPUnit)
-make lint   # formatear código PHP (Laravel Pint)
-```
+**1. Identificación del Restaurante:**
+- **Email:** `losgomez@yurest.com`
+- **Contraseña:** `password`
+
+**2. Empleados Disponibles (Acceso por PIN):**
+
+| Rol | Empleado | Email (para Supervisor) | PIN |
+|-----|----------|-------------------------|-----|
+| **Supervisor** | María García | `maria-4@tpv.com` | `2345` |
+| **Camarero** | Carlos López | - | `3456` |
+| **Camarero** | Laura Martínez | - | `4567` |
+| **Camarero** | Pedro Sánchez | - | `5678` |
+
+---
+
+> **Nota:** El correo del **Supervisor** (`maria-4@tpv.com`) también permite el acceso al Backoffice/Administración utilizando la contraseña `password`, aunque con permisos limitados en comparación con la cuenta de Administrador.
+

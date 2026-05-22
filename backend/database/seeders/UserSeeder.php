@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
         $restaurants = EloquentRestaurant::all();
 
         foreach ($restaurants as $restaurant) {
-            // Admin específico para Los Gomez si es el caso
+            
             if ($restaurant->name === 'Los Gomez') {
                 EloquentUser::factory()->admin()->create([
                     'restaurant_id' => $restaurant->id,
