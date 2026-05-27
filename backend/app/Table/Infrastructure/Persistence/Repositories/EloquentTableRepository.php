@@ -15,7 +15,7 @@ class EloquentTableRepository implements TableRepositoryInterface
 
     public function save(Table $table): void
     {
-        $this->model->newQuery()->updateOrCreate(
+        $eloquentTable = $this->model->newQuery()->withTrashed()->updateOrCreate(
             ['uuid' => $table->id()->value()],
             [
                 'restaurant_id' => $table->restaurantId()->value(),
@@ -26,6 +26,10 @@ class EloquentTableRepository implements TableRepositoryInterface
                 'updated_at' => $table->updatedAt()->value(),
             ],
         );
+
+        if ($eloquentTable->trashed()) {
+            $eloquentTable->restore();
+        }
     }
 
     public function findById(Uuid $id): ?Table

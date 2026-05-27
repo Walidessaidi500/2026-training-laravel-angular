@@ -14,7 +14,7 @@ class EloquentZoneRepository implements ZoneRepositoryInterface
 
     public function save(Zone $zone): void
     {
-        $this->model->newQuery()->updateOrCreate(
+        $eloquentZone = $this->model->newQuery()->withTrashed()->updateOrCreate(
             ['uuid' => $zone->id()->value()],
             [
                 'restaurant_id' => $zone->restaurantId()->value(),
@@ -23,6 +23,10 @@ class EloquentZoneRepository implements ZoneRepositoryInterface
                 'updated_at' => $zone->updatedAt()->value(),
             ],
         );
+
+        if ($eloquentZone->trashed()) {
+            $eloquentZone->restore();
+        }
     }
 
     public function findById(Uuid $id): ?Zone

@@ -16,7 +16,7 @@ class EloquentTaxRepository implements TaxRepositoryInterface
 
     public function save(Tax $tax): void
     {
-        $this->model->newQuery()->updateOrCreate(
+        $eloquentTax = $this->model->newQuery()->withTrashed()->updateOrCreate(
             ['uuid' => $tax->id()->value()],
             [
                 'restaurant_id' => $tax->restaurantId()->value(),
@@ -26,6 +26,10 @@ class EloquentTaxRepository implements TaxRepositoryInterface
                 'updated_at' => $tax->updatedAt()->value(),
             ],
         );
+
+        if ($eloquentTax->trashed()) {
+            $eloquentTax->restore();
+        }
     }
 
     public function findById(Uuid $id): ?Tax

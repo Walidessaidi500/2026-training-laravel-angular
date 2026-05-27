@@ -41,7 +41,7 @@
             [taxes]="state.taxes"
             [total]="cartService.getTotal()"
             (editDiners)="stateService.setShowDinersSelection(true)"
-            (printProvisional)="uiService.showSuccess('Imprimiendo...')"
+            (printProvisional)="printProvisional()"
             (clearCart)="cartService.clearCart()"
             (removeItem)="cartService.removeFromCart($event)"
             (addItem)="cartService.addToCart($event)"

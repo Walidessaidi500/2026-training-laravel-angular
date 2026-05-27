@@ -27,7 +27,7 @@ class EloquentOrderRepository implements OrderRepositoryInterface
     public function save(Order $order): void
     {
         DB::transaction(function () use ($order) {
-            $eloquentOrder = EloquentOrder::updateOrCreate(
+            $eloquentOrder = EloquentOrder::withTrashed()->updateOrCreate(
                 ['uuid' => $order->id()->value()],
                 [
                     'restaurant_id' => $order->restaurantId()->value(),
@@ -41,6 +41,10 @@ class EloquentOrderRepository implements OrderRepositoryInterface
                 ]
             );
 
+            if ($eloquentOrder->trashed()) {
+                $eloquentOrder->restore();
+            }
+
             $existingLineIds = $eloquentOrder->orderLines()->pluck('uuid')->toArray();
             $newLineIds = array_map(fn ($line) => $line->id()->value(), $order->lines());
 
@@ -48,7 +52,7 @@ class EloquentOrderRepository implements OrderRepositoryInterface
             EloquentOrderLine::whereIn('uuid', $linesToDelete)->delete();
 
             foreach ($order->lines() as $line) {
-                EloquentOrderLine::updateOrCreate(
+                $eloquentLine = EloquentOrderLine::withTrashed()->updateOrCreate(
                     ['uuid' => $line->id()->value()],
                     [
                         'restaurant_id' => $line->restaurantId()->value(),
@@ -60,6 +64,10 @@ class EloquentOrderRepository implements OrderRepositoryInterface
                         'tax_percentage' => $line->taxPercentage(),
                     ]
                 );
+
+                if ($eloquentLine->trashed()) {
+                    $eloquentLine->restore();
+                }
             }
         });
     }

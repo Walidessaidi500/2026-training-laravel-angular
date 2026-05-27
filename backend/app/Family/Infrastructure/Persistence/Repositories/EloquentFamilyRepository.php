@@ -16,7 +16,7 @@ class EloquentFamilyRepository implements FamilyRepositoryInterface
 
     public function save(Family $family): void
     {
-        $this->model->newQuery()->updateOrCreate(
+        $eloquentFamily = $this->model->newQuery()->withTrashed()->updateOrCreate(
             ['uuid' => $family->id()->value()],
             [
                 'restaurant_id' => $family->restaurantId()->value(),
@@ -26,6 +26,10 @@ class EloquentFamilyRepository implements FamilyRepositoryInterface
                 'updated_at' => $family->updatedAt()->value(),
             ],
         );
+
+        if ($eloquentFamily->trashed()) {
+            $eloquentFamily->restore();
+        }
     }
 
     public function findById(Uuid $id): ?Family

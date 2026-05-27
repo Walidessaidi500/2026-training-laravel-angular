@@ -19,6 +19,7 @@ import { AuthService } from '@services/auth/auth.service';
 import { UiService } from '@app/core/services/ui/ui.service';
 import { SaleService } from '@services/domain/sale.service';
 import { Order } from '@services/domain/order.service';
+import { PrintService, PrintData } from '@app/core/services/helper/print.service';
 
 import { TpvStateService } from './services/tpv-state.service';
 import { CartService } from './services/cart.service';
@@ -51,6 +52,7 @@ export class TpvPage implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly saleService = inject(SaleService);
+  private readonly printService = inject(PrintService);
   private readonly actionSheetCtrl = inject(ActionSheetController);
 
   // Estado local para el manejo de datos
@@ -401,9 +403,12 @@ export class TpvPage implements OnInit, OnDestroy {
     };
 
     this.saleService.process(saleData).subscribe({
-      next: () => {
+      next: (saleResponse) => {
         this.isProcessingPayment = false;
         this.uiService.showSuccess('Pago procesado');
+
+        // Imprimir ticket
+        this.printSaleTicket(saleResponse, linesToSell);
         
         // Recargar estado para reflejar cambios en mesas, órdenes y productos
         this.stateService.loadInitialData().subscribe();
@@ -435,6 +440,77 @@ export class TpvPage implements OnInit, OnDestroy {
         this.uiService.showError('Error al procesar la venta');
       }
     });
+  }
+
+  public printProvisional() {
+    const cart = this.cartService.cartValue;
+    if (cart.length === 0) {
+      this.uiService.showError('El carrito está vacío');
+      return;
+    }
+
+    const restaurant = this.stateService.state.restaurant || { name: 'Mi Restaurante' };
+    const now = new Date();
+    const totalCents = this.cartService.getTotal();
+
+    const printData: PrintData = {
+      restaurantName: restaurant.name,
+      ticketNumber: 'PRE-CUENTA PROVISIONAL',
+      date: now.toLocaleDateString(),
+      hour: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      items: cart.map(item => ({
+        quantity: item.quantity,
+        concept: item.product.name,
+        price: item.product.priceInCents / 100,
+        total: (item.product.priceInCents * item.quantity) / 100
+      })),
+      ivaPercentage: cart.length > 0 ? (this.stateService.state.taxes.find(t => t.uuid === cart[0].product.tax_id)?.percentage || 0) : 0,
+      baseImponible: 0,
+      ivaAmount: 0,
+      total: totalCents / 100
+    };
+
+    // Cálculo simplificado de base e IVA para el ticket
+    const ivaFact = 1 + (printData.ivaPercentage / 100);
+    printData.baseImponible = printData.total / ivaFact;
+    printData.ivaAmount = printData.total - printData.baseImponible;
+
+    this.printService.printTicket(printData);
+    this.uiService.showSuccess('Imprimiendo pre-cuenta...');
+  }
+
+  private printSaleTicket(sale: any, soldLines: any[]) {
+    const restaurant = this.stateService.state.restaurant || { name: 'Mi Restaurante' };
+    const now = new Date();
+    
+    const printData: PrintData = {
+      restaurantName: restaurant.name,
+      ticketNumber: sale.ticket_number || sale.uuid.substring(0, 8),
+      date: now.toLocaleDateString(),
+      hour: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      items: soldLines.map(line => {
+        const product = this.stateService.state.products.find(p => p.uuid === line.product_uuid);
+        return {
+          quantity: line.quantity,
+          concept: product?.name || 'Producto',
+          price: line.price / 100,
+          total: (line.price * line.quantity) / 100
+        };
+      }),
+      ivaPercentage: soldLines.length > 0 ? soldLines[0].tax_percentage : 0,
+      baseImponible: 0, // Se calculará abajo
+      ivaAmount: 0,    // Se calculará abajo
+      total: sale.total / 100
+    };
+
+    // Calcular desglose de IVA de forma simplificada para el ticket
+    // (En un sistema real se haría por cada línea y tipo de IVA)
+    const total = sale.total / 100;
+    const ivaFact = 1 + (printData.ivaPercentage / 100);
+    printData.baseImponible = total / ivaFact;
+    printData.ivaAmount = total - printData.baseImponible;
+
+    this.printService.printTicket(printData);
   }
 
   public logout() {

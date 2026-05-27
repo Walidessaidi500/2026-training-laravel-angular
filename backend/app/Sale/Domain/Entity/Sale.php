@@ -185,6 +185,31 @@ class Sale implements \JsonSerializable
         return $this->lines;
     }
 
+    public function paymentMethod(): string
+    {
+        return $this->paymentMethod;
+    }
+
+    public function amountCash(): int
+    {
+        return $this->amountCash;
+    }
+
+    public function amountCard(): int
+    {
+        return $this->amountCard;
+    }
+
+    public function createdAt(): DomainDateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function updatedAt(): DomainDateTime
+    {
+        return $this->updatedAt;
+    }
+
     public function close(Uuid $closedByUserId, int $ticketNumber): void
     {
         $this->closedByUserId = $closedByUserId;

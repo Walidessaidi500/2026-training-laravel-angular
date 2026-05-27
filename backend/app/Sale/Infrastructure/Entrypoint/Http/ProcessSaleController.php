@@ -4,6 +4,7 @@ namespace App\Sale\Infrastructure\Entrypoint\Http;
 
 use App\Sale\Application\ProcessSale\ProcessSale;
 use App\Sale\Application\ProcessSale\ProcessSaleRequest;
+use App\Sale\Application\ProcessSale\ProcessSaleResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -41,8 +42,9 @@ class ProcessSaleController
             $validated['amount_card'] ?? 0
         );
 
-        $this->processSale->execute($processSaleRequest);
+        $sale = $this->processSale->execute($processSaleRequest);
+        $response = ProcessSaleResponse::create($sale);
 
-        return response()->json(['message' => 'Sale processed successfully'], 201);
+        return response()->json($response->toArray(), 201);
     }
 }

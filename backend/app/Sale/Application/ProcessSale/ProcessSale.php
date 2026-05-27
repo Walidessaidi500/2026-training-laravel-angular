@@ -21,13 +21,13 @@ class ProcessSale
         private ProductRepositoryInterface $productRepository,
     ) {}
 
-    public function execute(ProcessSaleRequest $request): void
+    public function execute(ProcessSaleRequest $request): Sale
     {
         $restaurantId = RestaurantId::create($request->restaurantId);
         $tableUuid = Uuid::create($request->tableUuid);
         $userUuid = Uuid::create($request->userUuid);
 
-        DB::transaction(function () use ($restaurantId, $tableUuid, $userUuid, $request) {
+        return DB::transaction(function () use ($restaurantId, $tableUuid, $userUuid, $request) {
             $order = $this->orderRepository->findByTable($tableUuid, 'open');
 
             if (! $order) {
@@ -63,28 +63,6 @@ class ProcessSale
                     $line['tax_percentage']
                 );
             }, $soldLinesData);
-
-            $sale = Sale::fromPersistence(
-                $saleId->value(),
-                $restaurantId->value(),
-                $order->id()->value(),
-                $tableUuid->value(),
-                $userUuid->value(),
-                $order->openedByUserId()->value(),
-                $userUuid->value(),
-                null,
-                $request->diners,
-                $order->openedAt()->value(),
-                null,
-                new \DateTimeImmutable,
-                0, 
-                $saleLines,
-                new \DateTimeImmutable,
-                new \DateTimeImmutable,
-                $request->paymentMethod,
-                $request->amountCash,
-                $request->amountCard
-            );
 
             $saleTotal = array_reduce($saleLines, function ($carry, $line) {
                 return $carry + ($line->price() * $line->quantity());
@@ -166,6 +144,8 @@ class ProcessSale
             }
 
             $this->orderRepository->save($order);
+
+            return $sale;
         });
     }
 }

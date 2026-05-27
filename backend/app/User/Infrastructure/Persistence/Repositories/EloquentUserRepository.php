@@ -17,7 +17,7 @@ class EloquentUserRepository implements UserRepositoryInterface
 
     public function save(User $user): void
     {
-        $this->model->newQuery()->updateOrCreate(
+        $eloquentUser = $this->model->newQuery()->withTrashed()->updateOrCreate(
             ['uuid' => $user->id()->value()],
             [
                 'restaurant_id' => $user->restaurantId()->value(),
@@ -30,6 +30,10 @@ class EloquentUserRepository implements UserRepositoryInterface
                 'updated_at' => $user->updatedAt()->value(),
             ]
         );
+
+        if ($eloquentUser->trashed()) {
+            $eloquentUser->restore();
+        }
     }
 
     public function findById(Uuid $id): ?User

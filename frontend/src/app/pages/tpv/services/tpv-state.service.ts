@@ -10,6 +10,7 @@ import { User, UserService } from '@services/domain/user.service';
 import { AuthService } from '@services/auth/auth.service';
 import { UiService } from '@app/core/services/ui/ui.service';
 import { ActionSheetController } from '@ionic/angular';
+import { Restaurant, RestaurantService } from '@services/domain/restaurant.service';
 
 export type TpvViewState = 'tables' | 'order';
 
@@ -27,6 +28,7 @@ interface TpvState {
   filteredProducts: Product[];
   users: User[];
   selectedTable: Table | null;
+  restaurant: Restaurant | null;
   
   
   showUserSelection: boolean;
@@ -51,6 +53,7 @@ export class TpvStateService {
   private readonly orderService = inject(OrderService);
   private readonly userService = inject(UserService);
   private readonly authService = inject(AuthService);
+  private readonly restaurantService = inject(RestaurantService);
   private readonly uiService = inject(UiService);
   private readonly actionSheetCtrl = inject(ActionSheetController);
 
@@ -68,6 +71,7 @@ export class TpvStateService {
     filteredProducts: [],
     users: [],
     selectedTable: null,
+    restaurant: null,
     showUserSelection: false,
     showDinersSelection: false,
     showPinModal: false,
@@ -99,6 +103,10 @@ export class TpvStateService {
       taxes: this.taxService.list(),
       products: this.productService.list(1, 500, true),
       activeOrders: this.orderService.list(1, 1000),
+      restaurant: this.restaurantService.list().pipe(
+        map(res => res.data.length > 0 ? res.data[0] : null),
+        catchError(() => of(null))
+      ),
       users: this.userService.list(1, 100).pipe(
         map(res => res.data.filter(u => u.role === 'operator' || u.role === 'supervisor')),
         catchError(() => of([]))
@@ -127,7 +135,8 @@ export class TpvStateService {
           selectedZoneUuid,
           filteredTables,
           selectedFamilyUuid,
-          filteredProducts
+          filteredProducts,
+          restaurant: res.restaurant
         });
       })
     );

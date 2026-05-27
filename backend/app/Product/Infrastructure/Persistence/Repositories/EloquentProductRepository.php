@@ -19,7 +19,7 @@ class EloquentProductRepository implements ProductRepositoryInterface
     // convierte las entidades de dominio en modelo de base de datos
     public function save(Product $product): void
     {
-        $this->model->newQuery()->updateOrCreate(
+        $eloquentProduct = $this->model->newQuery()->withTrashed()->updateOrCreate(
             ['uuid' => $product->id()->value()],
             [
                 'family_id' => $product->familyId() ? $this->resolveFamilyId($product->familyId()) : null,
@@ -34,6 +34,10 @@ class EloquentProductRepository implements ProductRepositoryInterface
                 'updated_at' => $product->updatedAt()->value(),
             ],
         );
+
+        if ($eloquentProduct->trashed()) {
+            $eloquentProduct->restore();
+        }
     }
 
     public function findById(Uuid $id): ?Product

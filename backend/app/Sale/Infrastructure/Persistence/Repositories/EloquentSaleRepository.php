@@ -27,7 +27,7 @@ class EloquentSaleRepository implements SaleRepositoryInterface
     public function save(Sale $sale): void
     {
         DB::transaction(function () use ($sale) {
-            $eloquentSale = EloquentSale::updateOrCreate(
+            $eloquentSale = EloquentSale::withTrashed()->updateOrCreate(
                 ['uuid' => $sale->id()->value()],
                 [
                     'restaurant_id' => $sale->restaurantId()->value(),
@@ -45,6 +45,10 @@ class EloquentSaleRepository implements SaleRepositoryInterface
                 ]
             );
 
+            if ($eloquentSale->trashed()) {
+                $eloquentSale->restore();
+            }
+
             $existingLineIds = $eloquentSale->lines()->pluck('uuid')->toArray();
             $newLineIds = array_map(fn ($line) => $line->id()->value(), $sale->lines());
 
@@ -52,7 +56,7 @@ class EloquentSaleRepository implements SaleRepositoryInterface
             EloquentSaleLine::whereIn('uuid', $linesToDelete)->delete();
 
             foreach ($sale->lines() as $line) {
-                EloquentSaleLine::updateOrCreate(
+                $eloquentLine = EloquentSaleLine::withTrashed()->updateOrCreate(
                     ['uuid' => $line->id()->value()],
                     [
                         'restaurant_id' => $line->restaurantId()->value(),
@@ -65,6 +69,10 @@ class EloquentSaleRepository implements SaleRepositoryInterface
                         'tax_percentage' => $line->taxPercentage(),
                     ]
                 );
+
+                if ($eloquentLine->trashed()) {
+                    $eloquentLine->restore();
+                }
             }
         });
     }

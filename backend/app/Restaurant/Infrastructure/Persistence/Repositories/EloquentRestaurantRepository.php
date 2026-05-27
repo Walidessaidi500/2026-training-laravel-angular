@@ -12,7 +12,7 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
 {
     public function save(Restaurant $restaurant): void
     {
-        EloquentRestaurant::updateOrCreate(
+        $eloquentRestaurant = EloquentRestaurant::withTrashed()->updateOrCreate(
             ['uuid' => $restaurant->id()->value()],
             [
                 'name' => $restaurant->name(),
@@ -22,6 +22,10 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
                 'password' => $restaurant->passwordHash(),
             ]
         );
+
+        if ($eloquentRestaurant->trashed()) {
+            $eloquentRestaurant->restore();
+        }
     }
 
     public function search(Uuid $id): ?Restaurant
