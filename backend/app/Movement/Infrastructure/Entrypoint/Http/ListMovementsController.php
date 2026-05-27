@@ -12,7 +12,6 @@ class ListMovementsController
     {
         $user = $request->user();
         
-        // Only admin can see movement history
         if ($user->role !== 'admin') {
             return response()->json(['message' => 'Forbidden'], 403);
         }
