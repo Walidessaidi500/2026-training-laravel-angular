@@ -94,6 +94,23 @@ class MovementDescriptor
         }
 
         if ($method === 'PUT' || $method === 'PATCH' || $method === 'DELETE') {
+            if ($resourceType === 'table' && ($method === 'PUT' || $method === 'PATCH')) {
+                $tableName = $data['name'] ?? null;
+                if (!$tableName) {
+                    $id = $this->determineResourceId($request);
+                    $tableName = ($id) ? $this->entityResolver->resolveIdToName('table', $id) : "Mesa";
+                }
+
+                if (array_key_exists('joined_to_uuid', $data)) {
+                    if ($data['joined_to_uuid'] === null) {
+                        return "Separó la mesa \"$tableName\" de su unión";
+                    } else {
+                        $masterName = $this->entityResolver->resolveIdToName('joined_to_uuid', $data['joined_to_uuid']);
+                        return "Juntó la mesa \"$tableName\" con la mesa \"$masterName\"";
+                    }
+                }
+            }
+
             $name = $data['name'] ?? $data['title'] ?? null;
             if (!$name && $resourceType) {
                 $id = $this->determineResourceId($request);
