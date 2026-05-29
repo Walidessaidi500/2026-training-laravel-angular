@@ -10,6 +10,9 @@ class GetAuthenticatedUserResponse
         public readonly string $email,
         public readonly string $role,
         public readonly ?int $restaurantId,
+        public readonly ?string $restaurantUuid = null,
+        public readonly ?string $restaurantName = null,
+        public readonly ?string $restaurantLegalName = null,
     ) {}
 
     public static function create(
@@ -18,8 +21,11 @@ class GetAuthenticatedUserResponse
         string $email,
         string $role,
         ?int $restaurantId,
+        ?string $restaurantUuid = null,
+        ?string $restaurantName = null,
+        ?string $restaurantLegalName = null,
     ): self {
-        return new self($uuid, $name, $email, $role, $restaurantId);
+        return new self($uuid, $name, $email, $role, $restaurantId, $restaurantUuid, $restaurantName, $restaurantLegalName);
     }
 
     public function toArray(): array
@@ -30,6 +36,9 @@ class GetAuthenticatedUserResponse
             'email' => $this->email,
             'role' => $this->role,
             'restaurant_id' => $this->restaurantId,
+            'restaurant_uuid' => $this->restaurantUuid,
+            'restaurant_name' => $this->restaurantName,
+            'restaurant_legal_name' => $this->restaurantLegalName,
         ];
     }
 }

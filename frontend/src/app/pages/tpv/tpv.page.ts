@@ -449,12 +449,13 @@ export class TpvPage implements OnInit, OnDestroy {
       return;
     }
 
-    const restaurant = this.stateService.state.restaurant || { name: 'Mi Restaurante' };
+    const restaurant = this.stateService.state.restaurant;
+    const restaurantName = restaurant ? (restaurant.legal_name || restaurant.name) : 'Mi Restaurante';
     const now = new Date();
     const totalCents = this.cartService.getTotal();
 
     const printData: PrintData = {
-      restaurantName: restaurant.name,
+      restaurantName: restaurantName,
       ticketNumber: 'PRE-CUENTA PROVISIONAL',
       date: now.toLocaleDateString(),
       hour: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -480,11 +481,12 @@ export class TpvPage implements OnInit, OnDestroy {
   }
 
   private printSaleTicket(sale: any, soldLines: any[]) {
-    const restaurant = this.stateService.state.restaurant || { name: 'Mi Restaurante' };
+    const restaurant = this.stateService.state.restaurant;
+    const restaurantName = restaurant ? (restaurant.legal_name || restaurant.name) : 'Mi Restaurante';
     const now = new Date();
     
     const printData: PrintData = {
-      restaurantName: restaurant.name,
+      restaurantName: restaurantName,
       ticketNumber: sale.ticket_number || sale.uuid.substring(0, 8),
       date: now.toLocaleDateString(),
       hour: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),

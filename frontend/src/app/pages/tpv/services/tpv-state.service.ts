@@ -104,7 +104,43 @@ export class TpvStateService {
       products: this.productService.list(1, 500, true),
       activeOrders: this.orderService.list(1, 1000),
       restaurant: this.restaurantService.list().pipe(
-        map(res => res.data.length > 0 ? res.data[0] : null),
+        map(res => {
+          const restaurants = Array.isArray(res) ? res : (res as any).data;
+          if (!restaurants || restaurants.length === 0) return null;
+          
+          // Intentar obtener el usuario de nuevo por si se ha cargado durante la inicialización
+          const user = this.authService.getUser();
+          const targetUuid = user?.restaurant_uuid || (user?.role === 'restaurant' ? user?.uuid : null);
+          
+          if (targetUuid) {
+            const found = restaurants.find((r: any) => r.uuid === targetUuid);
+            if (found) return found;
+          }
+          
+          // Si el usuario ya trae la información del restaurante, podemos construir un objeto parcial
+          // si no se encuentra en la lista por alguna razón
+          if (user?.restaurant_uuid && user?.restaurant_name) {
+            return {
+              uuid: user.restaurant_uuid,
+              name: user.restaurant_name,
+              legal_name: user.restaurant_legal_name || user.restaurant_name,
+              tax_id: '',
+              email: '',
+              created_at: ''
+            } as Restaurant;
+          }
+          
+          // Si no se encuentra, pero solo hay uno, usamos ese
+          if (restaurants.length === 1) return restaurants[0];
+          
+          // Por último, si el currentUser original tenía el UUID, lo intentamos con ese una vez más
+          if (currentUser && currentUser.restaurant_uuid) {
+            const found = restaurants.find((r: any) => r.uuid === currentUser.restaurant_uuid);
+            if (found) return found;
+          }
+
+          return restaurants[0];
+        }),
         catchError(() => of(null))
       ),
       users: this.userService.list(1, 100).pipe(

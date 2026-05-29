@@ -15,6 +15,9 @@ export interface User {
   email: string;
   role: string;
   restaurant_id?: number;
+  restaurant_uuid?: string;
+  restaurant_name?: string;
+  restaurant_legal_name?: string;
 }
 
 export interface AuthResponse {

@@ -5,9 +5,9 @@ import { Observable } from 'rxjs';
 export interface Restaurant {
   uuid: string;
   name: string;
-  address: string;
-  city: string;
-  active: boolean;
+  legal_name: string;
+  tax_id: string;
+  email: string;
   created_at: string;
 }
 
