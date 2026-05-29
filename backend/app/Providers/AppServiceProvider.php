@@ -12,13 +12,13 @@ use App\Product\Domain\Interfaces\ProductRepositoryInterface;
 use App\Product\Infrastructure\Persistence\Repositories\EloquentProductRepository;
 use App\Restaurant\Domain\Interfaces\RestaurantRepositoryInterface;
 use App\Restaurant\Infrastructure\Persistence\Repositories\EloquentRestaurantRepository;
+use App\Restaurant\Infrastructure\Services\LaravelRestaurantPasswordHasher;
 use App\Sale\Domain\Interfaces\SaleRepositoryInterface;
 use App\Sale\Infrastructure\Persistence\Repositories\EloquentSaleRepository;
 use App\Table\Domain\Interfaces\TableRepositoryInterface;
 use App\Table\Infrastructure\Persistence\Repositories\EloquentTableRepository;
 use App\Tax\Domain\Interfaces\TaxRepositoryInterface;
 use App\Tax\Infrastructure\Persistence\Repositories\EloquentTaxRepository;
-use App\User\Domain\Interfaces\PasswordHasherInterface;
 use App\User\Domain\Interfaces\TokenGeneratorInterface;
 use App\User\Domain\Interfaces\UserRepositoryInterface;
 use App\User\Infrastructure\Persistence\Repositories\EloquentUserRepository;
@@ -26,6 +26,8 @@ use App\User\Infrastructure\Services\LaravelPasswordHasher;
 use App\User\Infrastructure\Services\SanctumTokenGenerator;
 use App\Zone\Domain\Interfaces\ZoneRepositoryInterface;
 use App\Zone\Infrastructure\Persistence\Repositories\EloquentZoneRepository;
+use App\User\Domain\Interfaces\PasswordHasherInterface as UserPasswordHasherInterface;
+use App\Restaurant\Domain\Interfaces\PasswordHasherInterface as RestaurantPasswordHasherInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -34,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // User
         $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
-        $this->app->bind(PasswordHasherInterface::class, LaravelPasswordHasher::class);
+        $this->app->bind(UserPasswordHasherInterface::class, LaravelPasswordHasher::class);
         $this->app->bind(TokenGeneratorInterface::class, SanctumTokenGenerator::class);
 
         // Family
@@ -54,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Restaurant
         $this->app->bind(RestaurantRepositoryInterface::class, EloquentRestaurantRepository::class);
-        $this->app->bind(PasswordHasherInterface::class, LaravelPasswordHasher::class);
+        $this->app->bind(RestaurantPasswordHasherInterface::class, LaravelRestaurantPasswordHasher::class);
 
         // Sale
         $this->app->bind(SaleRepositoryInterface::class, EloquentSaleRepository::class);

@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
-  IonButton,
   IonIcon,
   IonMenuButton,
   IonButtons,
@@ -22,7 +21,6 @@ import { searchOutline } from 'ionicons/icons';
     CommonModule,
     IonHeader,
     IonToolbar,
-    IonButton,
     IonIcon,
     IonMenuButton,
     IonButtons,

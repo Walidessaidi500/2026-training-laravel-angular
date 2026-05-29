@@ -32,6 +32,21 @@ class ProcessSale
 
             if (! $order) {
                 $orderId = Uuid::generate();
+                $initialOrderLines = array_map(function ($line) use ($restaurantId, $orderId, $userUuid) {
+                    return OrderLine::fromPersistence(
+                        $line['uuid'] ?? Uuid::generate()->value(),
+                        $restaurantId->value(),
+                        $orderId->value(),
+                        $line['product_uuid'],
+                        $userUuid->value(),
+                        $line['quantity'],
+                        $line['price'],
+                        $line['tax_percentage'],
+                        new \DateTimeImmutable,
+                        new \DateTimeImmutable
+                    );
+                }, $request->lines);
+
                 $order = Order::fromPersistence(
                     $orderId->value(),
                     $restaurantId->value(),
@@ -42,13 +57,27 @@ class ProcessSale
                     $request->diners,
                     new \DateTimeImmutable,
                     null,
-                    [],
+                    $initialOrderLines,
                     new \DateTimeImmutable,
                     new \DateTimeImmutable
                 );
             }
 
             $soldLinesData = $request->lines;
+
+            // Asegurarnos de que cada linea de venta tenga el UUID de la linea de pedido correspondiente
+            foreach ($soldLinesData as &$soldLine) {
+                if (!isset($soldLine['uuid'])) {
+                    // Si no tiene UUID, buscamos en las lineas del pedido (recien creadas o existentes)
+                    foreach ($order->lines() as $orderLine) {
+                        if ($orderLine->productId()->value() === $soldLine['product_uuid']) {
+                            $soldLine['uuid'] = $orderLine->id()->value();
+                            break;
+                        }
+                    }
+                }
+            }
+            unset($soldLine);
 
             $saleId = Uuid::generate();
             $saleLines = array_map(function ($line) use ($restaurantId, $saleId, $userUuid) {
@@ -89,6 +118,8 @@ class ProcessSale
                 $request->amountCash,
                 $request->amountCard
             );
+
+            $this->orderRepository->save($order);
 
             // Asignar un numero de ticket
             $lastTicketNumber = DB::table('sales')->where('restaurant_id', $restaurantId->value())->max('ticket_number') ?? 0;

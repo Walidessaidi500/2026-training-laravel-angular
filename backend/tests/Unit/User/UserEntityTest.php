@@ -19,7 +19,8 @@ class UserEntityTest extends TestCase
             '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'
         );
 
-        $user = User::dddCreate($email, $nameVO, $passwordHashVO);
+        $restaurantId = \App\User\Domain\ValueObject\RestaurantId::create(1);
+        $user = User::dddCreate($email, $nameVO, $passwordHashVO, $restaurantId);
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertMatchesRegularExpression(
