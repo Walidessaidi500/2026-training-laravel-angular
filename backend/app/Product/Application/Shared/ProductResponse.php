@@ -15,6 +15,7 @@ class ProductResponse
         public readonly int $stock,
         public readonly bool $active,
         public readonly ?string $imageSrc,
+        public readonly array $options,
         public readonly string $createdAt,
         public readonly string $updatedAt,
     ) {}
@@ -23,15 +24,16 @@ class ProductResponse
     {
         return new self(
             $product->id()->value(),
-            $product->familyId()->value(),
-            $product->taxId()->value(),
+            $product->familyId() ? $product->familyId()->value() : '',
+            $product->taxId() ? $product->taxId()->value() : '',
             $product->name(),
             $product->price()->value(),
             $product->stock(),
             $product->isActive(),
             $product->imageSrc(),
-            $product->createdAt()->format('Y-m-d\TH:i:s'),
-            $product->updatedAt()->format('Y-m-d\TH:i:s'),
+            $product->options(),
+            $product->createdAt()->value()->format('Y-m-d\TH:i:s.u\Z'),
+            $product->updatedAt()->value()->format('Y-m-d\TH:i:s.u\Z'),
         );
     }
 
@@ -46,6 +48,7 @@ class ProductResponse
             'stock' => $this->stock,
             'active' => $this->active,
             'image_src' => $this->imageSrc,
+            'options' => $this->options,
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
         ];

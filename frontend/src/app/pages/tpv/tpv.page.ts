@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ActionSheetController } from '@ionic/angular';
@@ -32,6 +32,7 @@ import { TpvUserSelectionModalComponent } from './components/tpv-user-selection-
 import { TpvPinModalComponent } from './components/tpv-pin-modal/tpv-pin-modal.component';
 import { TpvDinersModalComponent } from './components/tpv-diners-modal/tpv-diners-modal.component';
 import { TpvPaymentModalComponent } from './components/tpv-payment-modal/tpv-payment-modal.component';
+import { TpvProductOptionsModalComponent } from './components/tpv-product-options-modal/tpv-product-options-modal.component';
 
 @Component({
   selector: 'app-tpv',
@@ -42,8 +43,9 @@ import { TpvPaymentModalComponent } from './components/tpv-payment-modal/tpv-pay
     CommonModule, IonicModule, FormsModule, CurrencyPipe,
     TpvHeaderComponent, TpvTableSelectionComponent, TpvOrderManagementComponent,
     TpvCartComponent, TpvUserSelectionModalComponent, TpvPinModalComponent,
-    TpvDinersModalComponent, TpvPaymentModalComponent
-  ]
+    TpvDinersModalComponent, TpvPaymentModalComponent, TpvProductOptionsModalComponent
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class TpvPage implements OnInit, OnDestroy {
   public readonly stateService = inject(TpvStateService);
@@ -371,8 +373,9 @@ export class TpvPage implements OnInit, OnDestroy {
       linesToSell = cart.map(item => ({
         uuid: item.uuid,
         product_uuid: item.product.uuid,
+        product_option: item.option,
         quantity: item.quantity,
-        price: item.product.priceInCents,
+        price: item.product.priceInCents + (item.option ? item.option.price_change : 0),
         tax_percentage: this.stateService.state.taxes.find(t => t.uuid === item.product.tax_id)?.percentage || 0
       }));
     } else {
@@ -380,8 +383,9 @@ export class TpvPage implements OnInit, OnDestroy {
         .map(item => ({
           uuid: item.uuid,
           product_uuid: item.product.uuid,
+          product_option: item.option,
           quantity: item.selectedQuantity,
-          price: item.product.priceInCents,
+          price: item.product.priceInCents + (item.option ? item.option.price_change : 0),
           tax_percentage: this.stateService.state.taxes.find(t => t.uuid === item.product.tax_id)?.percentage || 0
         }));
     }
@@ -461,9 +465,9 @@ export class TpvPage implements OnInit, OnDestroy {
       hour: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       items: cart.map(item => ({
         quantity: item.quantity,
-        concept: item.product.name,
-        price: item.product.priceInCents / 100,
-        total: (item.product.priceInCents * item.quantity) / 100
+        concept: item.product.name + (item.option ? ` (${item.option.name})` : ''),
+        price: (item.product.priceInCents + (item.option ? item.option.price_change : 0)) / 100,
+        total: ((item.product.priceInCents + (item.option ? item.option.price_change : 0)) * item.quantity) / 100
       })),
       ivaPercentage: cart.length > 0 ? (this.stateService.state.taxes.find(t => t.uuid === cart[0].product.tax_id)?.percentage || 0) : 0,
       baseImponible: 0,
@@ -492,9 +496,10 @@ export class TpvPage implements OnInit, OnDestroy {
       hour: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       items: soldLines.map(line => {
         const product = this.stateService.state.products.find(p => p.uuid === line.product_uuid);
+        const optionName = line.product_option ? ` (${line.product_option.name})` : '';
         return {
           quantity: line.quantity,
-          concept: product?.name || 'Producto',
+          concept: (product?.name || 'Producto') + optionName,
           price: line.price / 100,
           total: (line.price * line.quantity) / 100
         };
@@ -513,6 +518,34 @@ export class TpvPage implements OnInit, OnDestroy {
     printData.ivaAmount = total - printData.baseImponible;
 
     this.printService.printTicket(printData);
+  }
+
+  public onProductSelect(product: Product) {
+    if (product.options && Array.isArray(product.options) && product.options.length > 0) {
+      this.stateService.setShowProductOptionsModal(true, product);
+    } else {
+      this.cartService.addToCart(product);
+    }
+  }
+
+  public onCartItemAdd(item: any) {
+    if (item.option) {
+      this.cartService.addToCart(item.product, item.option);
+    } else {
+      this.onProductSelect(item.product);
+    }
+  }
+
+  public onOptionSelect(option?: any) {
+    const product = this.stateService.state.selectedProductForOptions;
+    if (product) {
+      this.cartService.addToCart(product, option);
+    }
+    this.stateService.setShowProductOptionsModal(false);
+  }
+
+  public getTaxPercentage(product: Product): number {
+    return this.stateService.state.taxes.find(t => t.uuid === product.tax_id)?.percentage || 0;
   }
 
   public logout() {

@@ -21,10 +21,11 @@ class UpdateProduct
         ?string $taxId,
         string $name,
         int $priceInCents,
-        int $stock,
+        float $stock,
         int $restaurantId,
         bool $active,
         ?string $imageSrc = null,
+        array $options = [],
     ): ProductResponse {
         $uuid = Uuid::create($id);
         $product = $this->productRepository->findById($uuid);
@@ -41,7 +42,9 @@ class UpdateProduct
             Stock::create($stock),
             $active,
             $imageSrc,
+            $options,
         );
+
 
         $this->productRepository->save($product);
 

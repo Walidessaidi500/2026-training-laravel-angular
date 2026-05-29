@@ -61,9 +61,11 @@ class EloquentSaleRepository implements SaleRepositoryInterface
                     [
                         'restaurant_id' => $line->restaurantId()->value(),
                         'sale_id' => $eloquentSale->id,
-                        'order_line_id' => DB::table('order_lines')->where('uuid', $line->orderLineId()->value())->value('id'),
+                        'order_line_id' => $line->orderLineId() ? DB::table('order_lines')->where('uuid', $line->orderLineId()->value())->value('id') : null,
                         'product_id' => DB::table('products')->where('uuid', $line->productId()->value())->value('id'),
+                        'product_option' => $line->productOption(),
                         'user_id' => $this->getInternalUserId($line->userId()->value()),
+
                         'quantity' => $line->quantity(),
                         'price' => $line->price(),
                         'tax_percentage' => $line->taxPercentage(),
@@ -125,8 +127,9 @@ class EloquentSaleRepository implements SaleRepositoryInterface
                 $line->uuid,
                 $line->restaurant_id,
                 $line->sale->uuid,
-                DB::table('order_lines')->where('id', $line->order_line_id)->value('uuid'),
+                $line->orderLine->uuid,
                 DB::table('products')->where('id', $line->product_id)->value('uuid'),
+                $line->product_option,
                 $this->getUuidFromInternalId($line->user_id),
                 $line->quantity,
                 $line->price,
@@ -134,6 +137,7 @@ class EloquentSaleRepository implements SaleRepositoryInterface
                 new \DateTimeImmutable($line->created_at),
                 new \DateTimeImmutable($line->updated_at)
             );
+
         })->toArray();
 
         return Sale::fromPersistence(

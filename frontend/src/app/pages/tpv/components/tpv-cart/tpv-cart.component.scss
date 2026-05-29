@@ -123,7 +123,20 @@
 
       .item-info {
         flex: 1;
-        .item-name { display: block; font-weight: 700; color: var(--ion-color-secondary); font-size: 15px; }
+        .item-name { 
+          display: flex; 
+          flex-direction: column;
+          font-weight: 700; 
+          color: var(--ion-color-secondary); 
+          font-size: 15px; 
+
+          .option-name {
+            font-size: 0.75rem;
+            color: var(--ion-color-medium);
+            font-weight: 500;
+            margin-top: 2px;
+          }
+        }
         .item-price { display: block; font-size: 13px; color: var(--ion-color-medium); margin-top: 4px; font-weight: 600; }
       }
 

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, map } from 'rxjs';
-import { Product } from '@services/domain/product.service';
+import { Product, ProductOption } from '@services/domain/product.service';
 import { Tax } from '@services/domain/tax.service';
 import { Order, OrderService } from '@services/domain/order.service';
 import { UiService } from '@app/core/services/ui/ui.service';
@@ -11,6 +11,7 @@ export interface CartItem {
   quantity: number;
   selected?: boolean;
   selectedQuantity?: number;
+  option?: ProductOption;
 }
 
 @Injectable({
@@ -80,21 +81,31 @@ export class CartService {
     }
   }
 
-  public addToCart(product: Product) {
+  public addToCart(product: Product, option?: ProductOption) {
     const currentCart = this.cartValue;
-    const existingItem = currentCart.find(item => item.product.uuid === product.uuid);
-    const currentQtyInCart = existingItem ? existingItem.quantity : 0;
+    
+    // Calcular el impacto total actual en el carrito para este producto (todas las variantes)
+    const totalImpactInCart = currentCart
+      .filter(item => item.product.uuid === product.uuid)
+      .reduce((sum, item) => sum + (item.quantity * (item.option ? item.option.stock_impact : 1.0)), 0);
+    
+    const newImpact = option ? option.stock_impact : 1.0;
 
-    if (currentQtyInCart >= product.stock) {
-      this.uiService.showError(`No queda más stock de ${product.name}`);
+    if (totalImpactInCart + newImpact > product.stock) {
+      this.uiService.showError(`No queda suficiente stock de ${product.name}`);
       return;
     }
+
+    const existingItem = currentCart.find(item => 
+      item.product.uuid === product.uuid && 
+      ( (!option && !item.option) || (option && item.option && item.option.name === option.name) )
+    );
 
     if (existingItem) {
       existingItem.quantity++;
       this._cart.next([...currentCart]);
     } else {
-      this._cart.next([...currentCart, { product, quantity: 1, selected: false, selectedQuantity: 0 }]);
+      this._cart.next([...currentCart, { product, quantity: 1, selected: false, selectedQuantity: 0, option }]);
     }
   }
 
@@ -116,19 +127,20 @@ export class CartService {
     this._tempDiners.next('1');
   }
 
-  public getPriceWithTax(product: Product): number {
+  public getPriceWithTax(product: Product, option?: ProductOption): number {
     const tax = this.taxes.find(t => t.uuid === product.tax_id);
     const percentage = tax ? tax.percentage : 0;
-    return product.priceInCents * (1 + percentage / 100);
+    const basePrice = product.priceInCents + (option ? option.price_change : 0);
+    return basePrice * (1 + percentage / 100);
   }
 
   public getTotal(): number {
-    return this.cartValue.reduce((sum, item) => sum + (this.getPriceWithTax(item.product) * item.quantity), 0);
+    return this.cartValue.reduce((sum, item) => sum + (this.getPriceWithTax(item.product, item.option) * item.quantity), 0);
   }
 
   public getSelectedTotal(paymentType: 'total' | 'split'): number {
     if (paymentType === 'total') return this.getTotal();
-    return this.cartValue.reduce((sum, item) => sum + (item.selected ? (this.getPriceWithTax(item.product) * (item.selectedQuantity || 0)) : 0), 0);
+    return this.cartValue.reduce((sum, item) => sum + (item.selected ? (this.getPriceWithTax(item.product, item.option) * (item.selectedQuantity || 0)) : 0), 0);
   }
 
   public toggleItemSelection(item: CartItem) {
@@ -154,8 +166,9 @@ export class CartService {
       lines: this.cartValue.map(item => ({
         uuid: item.uuid,
         product_uuid: item.product.uuid,
+        product_option: item.option,
         quantity: item.quantity,
-        price: item.product.priceInCents,
+        price: item.product.priceInCents + (item.option ? item.option.price_change : 0),
         tax_percentage: this.taxes.find(t => t.uuid === item.product.tax_id)?.percentage || 0
       }))
     };
@@ -185,6 +198,7 @@ export class CartService {
               uuid: line.uuid,
               product: product!,
               quantity: line.quantity,
+              option: line.product_option,
               selected: false,
               selectedQuantity: 0
             };

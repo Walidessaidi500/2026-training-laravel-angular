@@ -26,11 +26,12 @@ class SyncOrder
 
             $order = $this->orderRepository->findByTable($tableUuid, 'open');
 
-            $oldQuantitiesByProduct = [];
+            $oldStockImpactByProduct = [];
             if ($order) {
                 foreach ($order->lines() as $line) {
                     $productUuid = $line->productId()->value();
-                    $oldQuantitiesByProduct[$productUuid] = ($oldQuantitiesByProduct[$productUuid] ?? 0) + $line->quantity();
+                    $impact = (isset($line->productOption()['stock_impact'])) ? (float) $line->productOption()['stock_impact'] : 1.0;
+                    $oldStockImpactByProduct[$productUuid] = ($oldStockImpactByProduct[$productUuid] ?? 0) + ($line->quantity() * $impact);
                 }
             } else {
                 $order = Order::dddCreate(
@@ -47,6 +48,7 @@ class SyncOrder
                     $restaurantId->value(),
                     $order->id()->value(),
                     $line['product_uuid'],
+                    $line['product_option'] ?? null,
                     $userUuid->value(),
                     $line['quantity'],
                     $line['price'],
@@ -56,20 +58,21 @@ class SyncOrder
                 );
             }, $request->lines);
 
-            $newQuantitiesByProduct = [];
+            $newStockImpactByProduct = [];
             foreach ($newLines as $line) {
                 $productUuid = $line->productId()->value();
-                $newQuantitiesByProduct[$productUuid] = ($newQuantitiesByProduct[$productUuid] ?? 0) + $line->quantity();
+                $impact = (isset($line->productOption()['stock_impact'])) ? (float) $line->productOption()['stock_impact'] : 1.0;
+                $newStockImpactByProduct[$productUuid] = ($newStockImpactByProduct[$productUuid] ?? 0) + ($line->quantity() * $impact);
             }
 
-            $allProductUuids = array_unique(array_merge(array_keys($oldQuantitiesByProduct), array_keys($newQuantitiesByProduct)));
+            $allProductUuids = array_unique(array_merge(array_keys($oldStockImpactByProduct), array_keys($newStockImpactByProduct)));
 
             foreach ($allProductUuids as $productUuid) {
-                $oldQty = $oldQuantitiesByProduct[$productUuid] ?? 0;
-                $newQty = $newQuantitiesByProduct[$productUuid] ?? 0;
-                $delta = $newQty - $oldQty;
+                $oldImpact = $oldStockImpactByProduct[$productUuid] ?? 0;
+                $newImpact = $newStockImpactByProduct[$productUuid] ?? 0;
+                $delta = $newImpact - $oldImpact;
 
-                if ($delta !== 0) {
+                if ($delta != 0) {
                     $product = $this->productRepository->findById(Uuid::create($productUuid));
                     if ($product) {
                         if ($delta > 0) {

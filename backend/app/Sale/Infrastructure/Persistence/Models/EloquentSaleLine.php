@@ -30,6 +30,7 @@ class EloquentSaleLine extends Model
         'sale_id',
         'order_line_id',
         'product_id',
+        'product_option',
         'user_id',
         'quantity',
         'price',
@@ -47,6 +48,7 @@ class EloquentSaleLine extends Model
             'quantity' => 'integer',
             'price' => 'integer',
             'tax_percentage' => 'integer',
+            'product_option' => 'array',
         ];
     }
 

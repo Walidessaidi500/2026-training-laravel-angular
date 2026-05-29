@@ -38,6 +38,7 @@ class ProcessSale
                         $restaurantId->value(),
                         $orderId->value(),
                         $line['product_uuid'],
+                        $line['product_option'] ?? null,
                         $userUuid->value(),
                         $line['quantity'],
                         $line['price'],
@@ -89,7 +90,8 @@ class ProcessSale
                     $userUuid,
                     $line['quantity'],
                     $line['price'],
-                    $line['tax_percentage']
+                    $line['tax_percentage'],
+                    $line['product_option'] ?? null
                 );
             }, $soldLinesData);
 
@@ -144,6 +146,7 @@ class ProcessSale
                         $orderLine->restaurantId()->value(),
                         $orderLine->orderId()->value(),
                         $orderLine->productId()->value(),
+                        $orderLine->productOption(),
                         $orderLine->userId()->value(),
                         $remainingQty,
                         $orderLine->price(),

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ProductOption } from './product.service';
 
 export interface SaleLine {
   uuid: string;
@@ -8,6 +9,7 @@ export interface SaleLine {
   sale_uuid: string;
   order_line_uuid: string;
   product_uuid: string;
+  product_option?: ProductOption;
   user_uuid: string;
   quantity: number;
   price: number;

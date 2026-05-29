@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface ProductOption {
+  name: string;
+  price_change: number; // in cents
+  stock_impact: number; // amount to subtract from stock (usually 1.0)
+}
+
 export interface Product {
   uuid: string;
   name: string;
@@ -9,6 +15,7 @@ export interface Product {
   stock: number;
   active: boolean;
   image_src?: string | null;
+  options?: ProductOption[];
   family_id: string;
   tax_id: string;
   created_at: string;

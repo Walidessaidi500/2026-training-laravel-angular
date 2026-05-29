@@ -24,10 +24,11 @@ class CreateProduct
         string $taxId,
         string $name,
         int $priceInCents,
-        int $stock,
+        float $stock,
         int $restaurantId,
         bool $active = true,
         ?string $imageSrc = null,
+        array $options = [],
     ): ProductResponse {
         // valida si el usuario tiene permiso para realizar la acción
 
@@ -40,6 +41,7 @@ class CreateProduct
             RestaurantId::create($restaurantId),
             $active,
             $imageSrc,
+            $options,
         );
 
         $this->productRepository->save($product);

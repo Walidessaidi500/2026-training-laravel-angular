@@ -19,12 +19,13 @@ class StoreProductController
             'tax_id' => ['nullable', 'string'],
             'name' => ['required', 'string', 'max:255'],
             'price_in_cents' => ['required', 'integer', 'min:0'],
-            'stock' => ['required', 'integer', 'min:0'],
+            'stock' => ['required', 'numeric', 'min:0'],
             'active' => ['required', 'boolean'],
             'image_src' => ['nullable', 'string', 'max:255'],
+            'options' => ['nullable', 'array'],
         ]);
 
-        $responde = ($this->createProduct)(
+        $response = ($this->createProduct)(
             $validated['family_id'] ?? null,
             $validated['tax_id'] ?? null,
             $validated['name'],
@@ -33,8 +34,9 @@ class StoreProductController
             (int) $request->user()->restaurant_id,
             (bool) $validated['active'],
             $validated['image_src'] ?? null,
+            $validated['options'] ?? [],
         );
 
-        return new JsonResponse($responde->toArray(), 201);
+        return new JsonResponse($response->toArray(), 201);
     }
 }

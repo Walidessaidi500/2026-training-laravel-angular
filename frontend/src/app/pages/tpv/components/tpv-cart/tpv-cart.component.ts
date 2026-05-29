@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { Product } from '@services/domain/product.service';
+import { Product, ProductOption } from '@services/domain/product.service';
 import { Tax } from '@services/domain/tax.service';
 import { Order } from '@services/domain/order.service';
 import { addIcons } from 'ionicons';
@@ -11,6 +11,7 @@ interface CartItem {
   uuid?: string;
   product: Product;
   quantity: number;
+  option?: ProductOption;
 }
 
 @Component({
@@ -31,7 +32,7 @@ export class TpvCartComponent {
   @Output() printProvisional = new EventEmitter<void>();
   @Output() clearCart = new EventEmitter<void>();
   @Output() removeItem = new EventEmitter<number>();
-  @Output() addItem = new EventEmitter<Product>();
+  @Output() addItem = new EventEmitter<CartItem>();
   @Output() sendOrder = new EventEmitter<void>();
   @Output() closeTicket = new EventEmitter<void>();
 
@@ -39,17 +40,18 @@ export class TpvCartComponent {
     addIcons({ receiptOutline, peopleOutline, printOutline, trashOutline, cartOutline, removeOutline, addOutline, cloudUploadOutline, walletOutline });
   }
 
-  getPriceWithTax(product: Product): number {
-    const tax = this.taxes.find(t => t.uuid === product.tax_id);
+  getPriceWithTax(item: CartItem): number {
+    const tax = this.taxes.find(t => t.uuid === item.product.tax_id);
     const percentage = tax ? tax.percentage : 0;
-    return product.priceInCents * (1 + percentage / 100);
+    const basePrice = item.product.priceInCents + (item.option ? item.option.price_change : 0);
+    return basePrice * (1 + percentage / 100);
   }
 
   onEditDiners() { this.editDiners.emit(); }
   onPrintProvisional() { this.printProvisional.emit(); }
   onClearCart() { this.clearCart.emit(); }
   onRemoveItem(index: number) { this.removeItem.emit(index); }
-  onAddItem(product: Product) { this.addItem.emit(product); }
+  onAddItem(item: CartItem) { this.addItem.emit(item); }
   onSendOrder() { this.sendOrder.emit(); }
   onCloseTicket() { this.closeTicket.emit(); }
 }

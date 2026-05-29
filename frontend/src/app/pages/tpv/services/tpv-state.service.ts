@@ -35,6 +35,8 @@ interface TpvState {
   showDinersSelection: boolean;
   showPinModal: boolean;
   showPaymentModal: boolean;
+  showProductOptionsModal: boolean;
+  selectedProductForOptions: Product | null;
   userSelectionContext: 'opening' | 'closing';
   selectedOpUser: User | null;
   selectedUserForPin: User | null;
@@ -76,6 +78,8 @@ export class TpvStateService {
     showDinersSelection: false,
     showPinModal: false,
     showPaymentModal: false,
+    showProductOptionsModal: false,
+    selectedProductForOptions: null,
     userSelectionContext: 'opening',
     selectedOpUser: null,
     selectedUserForPin: null,
@@ -269,6 +273,10 @@ export class TpvStateService {
 
   public setShowPaymentModal(show: boolean) {
     this.updateState({ showPaymentModal: show });
+  }
+
+  public setShowProductOptionsModal(show: boolean, product: Product | null = null) {
+    this.updateState({ showProductOptionsModal: show, selectedProductForOptions: product });
   }
 
   public setSelectedOpUser(user: User | null) {

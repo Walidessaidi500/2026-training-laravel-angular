@@ -34,14 +34,16 @@ class EloquentProduct extends Model
         'price',
         'stock',
         'active',
+        'options',
     ];
 
     protected function casts(): array
     {
         return [
             'price' => 'integer',
-            'stock' => 'integer',
+            'stock' => 'decimal:2',
             'active' => 'boolean',
+            'options' => 'array',
         ];
     }
 

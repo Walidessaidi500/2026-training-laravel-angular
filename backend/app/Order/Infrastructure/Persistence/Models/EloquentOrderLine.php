@@ -21,6 +21,7 @@ class EloquentOrderLine extends Model
         'restaurant_id',
         'order_id',
         'product_id',
+        'product_option',
         'user_id',
         'quantity',
         'price',
@@ -29,6 +30,7 @@ class EloquentOrderLine extends Model
 
     protected $casts = [
         'deleted_at' => 'datetime',
+        'product_option' => 'array',
     ];
 
     protected static function newFactory()

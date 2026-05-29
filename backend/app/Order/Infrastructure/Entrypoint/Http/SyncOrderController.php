@@ -25,6 +25,7 @@ class SyncOrderController
             'lines.*.quantity' => 'required|integer|min:1',
             'lines.*.price' => 'required|integer|min:0',
             'lines.*.tax_percentage' => 'required|integer|min:0',
+            'lines.*.product_option' => 'nullable|array',
         ]);
 
         $syncOrderRequest = new SyncOrderRequest(

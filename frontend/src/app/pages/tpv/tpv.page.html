@@ -30,7 +30,7 @@
             [filteredProducts]="state.filteredProducts"
             [taxes]="state.taxes"
             (familySelect)="stateService.selectFamily($event)"
-            (productSelect)="cartService.addToCart($event)">
+            (productSelect)="onProductSelect($event)">
           </app-tpv-order-management>
 
           <app-tpv-cart
@@ -44,7 +44,7 @@
             (printProvisional)="printProvisional()"
             (clearCart)="cartService.clearCart()"
             (removeItem)="cartService.removeFromCart($event)"
-            (addItem)="cartService.addToCart($event)"
+            (addItem)="onCartItemAdd($event)"
             (sendOrder)="sendOrder()"
             (closeTicket)="closeTicket()">
           </app-tpv-cart>
@@ -106,3 +106,12 @@
   </app-tpv-payment-modal>
 
 </ion-content>
+
+<app-tpv-product-options-modal
+  *ngIf="stateService.state$ | async as state"
+  [isOpen]="state.showProductOptionsModal"
+  [product]="state.selectedProductForOptions"
+  [taxPercentage]="state.selectedProductForOptions ? getTaxPercentage(state.selectedProductForOptions) : 0"
+  (close)="stateService.setShowProductOptionsModal(false)"
+  (selectOption)="onOptionSelect($event)">
+</app-tpv-product-options-modal>

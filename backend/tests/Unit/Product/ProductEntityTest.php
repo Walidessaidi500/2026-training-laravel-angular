@@ -25,8 +25,8 @@ class ProductEntityTest extends TestCase
 
         $this->assertInstanceOf(Product::class, $product);
         $this->assertSame('Pizza', $product->name());
-        $this->assertSame(1000, $product->price()->value());
-        $this->assertSame(50, $product->stock());
+        $this->assertEquals(1000, $product->price()->value());
+        $this->assertEquals(50, $product->stock());
         $this->assertTrue($product->isActive());
     }
 
@@ -42,7 +42,45 @@ class ProductEntityTest extends TestCase
         );
 
         $product->decrementStock(3);
-        $this->assertSame(7, $product->stock());
+        $this->assertEquals(7, $product->stock());
+        
+        $product->decrementStock(0.5);
+        $this->assertEquals(6.5, $product->stock());
+    }
+
+    public function test_options_are_handled_correctly(): void
+    {
+        $options = [
+            ['name' => 'Muy hecho', 'price_change' => 0, 'stock_impact' => 1.0],
+            ['name' => 'Media ración', 'price_change' => -200, 'stock_impact' => 0.5]
+        ];
+        $product = Product::dddCreate(
+            null,
+            Uuid::generate(),
+            ProductName::create('Filete'),
+            Price::create(1500),
+            Stock::create(10),
+            RestaurantId::create(1),
+            true,
+            null,
+            $options
+        );
+
+        $this->assertSame($options, $product->options());
+        
+        $newOptions = [['name' => 'Sin sal', 'price_change' => 0, 'stock_impact' => 1.0]];
+        $product->update(
+            null,
+            $product->taxId(),
+            ProductName::create('Filete'),
+            $product->price(),
+            Stock::create(10),
+            true,
+            null,
+            $newOptions
+        );
+        
+        $this->assertSame($newOptions, $product->options());
     }
 
     public function test_toggle_active_works(): void

@@ -79,6 +79,55 @@
         </div>
       </div>
     </div>
+
+    <div class="form-section">
+      <span class="section-title">Opciones del Producto</span>
+      <p class="section-description">Añade variantes como "Muy hecho" (0€), "Media ración" (-2€), etc.</p>
+
+      <div class="options-container">
+        <div class="add-option-row-complex">
+          <ion-item lines="none" class="custom-input-item name-input">
+            <ion-input [(ngModel)]="newOptionName" [ngModelOptions]="{standalone: true}" 
+                       type="text" placeholder="Nombre (ej: Media ración)"></ion-input>
+          </ion-item>
+          
+          <ion-item lines="none" class="custom-input-item price-input">
+            <ion-input [(ngModel)]="newOptionPrice" [ngModelOptions]="{standalone: true}" 
+                       type="number" placeholder="+/- €"></ion-input>
+          </ion-item>
+
+          <ion-item lines="none" class="custom-input-item stock-input">
+            <ion-input [(ngModel)]="newOptionStock" [ngModelOptions]="{standalone: true}" 
+                       type="number" placeholder="Stock (1.0)"></ion-input>
+          </ion-item>
+
+          <ion-button fill="solid" (click)="addOption()" [disabled]="!newOptionName.trim()" class="add-btn">
+            <ion-icon name="add-circle-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+
+        <div class="options-list-table" *ngIf="options.length > 0">
+          <div class="option-row header">
+            <span>Nombre</span>
+            <span>Ajuste Precio</span>
+            <span>Impacto Stock</span>
+            <span></span>
+          </div>
+          <div class="option-row" *ngFor="let opt of options; let i = index">
+            <span class="opt-name">{{ opt.name }}</span>
+            <span class="opt-price">{{ (opt.price_change / 100) | currency:'EUR' }}</span>
+            <span class="opt-stock">{{ opt.stock_impact }}</span>
+            <button type="button" class="remove-btn" (click)="removeOption(i)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-options" *ngIf="options.length === 0">
+          <small>No hay opciones configuradas.</small>
+        </div>
+      </div>
+    </div>
   </form>
 </ion-content>
 

@@ -13,6 +13,7 @@ class OrderLine implements \JsonSerializable
         private RestaurantId $restaurantId,
         private Uuid $orderId,
         private Uuid $productId,
+        private ?array $productOption,
         private Uuid $userId,
         private int $quantity,
         private int $price,
@@ -29,6 +30,7 @@ class OrderLine implements \JsonSerializable
         int $quantity,
         int $price,
         int $taxPercentage,
+        ?array $productOption = null,
     ): self {
         $now = DomainDateTime::now();
 
@@ -37,6 +39,7 @@ class OrderLine implements \JsonSerializable
             $restaurantId,
             $orderId,
             $productId,
+            $productOption,
             $userId,
             $quantity,
             $price,
@@ -51,6 +54,7 @@ class OrderLine implements \JsonSerializable
         int $restaurantId,
         string $orderId,
         string $productId,
+        ?array $productOption,
         string $userId,
         int $quantity,
         int $price,
@@ -63,6 +67,7 @@ class OrderLine implements \JsonSerializable
             RestaurantId::create($restaurantId),
             Uuid::create($orderId),
             Uuid::create($productId),
+            $productOption,
             Uuid::create($userId),
             $quantity,
             $price,
@@ -90,6 +95,11 @@ class OrderLine implements \JsonSerializable
     public function productId(): Uuid
     {
         return $this->productId;
+    }
+
+    public function productOption(): ?array
+    {
+        return $this->productOption;
     }
 
     public function userId(): Uuid
@@ -129,6 +139,7 @@ class OrderLine implements \JsonSerializable
             'restaurant_id' => $this->restaurantId->value(),
             'order_uuid' => $this->orderId->value(),
             'product_uuid' => $this->productId->value(),
+            'product_option' => $this->productOption,
             'user_uuid' => $this->userId->value(),
             'quantity' => $this->quantity,
             'price' => $this->price,

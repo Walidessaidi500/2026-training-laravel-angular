@@ -26,6 +26,7 @@ class ProcessSaleController
             'lines.*.quantity' => 'required|numeric|min:0.01',
             'lines.*.price' => 'required|integer|min:0',
             'lines.*.tax_percentage' => 'required|integer|min:0',
+            'lines.*.product_option' => 'nullable|array',
             'payment_method' => 'nullable|string|in:cash,card,mixed',
             'amount_cash' => 'nullable|integer|min:0',
             'amount_card' => 'nullable|integer|min:0',

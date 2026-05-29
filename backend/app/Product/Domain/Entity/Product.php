@@ -23,6 +23,7 @@ class Product implements \JsonSerializable
         private RestaurantId $restaurantId,
         private bool $active,
         private ?string $imageSrc,
+        private array $options,
         private DomainDateTime $createdAt,
         private DomainDateTime $updatedAt,
     ) {}
@@ -36,6 +37,7 @@ class Product implements \JsonSerializable
         RestaurantId $restaurantId,
         bool $active = true,
         ?string $imageSrc = null,
+        array $options = [],
     ): self {
         $now = DomainDateTime::now();
 
@@ -49,6 +51,7 @@ class Product implements \JsonSerializable
             $restaurantId,
             $active,
             $imageSrc,
+            $options,
             $now,
             $now,
         );
@@ -60,10 +63,11 @@ class Product implements \JsonSerializable
         ?string $taxId,
         string $name,
         int $price,
-        int $stock,
+        float $stock,
         int $restaurantId,
         bool $active,
         ?string $imageSrc,
+        array $options,
         \DateTimeImmutable $createdAt,
         \DateTimeImmutable $updatedAt,
     ): self {
@@ -77,6 +81,7 @@ class Product implements \JsonSerializable
             RestaurantId::create($restaurantId),
             $active,
             $imageSrc,
+            $options,
             DomainDateTime::create($createdAt),
             DomainDateTime::create($updatedAt),
         );
@@ -107,7 +112,7 @@ class Product implements \JsonSerializable
         return $this->price;
     }
 
-    public function stock(): int
+    public function stock(): float
     {
         return $this->stock->value();
     }
@@ -120,6 +125,11 @@ class Product implements \JsonSerializable
     public function imageSrc(): ?string
     {
         return $this->imageSrc;
+    }
+
+    public function options(): array
+    {
+        return $this->options;
     }
 
     public function restaurantId(): RestaurantId
@@ -135,6 +145,7 @@ class Product implements \JsonSerializable
         Stock $stock,
         bool $active,
         ?string $imageSrc = null,
+        array $options = [],
     ): void {
         $this->familyId = $familyId;
         $this->taxId = $taxId;
@@ -143,16 +154,17 @@ class Product implements \JsonSerializable
         $this->stock = $stock;
         $this->active = $active;
         $this->imageSrc = $imageSrc;
+        $this->options = $options;
         $this->updatedAt = DomainDateTime::now();
     }
 
-    public function decrementStock(int $quantity): void
+    public function decrementStock(float $quantity): void
     {
         $this->stock = Stock::create($this->stock->value() - $quantity);
         $this->updatedAt = DomainDateTime::now();
     }
 
-    public function incrementStock(int $quantity): void
+    public function incrementStock(float $quantity): void
     {
         $this->stock = Stock::create($this->stock->value() + $quantity);
         $this->updatedAt = DomainDateTime::now();
@@ -187,6 +199,7 @@ class Product implements \JsonSerializable
             'restaurant_id' => $this->restaurantId->value(),
             'active' => $this->active,
             'image_src' => $this->imageSrc,
+            'options' => $this->options,
             'created_at' => $this->createdAt->value()->format('Y-m-d\TH:i:s.u\Z'),
             'updated_at' => $this->updatedAt->value()->format('Y-m-d\TH:i:s.u\Z'),
         ];

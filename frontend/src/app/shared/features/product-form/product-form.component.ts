@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonItem,
   IonLabel, IonInput, IonToggle, IonButton, IonButtons,
@@ -8,7 +8,7 @@ import {
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
-import { closeOutline, saveOutline } from 'ionicons/icons';
+import { closeOutline, saveOutline, addCircleOutline, trashOutline } from 'ionicons/icons';
 import { AuthService } from '@services/auth/auth.service';
 
 export interface ProductFormData {
@@ -18,6 +18,7 @@ export interface ProductFormData {
   family_id: string;
   tax_id: string;
   active: boolean;
+  options: any[];
 }
 
 @Component({
@@ -26,7 +27,7 @@ export interface ProductFormData {
   styleUrls: ['./product-form.component.scss'],
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, IonHeader, IonToolbar, IonTitle,
+    CommonModule, ReactiveFormsModule, FormsModule, IonHeader, IonToolbar, IonTitle,
     IonContent, IonItem, IonLabel, IonInput, IonToggle, IonButton,
     IonButtons, IonIcon, IonNote, IonSelect, IonSelectOption
   ],
@@ -41,6 +42,11 @@ export class ProductFormComponent implements OnInit {
   isSupervisor = false;
   productForm: FormGroup;
   isEditMode = false;
+  options: any[] = [];
+  
+  newOptionName = '';
+  newOptionPrice = 0;
+  newOptionStock = 1.0;
 
   constructor(
     private fb: FormBuilder,
@@ -49,7 +55,9 @@ export class ProductFormComponent implements OnInit {
   ) {
     addIcons({
       'close-outline': closeOutline,
-      'save-outline': saveOutline
+      'save-outline': saveOutline,
+      'add-circle-outline': addCircleOutline,
+      'trash-outline': trashOutline
     });
 
     const user = this.authService.getUser();
@@ -69,6 +77,7 @@ export class ProductFormComponent implements OnInit {
   ngOnInit() {
     if (this.product) {
       this.isEditMode = true;
+      this.options = this.product.options || [];
       this.productForm.patchValue({
         name: this.product.name,
         price: this.product.priceInCents / 100,
@@ -90,6 +99,24 @@ export class ProductFormComponent implements OnInit {
     this.modalCtrl.dismiss(null);
   }
 
+  addOption() {
+    const name = this.newOptionName.trim();
+    if (name) {
+      this.options.push({
+        name,
+        price_change: Math.round(Number(this.newOptionPrice) * 100),
+        stock_impact: Number(this.newOptionStock)
+      });
+      this.newOptionName = '';
+      this.newOptionPrice = 0;
+      this.newOptionStock = 1.0;
+    }
+  }
+
+  removeOption(index: number) {
+    this.options.splice(index, 1);
+  }
+
   onSubmit() {
     if (this.productForm.valid) {
       const rawValues = this.productForm.getRawValue();
@@ -99,7 +126,8 @@ export class ProductFormComponent implements OnInit {
         stock: Number(rawValues.stock),
         family_id: rawValues.family_id,
         tax_id: rawValues.tax_id,
-        active: Boolean(this.productForm.get('active')?.value)
+        active: Boolean(this.productForm.get('active')?.value),
+        options: this.options
       };
 
       this.modalCtrl.dismiss(formData);
