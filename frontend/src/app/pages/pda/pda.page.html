@@ -90,4 +90,12 @@
     [isProcessing]="isProcessingPayment"
     (confirmPayment)="confirmPayment()">
   </app-tpv-payment-modal>
+
+  <app-tpv-product-options-modal
+    [isOpen]="state.showProductOptionsModal"
+    [product]="state.selectedProductForOptions"
+    [taxPercentage]="state.selectedProductForOptions ? getTaxPercentage(state.selectedProductForOptions) : 0"
+    (close)="stateService.setShowProductOptionsModal(false)"
+    (selectOption)="onOptionSelect($event)">
+  </app-tpv-product-options-modal>
 </ion-content>

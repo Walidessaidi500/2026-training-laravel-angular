@@ -3,11 +3,11 @@
     <ion-item-sliding *ngFor="let item of cart; let i = index">
       <ion-item>
         <ion-label>
-          <h3>{{ item.product.name }}</h3>
-          <p>{{ item.quantity }} x {{ (cartService.getPriceWithTax(item.product) / 100) | currency:'EUR' }}</p>
+          <h3>{{ item.product.name }} <small *ngIf="item.option">({{ item.option.name }})</small></h3>
+          <p>{{ item.quantity }} x {{ (cartService.getPriceWithTax(item.product, item.option) / 100) | currency:'EUR' }}</p>
         </ion-label>
         <ion-note slot="end" color="primary">
-          {{ (item.quantity * cartService.getPriceWithTax(item.product) / 100) | currency:'EUR' }}
+          {{ (item.quantity * cartService.getPriceWithTax(item.product, item.option) / 100) | currency:'EUR' }}
         </ion-note>
       </ion-item>
       <ion-item-options side="end">

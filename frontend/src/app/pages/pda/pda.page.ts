@@ -29,6 +29,7 @@ import { TpvUserSelectionModalComponent } from '../tpv/components/tpv-user-selec
 import { TpvPinModalComponent } from '../tpv/components/tpv-pin-modal/tpv-pin-modal.component';
 import { TpvDinersModalComponent } from '../tpv/components/tpv-diners-modal/tpv-diners-modal.component';
 import { TpvPaymentModalComponent } from '../tpv/components/tpv-payment-modal/tpv-payment-modal.component';
+import { TpvProductOptionsModalComponent } from '../tpv/components/tpv-product-options-modal/tpv-product-options-modal.component';
 
 import { PdaHeaderComponent } from './layout/pda-header/pda-header.component';
 import { PdaProductListComponent } from './components/pda-product-list/pda-product-list.component';
@@ -47,7 +48,7 @@ const SESSION_DURATION = 4 * 60 * 60 * 1000;
   imports: [
     CommonModule, IonicModule, FormsModule, CurrencyPipe,
     TpvTableSelectionComponent, TpvUserSelectionModalComponent, TpvPinModalComponent,
-    TpvDinersModalComponent, TpvPaymentModalComponent,
+    TpvDinersModalComponent, TpvPaymentModalComponent, TpvProductOptionsModalComponent,
     PdaHeaderComponent, PdaProductListComponent, PdaCartComponent
   ]
 })
@@ -219,8 +220,24 @@ export class PdaPage implements OnInit, OnDestroy {
   }
 
   public addToCart(product: Product) {
-    this.cartService.addToCart(product);
-    this.uiService.showSuccess(`Añadido: ${product.name}`);
+    if (product.options && Array.isArray(product.options) && product.options.length > 0) {
+      this.stateService.setShowProductOptionsModal(true, product);
+    } else {
+      this.cartService.addToCart(product);
+      this.uiService.showSuccess(`Añadido: ${product.name}`);
+    }
+  }
+
+  public onOptionSelect(option?: any) {
+    const product = this.stateService.state.selectedProductForOptions;
+    if (product) {
+      this.cartService.addToCart(product, option);
+    }
+    this.stateService.setShowProductOptionsModal(false);
+  }
+
+  public getTaxPercentage(product: Product): number {
+    return this.stateService.state.taxes.find(t => t.uuid === product.tax_id)?.percentage || 0;
   }
 
   public sendOrder() {
@@ -376,8 +393,9 @@ export class PdaPage implements OnInit, OnDestroy {
       linesToSell = cart.map(item => ({
         uuid: item.uuid,
         product_uuid: item.product.uuid,
+        product_option: item.option,
         quantity: item.quantity,
-        price: item.product.priceInCents,
+        price: item.product.priceInCents + (item.option ? item.option.price_change : 0),
         tax_percentage: this.stateService.state.taxes.find(t => t.uuid === item.product.tax_id)?.percentage || 0
       }));
     } else {
@@ -385,8 +403,9 @@ export class PdaPage implements OnInit, OnDestroy {
         .map(item => ({
           uuid: item.uuid,
           product_uuid: item.product.uuid,
+          product_option: item.option,
           quantity: item.selectedQuantity,
-          price: item.product.priceInCents,
+          price: item.product.priceInCents + (item.option ? item.option.price_change : 0),
           tax_percentage: this.stateService.state.taxes.find(t => t.uuid === item.product.tax_id)?.percentage || 0
         }));
     }
